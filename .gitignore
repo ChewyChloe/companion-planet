@@ -1,0 +1,11 @@
+node_modules/
+dist/
+release/
+.env
+*.log
+test-results/
+playwright-report/
+test-results-electron/
+playwright-report-electron/
+
+test-results-mobile/

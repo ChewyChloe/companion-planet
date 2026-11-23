@@ -1,0 +1,10 @@
+{
+  "file": "release/Companion-Planet-0.1.0-x64.zip",
+  "bytes": 162324585,
+  "sha256": "313ca2ef53394ada096853e571c35c00dd7193b99afbbb5493bcb1317a12ed52",
+  "zipCRC": "passed",
+  "asarContents": "passed",
+  "frontendByteMatch": "passed",
+  "windowsExecution": "unverified",
+  "signed": false
+}

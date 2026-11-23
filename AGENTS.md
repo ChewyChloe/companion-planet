@@ -1,0 +1,54 @@
+# Companion Planet development
+
+This repository was initialized from an empty GitHub repository. The user authorized committing and pushing this project to ChewyChloe/companion-planet main. Do not reset or replace the checkout.
+
+## Scope and structure
+
+The user's current request authorizes implementation, tests and local builds. The attachment's expanded desktop requirements guide this version; it does not authorize publishing, messaging, private-file access, or cross-application automation.
+
+- React 19 + TypeScript + Vite; Three.js via R3F. One scene and character implementation serves planet/pet modes.
+- `src/domain.ts` is pure deadline timer and state policy. `src/behavior.ts` is a pure priority/cooldown/destination planner; frame interpolation and meshes live in `src/Scene.tsx`.
+- `src/store.ts` owns timer/preferences; only these persist. Keep conversations in RAM. Persist pause/start/preferences immediately, throttle ticking writes.
+- `shared/dialogue.js` contains browser-safe validation/mock/safety responses. Never import server transport dependencies into browser code.
+- `server/dialogue.js` implements a replaceable OpenAI-compatible provider, proxy-aware fetch, timeout and validation. `server/index.js` exposes bounded loopback endpoints.
+- `electron/main.cjs` starts an embedded production server on stable port 3002 and one frameless window; switching modes preserves renderer state. `preload.cjs` exposes only mode/hide/quit events. Keep contextIsolation/sandbox enabled and nodeIntegration disabled.
+
+## Invariants
+
+- AI never changes timer or notification settings. UI confirmation is required.
+- No unsolicited focus messages. At most one completion reminder, suppressed by quiet mode or disabled notifications.
+- User text is rendered as React text, never raw HTML. Validate model output, request limits and origins/hosts. Never expose API keys via VITE variables, logs, UI or saved setup scripts.
+- No camera/microphone/screen monitoring. No tool execution by the AI.
+- Animate with refs in `useFrame`; do not update React every frame. Use bounded destinations and damped transitions. Keep desktop and planet behavior shared.
+- The production server CSP permits only same-origin scripts. New remote model URLs need an explicit reviewed change; default assets should live in `public`.
+- Preserve TLS, artifact checksums, package signatures and frozen lockfile installs.
+
+## Commands
+
+Use the existing isolated `/workspace/companion-planet` checkout. Do not create a Git worktree unless explicitly requested.
+
+- `npm ci`; `npm run dev` (5173 + 3001).
+- `npm run check`: types, lint, 19+ unit/integration tests, production build and dependency compatibility.
+- `npm run test:e2e`: real Chromium at 1366×768 and 390×844; `CHROMIUM_PATH` overrides `/usr/bin/chromium`.
+- `npm run build` then `npm run test:electron`: real Electron, requires a display. Cloud currently has Xvfb extracted at `/workspace/.companion-tools/usr/bin/Xvfb`; start `:99` as needed, set DISPLAY=:99 and writable XDG cache/config locations.
+- `npm run desktop`: build + desktop application.
+- `npm run package:win`: NSIS installer (Linux requires Wine).
+- `npm run package:win:portable`: unsigned Windows x64 ZIP.
+
+Never run two Web E2E suites concurrently: they share a dev server and output paths. Keep report/build/artifact directories ignored by Vite and ESLint so report writes cannot reload the application. Finish source changes before final suites. Test time travel changes Date only, preserving real requestAnimationFrame and Playwright actionability. Electron tests have separate output/configuration and do not launch a second dev server.
+
+For cloud install, use writable npm/electron caches under `/tmp`, Electron's documented proxy activation and inherited CA/proxy variables. Do not change HOME or disable sandbox/security settings globally.
+
+## Known verification limits
+
+No supplied GLB was available; the current creature is original procedural geometry. Optional GLB replacement supports transform animation, not arbitrary rig clips. Live LLM calls require backend credentials and an allowed provider domain; no paid provider was verified. Windows native transparency, drag, tray and installer execution require a real Windows machine. Linux Xvfb verifies configured transparency/always-on-top and lifecycle, not Windows compositing. No click-through is enabled. The keyphrase safety fallback is limited and not a clinical assessment. Hardware FPS cannot be inferred from software rendering.
+
+See README.md and DEVELOPMENT_REPORT.md for current evidence, delivery and Windows acceptance steps.
+
+## Mobile web additions
+
+- `npm run build && npm start` serves the production frontend and API on 0.0.0.0:8080 (or PORT). `server/web.js` is the website entrypoint; Electron still uses loopback `startServer` defaults and port 3002.
+- `server/access.js` enumerates current local interface origins for LAN use and parses explicit `WEB_ORIGINS` for deployed HTTPS domains. Never replace the allowlist with wildcard origins or trust arbitrary forwarded Host/Origin. Vite changes the upstream Host to loopback; only known local web origins are accepted by the dev API.
+- `npm run test:mobile` has its own production server, three touch-enabled orientations/sizes and output directory. It tests actual touch events, not only desktop mouse interactions in a small viewport. Run build first.
+- Mobile chat uses visualViewport height/offset and 16px inputs; keep safe area and small-screen scrolling usable. Real iOS/Android keyboard/WebGL behavior still needs device validation.
+- `render.yaml` and MOBILE.md describe a possible deployment, not a deployed service. No hosting credentials are present; do not claim a public URL exists or publish to a paid account without authorization.

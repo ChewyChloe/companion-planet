@@ -1,0 +1,121 @@
+{
+  "version": "0.1.0",
+  "name": "companion-planet",
+  "dependencies": {
+    "@eslint/js": {
+      "version": "9.39.5",
+      "resolved": "https://registry.npmjs.org/@eslint/js/-/js-9.39.5.tgz",
+      "overridden": false
+    },
+    "@playwright/test": {
+      "version": "1.65.1",
+      "resolved": "https://registry.npmjs.org/@playwright/test/-/test-1.65.1.tgz",
+      "overridden": false
+    },
+    "@react-three/drei": {
+      "version": "10.7.9",
+      "resolved": "https://registry.npmjs.org/@react-three/drei/-/drei-10.7.9.tgz",
+      "overridden": false
+    },
+    "@react-three/fiber": {
+      "version": "9.8.2",
+      "resolved": "https://registry.npmjs.org/@react-three/fiber/-/fiber-9.8.2.tgz",
+      "overridden": false
+    },
+    "@types/react-dom": {
+      "version": "19.3.0",
+      "resolved": "https://registry.npmjs.org/@types/react-dom/-/react-dom-19.3.0.tgz",
+      "overridden": false
+    },
+    "@types/react": {
+      "version": "19.3.0",
+      "resolved": "https://registry.npmjs.org/@types/react/-/react-19.3.0.tgz",
+      "overridden": false
+    },
+    "@types/three": {
+      "version": "0.181.0",
+      "resolved": "https://registry.npmjs.org/@types/three/-/three-0.181.0.tgz",
+      "overridden": false
+    },
+    "@vitejs/plugin-react": {
+      "version": "5.2.0",
+      "resolved": "https://registry.npmjs.org/@vitejs/plugin-react/-/plugin-react-5.2.0.tgz",
+      "overridden": false
+    },
+    "concurrently": {
+      "version": "9.2.5",
+      "resolved": "https://registry.npmjs.org/concurrently/-/concurrently-9.2.5.tgz",
+      "overridden": false
+    },
+    "electron-builder": {
+      "version": "26.18.0",
+      "resolved": "https://registry.npmjs.org/electron-builder/-/electron-builder-26.18.0.tgz",
+      "overridden": false
+    },
+    "electron": {
+      "version": "39.8.10",
+      "resolved": "https://registry.npmjs.org/electron/-/electron-39.8.10.tgz",
+      "overridden": false
+    },
+    "eslint": {
+      "version": "9.39.5",
+      "resolved": "https://registry.npmjs.org/eslint/-/eslint-9.39.5.tgz",
+      "overridden": false
+    },
+    "express": {
+      "version": "5.3.0",
+      "resolved": "https://registry.npmjs.org/express/-/express-5.3.0.tgz",
+      "overridden": false
+    },
+    "globals": {
+      "version": "16.5.0",
+      "resolved": "https://registry.npmjs.org/globals/-/globals-16.5.0.tgz",
+      "overridden": false
+    },
+    "react-dom": {
+      "version": "19.3.1",
+      "resolved": "https://registry.npmjs.org/react-dom/-/react-dom-19.3.1.tgz",
+      "overridden": false
+    },
+    "react": {
+      "version": "19.3.1",
+      "resolved": "https://registry.npmjs.org/react/-/react-19.3.1.tgz",
+      "overridden": false
+    },
+    "three": {
+      "version": "0.181.2",
+      "resolved": "https://registry.npmjs.org/three/-/three-0.181.2.tgz",
+      "overridden": false
+    },
+    "typescript-eslint": {
+      "version": "8.73.0",
+      "resolved": "https://registry.npmjs.org/typescript-eslint/-/typescript-eslint-8.73.0.tgz",
+      "overridden": false
+    },
+    "typescript": {
+      "version": "5.9.3",
+      "resolved": "https://registry.npmjs.org/typescript/-/typescript-5.9.3.tgz",
+      "overridden": false
+    },
+    "undici": {
+      "version": "7.30.2",
+      "resolved": "https://registry.npmjs.org/undici/-/undici-7.30.2.tgz",
+      "overridden": false
+    },
+    "vite": {
+      "version": "7.3.8",
+      "resolved": "https://registry.npmjs.org/vite/-/vite-7.3.8.tgz",
+      "overridden": false
+    },
+    "vitest": {
+      "version": "4.1.12",
+      "resolved": "https://registry.npmjs.org/vitest/-/vitest-4.1.12.tgz",
+      "overridden": false
+    },
+    "zustand": {
+      "version": "5.1.0",
+      "resolved": "https://registry.npmjs.org/zustand/-/zustand-5.1.0.tgz",
+      "overridden": false
+    }
+  }
+}

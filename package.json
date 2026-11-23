@@ -1,0 +1,77 @@
+{
+  "name": "companion-planet",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "concurrently -k -n api,web \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:web": "vite --host 0.0.0.0",
+    "dev:api": "node --env-file-if-exists=.env server/index.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "build": "npm run typecheck && vite build",
+    "test": "vitest run",
+    "test:e2e": "playwright test tests/web.spec.ts",
+    "test:electron": "playwright test --config=playwright.electron.config.ts",
+    "desktop": "npm run build && electron .",
+    "package:win": "npm run build && electron-builder --win nsis --x64",
+    "check": "npm run typecheck && npm run lint && npm run test && npm run build && npm ls --depth=0",
+    "package:win:portable": "npm run build && electron-builder --win zip --x64",
+    "start": "node --env-file-if-exists=.env server/web.js",
+    "test:mobile": "playwright test --config=playwright.mobile.config.ts"
+  },
+  "build": {
+    "appId": "tw.companionplanet.app",
+    "productName": "同頻星球",
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "server/**/*",
+      "package.json",
+      "shared/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "signAndEditExecutable": false,
+      "icon": "public/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "directories": {
+      "output": "release"
+    },
+    "artifactName": "Companion-Planet-${version}-${arch}.${ext}"
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.4.0",
+    "express": "^5.1.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "three": "^0.181.0",
+    "zustand": "^5.0.8",
+    "undici": "^7.16.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "@playwright/test": "^1.56.1",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@types/three": "^0.181.0",
+    "@vitejs/plugin-react": "^5.1.0",
+    "concurrently": "^9.2.1",
+    "electron": "^39.2.0",
+    "electron-builder": "^26.0.12",
+    "eslint": "^9.39.0",
+    "globals": "^16.5.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.3",
+    "vite": "^7.2.2",
+    "vitest": "^4.0.9"
+  },
+  "description": "A quiet 3D planet and desktop study companion",
+  "author": "Companion Planet Team"
+}
