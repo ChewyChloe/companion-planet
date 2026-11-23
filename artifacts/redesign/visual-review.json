@@ -1,0 +1,79 @@
+[
+  {
+    "name": "desktop",
+    "width": 1440,
+    "height": 900,
+    "font": "Huninn, \"Noto Sans TC\", sans-serif",
+    "fontReady": true,
+    "horizontalOverflow": false,
+    "background": "rgb(244, 241, 232)",
+    "buttonRadius": "0px",
+    "errors": []
+  },
+  {
+    "name": "laptop",
+    "width": 1280,
+    "height": 800,
+    "font": "Huninn, \"Noto Sans TC\", sans-serif",
+    "fontReady": true,
+    "horizontalOverflow": false,
+    "background": "rgb(244, 241, 232)",
+    "buttonRadius": "0px",
+    "errors": []
+  },
+  {
+    "name": "tablet",
+    "width": 1024,
+    "height": 768,
+    "font": "Huninn, \"Noto Sans TC\", sans-serif",
+    "fontReady": true,
+    "horizontalOverflow": false,
+    "background": "rgb(244, 241, 232)",
+    "buttonRadius": "0px",
+    "errors": []
+  },
+  {
+    "name": "tablet-portrait",
+    "width": 820,
+    "height": 1180,
+    "font": "Huninn, \"Noto Sans TC\", sans-serif",
+    "fontReady": true,
+    "horizontalOverflow": false,
+    "background": "rgb(244, 241, 232)",
+    "buttonRadius": "0px",
+    "errors": []
+  },
+  {
+    "name": "phone",
+    "width": 390,
+    "height": 844,
+    "font": "Huninn, \"Noto Sans TC\", sans-serif",
+    "fontReady": true,
+    "horizontalOverflow": false,
+    "background": "rgb(244, 241, 232)",
+    "buttonRadius": "0px",
+    "errors": []
+  },
+  {
+    "name": "phone-small",
+    "width": 360,
+    "height": 640,
+    "font": "Huninn, \"Noto Sans TC\", sans-serif",
+    "fontReady": true,
+    "horizontalOverflow": false,
+    "background": "rgb(244, 241, 232)",
+    "buttonRadius": "0px",
+    "errors": []
+  },
+  {
+    "name": "landscape",
+    "width": 844,
+    "height": 390,
+    "font": "Huninn, \"Noto Sans TC\", sans-serif",
+    "fontReady": true,
+    "horizontalOverflow": false,
+    "background": "rgb(244, 241, 232)",
+    "buttonRadius": "0px",
+    "errors": []
+  }
+]

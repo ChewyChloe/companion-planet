@@ -13,6 +13,7 @@ test("touch rotation, character tap, timer and mobile keyboard chat work", async
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
+  await canvas.scrollIntoViewIfNeeded();
   const box = (await canvas.boundingBox())!;
   const before = await canvas.getAttribute("data-camera");
   const x = box.x + box.width * 0.5,

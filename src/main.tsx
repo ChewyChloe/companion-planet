@@ -1,3 +1,4 @@
+import { Icon } from "./Icon";
 import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import Scene from "./Scene";
@@ -87,6 +88,17 @@ function useAmbient() {
 }
 function App() {
   const state = useWorld();
+  useEffect(() => {
+    const stylesheet = document.getElementById(
+      "google-huninn",
+    ) as HTMLLinkElement | null;
+    const enable = () => {
+      if (stylesheet) stylesheet.media = "all";
+    };
+    stylesheet?.addEventListener("load", enable);
+    if (stylesheet?.sheet) enable();
+    return () => stylesheet?.removeEventListener("load", enable);
+  }, []);
   useEffect(() => {
     const viewport = window.visualViewport;
     const update = () => {
@@ -271,7 +283,9 @@ function App() {
       {!pet && (
         <header>
           <a className="brand" href="#" aria-label="同頻星球首頁">
-            <span className="brand-mark">✦</span>
+            <span className="brand-mark">
+              <Icon name="orbit" />
+            </span>
             <span>
               同頻星球<small>COMPANION PLANET</small>
             </span>
@@ -283,13 +297,13 @@ function App() {
                   onClick={() => window.desktop?.hide()}
                   aria-label="最小化星球"
                 >
-                  −
+                  <Icon name="minimize" />
                 </button>
                 <button
                   onClick={() => window.desktop?.quit()}
                   aria-label="退出應用程式"
                 >
-                  ×
+                  <Icon name="close" />
                 </button>
               </>
             )}
@@ -297,7 +311,8 @@ function App() {
               aria-pressed={state.silent}
               onClick={() => state.setSilent(!state.silent)}
             >
-              {state.silent ? "☾ 已安靜" : "☾ 安靜陪我"}
+              <Icon name="moon" />
+              <span>{state.silent ? "已安靜" : "安靜陪我"}</span>
             </button>
             <button
               className="audio-toggle"
@@ -305,7 +320,7 @@ function App() {
               aria-pressed={audio.on}
               onClick={() => void audio.toggle()}
             >
-              <span aria-hidden="true">♫</span>
+              <Icon name="sound" />
               <span className="audio-label">
                 {audio.on ? " 聲音開啟" : " 環境音"}
               </span>
@@ -315,24 +330,45 @@ function App() {
               aria-expanded={settings}
               onClick={() => setSettings(!settings)}
             >
-              ⚙
+              <Icon name="settings" />
             </button>
           </nav>
         </header>
       )}
       <section className="world" aria-label="星雲仔的微型世界">
+        {!pet && (
+          <div className="stage-label">
+            <span>小星球觀察日誌</span>
+            <span>NO. 001</span>
+          </div>
+        )}
         <Scene pet={pet} onClick={interact} reduced={state.reduced} />
       </section>
       {!pet && (
         <>
           <section className="intro">
-            <span className="eyebrow">A LITTLE WORLD, A LITTLE COMPANY</span>
+            <span className="eyebrow">一座小星球，一點剛好的陪伴。</span>
             <h1>
               各自忙碌，
               <br />
               也一起發光。
             </h1>
-            <p>你專心的時候，牠也在做自己的事。</p>
+            <p>
+              你專心的時候，
+              <br />
+              牠也在做自己的事。
+            </p>
+            <div className="intro-note">
+              <Icon name="leaf" />
+              <div>
+                陪伴，不需要一直說話。
+                <small>
+                  讀幾頁書、發一會兒呆。
+                  <br />
+                  這裡沒有需要趕上的進度。
+                </small>
+              </div>
+            </div>
           </section>
           <section className="focus-panel" aria-label="番茄鐘">
             <div className="panel-top">
@@ -342,7 +378,7 @@ function App() {
                 : state.timer.phase === "break"
                   ? "留一點時間休息"
                   : "今天，慢慢來就好"}
-              <span className="tiny">POMODORO</span>
+              <span className="tiny">專注手帖</span>
             </div>
             <div className="time" role="timer" aria-label="剩餘時間">
               {display}
@@ -382,7 +418,7 @@ function App() {
                   className="primary"
                   onClick={() => state.setTimer(pause(state.timer, Date.now()))}
                 >
-                  Ⅱ 暫停
+                  <Icon name="pause" /> 暫停
                 </button>
               ) : state.timer.phase === "focus" ? (
                 <button
@@ -391,11 +427,11 @@ function App() {
                     state.setTimer(resume(state.timer, Date.now()))
                   }
                 >
-                  繼續專注 →
+                  繼續專注 <Icon name="play" />
                 </button>
               ) : (
                 <button className="primary" onClick={() => begin()}>
-                  開始專注 <span>→</span>
+                  開始專注 <Icon name="arrow" />
                 </button>
               )}
               <button
@@ -409,7 +445,7 @@ function App() {
                   setNotice("");
                 }}
               >
-                ↺
+                <Icon name="reset" />
               </button>
             </div>
             {state.timer.phase === "break" && !state.timer.running && (
@@ -418,7 +454,7 @@ function App() {
               </button>
             )}
             <div className="focus-footer">
-              <span>✧ 今天的每一小步，都算數</span>
+              <span>每一小步，都算數。</span>
               <span>{state.timer.completed} 段完成</span>
             </div>
           </section>
@@ -427,16 +463,20 @@ function App() {
             <b>星雲仔</b>
             <span>· {actionNames[activity]}</span>
             <button className="text-button" onClick={interact}>
-              打個招呼 ↗
+              打個招呼 <Icon name="hand" />
             </button>
           </div>
           <div className="orbit-hint">
-            ⤧ 拖曳旋轉星球 <span>·</span> 滾輪縮放
+            <Icon name="move" /> 拖曳旋轉 <span>／</span> 滾輪或雙指縮放
           </div>
           <footer>
-            <span>YOUR OWN QUIET CORNER OF THE UNIVERSE</span>
+            <span>
+              同頻星球 <span className="footer-divider">／</span>{" "}
+              各自忙碌，也一起生活。
+            </span>
             <button onClick={() => void mode()}>
-              ▣ {window.desktop ? "切換桌寵模式" : "體驗迷你陪伴"} ↗
+              <Icon name="expand" />{" "}
+              {window.desktop ? "切換桌寵模式" : "體驗迷你陪伴"}
             </button>
           </footer>
         </>
@@ -444,14 +484,14 @@ function App() {
       {pet && (
         <>
           <div className="pet-handle" title="拖曳這裡移動桌寵">
-            ⠿ 星雲仔 <span>{display}</span>
+            <Icon name="move" /> 星雲仔 <span>{display}</span>
           </div>
           <div className="pet-controls">
             <button onClick={() => void mode()} aria-label="返回星球">
-              ↗
+              <Icon name="expand" />
             </button>
             <button onClick={() => setChat(!chat)} aria-label="桌寵聊天">
-              ☏
+              <Icon name="chat" />
             </button>
             {window.desktop && (
               <>
@@ -459,13 +499,13 @@ function App() {
                   onClick={() => window.desktop?.hide()}
                   aria-label="隱藏桌寵"
                 >
-                  −
+                  <Icon name="minimize" />
                 </button>
                 <button
                   onClick={() => window.desktop?.quit()}
                   aria-label="退出應用程式"
                 >
-                  ×
+                  <Icon name="close" />
                 </button>
               </>
             )}
@@ -474,9 +514,9 @@ function App() {
       )}
       {notice && !state.silent && (
         <div className="notice" role="status">
-          ✦ {notice}
+          <Icon name="leaf" /> {notice}
           <button aria-label="關閉提示" onClick={() => setNotice("")}>
-            ×
+            <Icon name="close" />
           </button>
         </div>
       )}
@@ -486,11 +526,11 @@ function App() {
           aria-expanded={chat}
           onClick={() => setChat(!chat)}
         >
-          <span>✧</span>
+          <Icon name="chat" />
           <div>
             和星雲仔說說話<small>{provider}</small>
           </div>
-          <span>{chat ? "−" : "↗"}</span>
+          <Icon name={chat ? "minimize" : "arrow"} />
         </button>
       )}
       {chat && (
@@ -500,15 +540,15 @@ function App() {
               星雲仔 <small>{provider}</small>
             </div>
             <button aria-label="收合聊天" onClick={() => setChat(false)}>
-              ×
+              <Icon name="close" />
             </button>
           </div>
           <p className="privacy">
             AI 陪伴角色，非真人。
             {provider === "AI 已連線"
-              ? "訊息將送往設定的 LLM 服務。"
-              : "本機／備援回覆不需 API Key。"}
-            對話僅暫存本次視窗。
+              ? "文字將傳送至 AI 服務。"
+              : "目前由本機陪伴模式回應。"}
+            對話只暫存在這個視窗。
           </p>
           <div className="messages" aria-live="polite">
             {messages.length === 0 && (
@@ -564,7 +604,7 @@ function App() {
               disabled={busy || !input.trim()}
               aria-label="送出訊息"
             >
-              ↑
+              <Icon name="arrow" style={{ transform: "rotate(-90deg)" }} />
             </button>
           </form>
         </section>

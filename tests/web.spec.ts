@@ -5,7 +5,10 @@ test("planet renders, camera rotates, character responds, timer and conversation
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   page.on("console", (m) => {
-    if (m.type() === "error") errors.push(m.text());
+    const optionalFont = /^https:\/\/fonts\.(googleapis|gstatic)\.com\//.test(
+      m.location().url,
+    );
+    if (m.type() === "error" && !optionalFont) errors.push(m.text());
   });
   await page.goto("/");
   await expect(

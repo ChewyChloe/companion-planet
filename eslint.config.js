@@ -11,6 +11,7 @@ export default ts.config(
       "test-results/**",
       "test-results-electron/**",
       "test-results-mobile/**",
+      "test-results-design/**",
       "playwright-report/**",
       "playwright-report-electron/**",
     ],

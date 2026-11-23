@@ -1,0 +1,38 @@
+{
+  "unitPassed": 21,
+  "suites": {
+    "web": {
+      "startTime": "2026-11-23T14:31:28.177Z",
+      "duration": 74472.719,
+      "expected": 6,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "mobile": {
+      "startTime": "2026-11-23T14:38:43.058Z",
+      "duration": 44909.219,
+      "expected": 3,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "design": {
+      "startTime": "2026-11-23T14:32:42.723Z",
+      "duration": 33983.310000000005,
+      "expected": 6,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "electron": {
+      "startTime": "2026-11-23T14:41:21.255Z",
+      "duration": 4939.271,
+      "expected": 1,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  },
+  "liveRenderVerified": false
+}

@@ -84,4 +84,8 @@ E2E 預設使用 `/usr/bin/chromium`；其他系統請設定 `CHROMIUM_PATH` 為
 
 ## 手機版與公開網址
 
-手機使用 Safari／Chrome 開啟網頁版，支援觸控旋轉、計時、聊天、安靜與音效；Windows ZIP 不適用手機。推薦部署公開 HTTPS 網站，設定已提供於 `render.yaml`。也可 `npm run build && npm start` 後，在同 Wi-Fi 手機開啟電腦網路地址。詳細連線、部署與實機限制見 [MOBILE.md](MOBILE.md)。目前尚未發布公開網址。
+手機使用 Safari／Chrome 開啟網頁版，支援觸控旋轉、計時、聊天、安靜與音效；Windows ZIP 不適用手機。推薦部署公開 HTTPS 網站，設定已提供於 `render.yaml`。也可 `npm run build && npm start` 後，在同 Wi-Fi 手機開啟電腦網路地址。詳細連線、部署與實機限制見 [MOBILE.md](MOBILE.md)。使用者已透過 Render 試用初版；實際網址與部署狀態請以你的 Render 服務頁面為準。
+
+## 響應式美術與字型
+
+桌機、平板與手機共用淺色手帖風格、方正卡片及 SVG 圖示；3D 角色與場景採霧面材質、紙葉植栽、步道與小水池。Huninn 來自 Google Fonts，並提供本機 WOFF2 與 `Noto Sans TC, sans-serif` 後備；外部字型載入採非阻塞方式，字型下載失敗仍顯示文字。授權與來源記錄在 `public/fonts/`。`npx playwright test --config=playwright.design.config.ts` 驗證桌機／平板／手機與字型失敗情境，截圖位於 `artifacts/redesign/`。

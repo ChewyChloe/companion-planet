@@ -9,3 +9,5 @@ test-results-electron/
 playwright-report-electron/
 
 test-results-mobile/
+
+test-results-design/

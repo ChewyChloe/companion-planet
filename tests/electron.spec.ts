@@ -58,7 +58,10 @@ test("desktop shares state, transparent topmost pet switches back and quits", as
       frames!,
     );
     await expect(page.locator("main")).toHaveAttribute("data-phase", "focus");
-    await page.screenshot({ path: "artifacts/desktop-pet.png",omitBackground:true });
+    await page.screenshot({
+      path: "artifacts/desktop-pet.png",
+      omitBackground: true,
+    });
     await page.getByRole("button", { name: "隱藏桌寵" }).click();
     await app.evaluate(({ BrowserWindow }) =>
       BrowserWindow.getAllWindows()[0].restore(),
@@ -72,8 +75,23 @@ test("desktop shares state, transparent topmost pet switches back and quits", as
     ).toBe(false);
     expect(errors).toEqual([]);
     await page.getByRole("button", { name: "切換桌寵模式" }).click();
-    await page.getByRole("button", { name: "退出應用程式" }).click();
-    await expect.poll(() => child.exitCode).not.toBeNull();
+    const closed = app.waitForEvent("close");
+    await Promise.all([
+      closed,
+      page
+        .getByRole("button", { name: "退出應用程式" })
+        .click({ noWaitAfter: true })
+        .catch((error) => {
+          if (
+            !page.isClosed() ||
+            !String(error).includes(
+              "Target page, context or browser has been closed",
+            )
+          )
+            throw error;
+        }),
+    ]);
+    await expect.poll(() => child.exitCode).toBe(0);
   } finally {
     if (child.exitCode === null && child.signalCode === null) await app.close();
   }
