@@ -5,7 +5,7 @@ if(visual.errors.length||visual.views.length!==10||visual.views.some(v=>v.glErro
 for(const suffix of ['close','planet','transmission-probe']){
  const rows=['soft','mist','gel'].map(id=>visual.views.find(v=>v.name===`${id}-${suffix}`));
  for(const row of rows)if(JSON.stringify(row.camera)!==JSON.stringify(rows[0].camera)||row.pose!==rows[0].pose)throw Error('Comparison camera/pose mismatch');
- if(JSON.stringify(rows.map(v=>v.transmission))!==JSON.stringify([.28,.72,.94]))throw Error('Transmission values incorrect');
+ if(JSON.stringify(rows.map(v=>v.transmission))!==JSON.stringify([.28,.58,.82]))throw Error('Transmission values incorrect');
 }
 async function bodyHash(path){const b=await readFile(path),n=b.readUInt32LE(12),g=JSON.parse(b.subarray(20,20+n).toString()),node=g.nodes.find(x=>x.name==='Body'),a=g.accessors[g.meshes[node.mesh].primitives[0].attributes.POSITION],v=g.bufferViews[a.bufferView],start=20+n+8+(v.byteOffset||0)+(a.byteOffset||0);return {hash:createHash('sha256').update(b.subarray(start,start+a.count*12)).digest('hex'),animations:(g.animations||[]).length};}
 const clay=await bodyHash('assets/art/clay-stage/nebula.glb'),preview=await bodyHash('public/models/material-preview/nebula.glb');

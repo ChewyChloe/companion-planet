@@ -1,8 +1,8 @@
 import * as THREE from "three";
 export const nebulaMaterialVariants = {
   soft: { name: "A・柔霧", roughness: .46, transmission: .28, thickness: .72, scatter: .12 },
-  mist: { name: "B・星雲果凍", roughness: .23, transmission: .72, thickness: .68, scatter: .16 },
-  gel: { name: "C・清透果凍", roughness: .10, transmission: .94, thickness: .58, scatter: .08 },
+  mist: { name: "B・星雲果凍", roughness: .23, transmission: .58, thickness: .68, scatter: .16 },
+  gel: { name: "C・清透果凍", roughness: .10, transmission: .82, thickness: .58, scatter: .08 },
 } as const;
 export type NebulaMaterialVariant = keyof typeof nebulaMaterialVariants;
 export function getNebulaMaterialVariant(search = location.search): NebulaMaterialVariant | undefined {
@@ -20,7 +20,7 @@ export function nebulaTestMaterial(variant: NebulaMaterialVariant, thinShell: bo
   const material = new THREE.MeshPhysicalMaterial({
     color: "#ffffff", vertexColors: true, roughness: p.roughness, metalness: 0,
     transmission: thinShell ? 0 : p.transmission,
-    transparent: thinShell, opacity: thinShell ? (variant === "gel" ? .48 : variant === "mist" ? .68 : .90) : 1, depthWrite: false,
+    transparent: thinShell, opacity: thinShell ? (variant === "gel" ? .63 : variant === "mist" ? .80 : .94) : 1, depthWrite: false,
     thickness: p.thickness, ior: variant === "gel" ? 1.43 : 1.38, attenuationColor: variant === "soft" ? "#d2e4f0" : "#8bbddd", attenuationDistance: variant === "soft" ? 1.1 : variant === "mist" ? 2.4 : 5,
     clearcoat: variant === "gel" ? .35 : .18, clearcoatRoughness: .18, specularIntensity: .42,
   });

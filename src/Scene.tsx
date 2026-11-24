@@ -1,6 +1,6 @@
+import { headingFromStep, turnToward } from "./art/locomotion";
 import { residentFocusHeight, residentSeatLift } from "./art/resident-assets";
 import { NebulaBloom } from "./art/NebulaBloom";
-import { getNebulaMaterialVariant } from "./art/nebula-material-test";
 import { JourneyCamera } from "./art/JourneyCamera";
 import { CanvasGestures } from "./art/CanvasGestures";
 import { Atmosphere } from "./art/Atmosphere";
@@ -34,10 +34,12 @@ import {
   smoothstep,
 } from "./art/terrain";
 function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
-  const materialPreview = !!getNebulaMaterialVariant();
+  const poseLocked = new URLSearchParams(location.search).has("still");
+  const heading = useRef(.35);
   const root = useRef<THREE.Group>(null);
   const model = useRef<THREE.Group>(null);
   const clock = useRef(0);
+  const gaitClock = useRef(0);
   const seatBlend = useRef(0);
   const action = useRef<Action>("idle");
   const target = useRef(new THREE.Vector3(HOME[0], 0, HOME[1]));
@@ -159,7 +161,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
     const reaction = state.reaction
       ? allowedAction(state.reaction, state.timer.phase)
       : null;
-    const dt = Math.min(delta, 0.1);
+    const dt = Math.min(delta, 0.25);
     const motionDt = Math.min(delta, 0.25);
     clock.current += state.reduced ? dt * 0.18 : dt;
     if (phase.current !== state.timer.phase) {
@@ -202,7 +204,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
         action: arrivalAction.current,
       };
     }
-    const manual = materialPreview || held.current || Date.now() < manualUntil.current;
+    const manual = poseLocked || held.current || Date.now() < manualUntil.current;
     if (!manual)
       behavior.current = advanceBehavior(
         behavior.current,
@@ -231,9 +233,11 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
       manual && !walking.current
         ? 0
         : position.current.distanceTo(target.current);
+    const beforeX = position.current.x, beforeZ = position.current.z;
     waypoint(position.current, target.current, next);
     if ((!manual || walking.current) && !held.current)
-      position.current.lerp(next, 1 - Math.exp(-motionDt * 1.3));
+      position.current.lerp(next, Math.min(1, .82 * motionDt / Math.max(.001,position.current.distanceTo(next))));
+    gaitClock.current += Math.hypot(position.current.x-beforeX, position.current.z-beforeZ) / .48 * (Math.PI*2/7.1);
     const actual =
       distance > 0.07 && !pet
         ? action.current === "approach"
@@ -286,22 +290,16 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
       }
     }
     if (model.current) {
-      const angle = pet
-        ? 0
-        : state.timer.phase === "focus" && distance < 0.08
-          ? 0
-          : distance > 0.07
-            ? Math.atan2(
-                next.x - position.current.x,
-                next.z - position.current.z,
-              )
-            : 0.35;
-      const difference = Math.atan2(
-        Math.sin(angle - model.current.rotation.y),
-        Math.cos(angle - model.current.rotation.y),
-      );
-      model.current.rotation.y += difference * (1 - Math.exp(-motionDt * 4));
+      if (pet) heading.current = 0;
+      else if (!held.current) {
+        heading.current = headingFromStep(heading.current, position.current.x-beforeX, position.current.z-beforeZ);
+        if (distance < .08 && (actual === "read" || seatBlend.current > .9)) heading.current = 0;
+      }
+      model.current.rotation.y = turnToward(model.current.rotation.y, heading.current, motionDt);
+      gl.domElement.dataset.heading = model.current.rotation.y.toFixed(5);
+      gl.domElement.dataset.step = `${position.current.x-beforeX},${position.current.z-beforeZ}`;
     }
+
     if (root.current) {
       screen.copy(root.current.position);
       screen.y += pet ? 1.55 : 1.9;
@@ -386,9 +384,11 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
       <group name="CharacterFacing" ref={model}>
         <SculptCharacter
           pet={pet}
+          still={poseLocked}
           action={visual}
           held={held}
           time={clock}
+          gaitTime={gaitClock}
           seatBlend={pet ? undefined : seatBlend}
           modelUrl={import.meta.env.VITE_CHARACTER_MODEL_URL}
         />

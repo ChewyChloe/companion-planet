@@ -1,3 +1,4 @@
+import { faceVisibleFrom } from "./locomotion";
 import { residentModelPath } from "./resident-assets";
 import { ResidentInterior } from "./ResidentInterior";
 import { NebulaInterior, NebulaTransmissionProbe } from "./NebulaInterior";
@@ -42,6 +43,7 @@ interface Control {
   x: THREE.Vector3;
   y: THREE.Vector3;
   z: THREE.Vector3;
+  parentUp: THREE.Vector3;
 }
 export default function SculptCharacter({
   action,
@@ -52,12 +54,16 @@ export default function SculptCharacter({
   pet = false,
   still = false,
   modelUrl,
+  gaitTime,
+  poseTime,
 }: {
   action: Action;
   companionId?: CompanionId;
   held?: React.RefObject<boolean>;
   time: React.RefObject<number>;
   modelUrl?: string;
+  gaitTime?: React.RefObject<number>;
+  poseTime?: number;
   seatBlend?: React.RefObject<number>;
   pet?: boolean;
   still?: boolean;
@@ -66,13 +72,14 @@ export default function SculptCharacter({
   const id = companionId || selected;
   const materialVariant = resolveNebulaMaterial(id);
   const materialPreview = id === "nebula" && !!getNebulaMaterialVariant();
-  const freezePose = materialPreview || still;
+  const freezePose = still;
   const previewModel = residentModelPath(id);
   const gltf = useLoader(GLTFLoader, modelUrl || import.meta.env.BASE_URL + previewModel);
-  const { gl } = useThree();
+  const { gl, camera } = useThree();
   const pose = useRef({ ...neutralPose });
   const root = useRef<THREE.Group>(null);
   const q = useMemo(() => new THREE.Quaternion(), []);
+  const view = useMemo(()=>({ forward:new THREE.Vector3(), right:new THREE.Vector3(), origin:new THREE.Vector3(), observer:new THREE.Vector3(), rotation:new THREE.Quaternion() }),[]);
   const asset = useMemo(() => {
     const scene = clone(gltf.scene);
     scene.updateMatrixWorld(true);
@@ -90,6 +97,7 @@ export default function SculptCharacter({
           x: new THREE.Vector3(1, 0, 0).applyQuaternion(inverse),
           y: new THREE.Vector3(0, 1, 0).applyQuaternion(inverse),
           z: new THREE.Vector3(0, 0, 1).applyQuaternion(inverse),
+          parentUp: new THREE.Vector3(0,1,0).applyQuaternion(node.parent!.getWorldQuaternion(new THREE.Quaternion()).invert()),
         };
       }
     });
@@ -147,7 +155,35 @@ export default function SculptCharacter({
     const bodyMesh = scene.getObjectByName("Body") as THREE.SkinnedMesh;
     if (bodyMesh.morphTargetDictionary?.Seated === undefined)
       throw Error("Missing seated corrective");
+    const expressionMaterials: THREE.Material[] = [];
+    const expressionGeometries: THREE.BufferGeometry[] = [];
+    const happyArcs: Record<string,THREE.Mesh> = {};
+    const worldFrame = scene.getWorldQuaternion(new THREE.Quaternion());
+    for (const side of ["Left","Right"]) {
+      const eye=controls[side+"Eye"].node;
+      const inverse=eye.getWorldQuaternion(new THREE.Quaternion()).invert();
+      const right=new THREE.Vector3(1,0,0).applyQuaternion(worldFrame).applyQuaternion(inverse);
+      const up=new THREE.Vector3(0,1,0).applyQuaternion(worldFrame).applyQuaternion(inverse);
+      const front=new THREE.Vector3(0,0,1).applyQuaternion(worldFrame).applyQuaternion(inverse);
+      const points=Array.from({length:17},(_,i)=>right.clone().multiplyScalar((i/16-.5)*.062).addScaledVector(up,Math.sin(i/16*Math.PI)*.014).addScaledVector(front,.025));
+      const geometry=new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points),24,.0045,8,false);
+      const ink=new THREE.MeshStandardMaterial({color:id==="stardust"?"#efd493":"#27343c",roughness:.55,transparent:true,opacity:1,depthWrite:true});
+      const arc=new THREE.Mesh(geometry,ink);arc.name=side+"HappyEye";arc.renderOrder=5;arc.visible=false;eye.add(arc);happyArcs[side]=arc;
+      expressionGeometries.push(geometry);expressionMaterials.push(ink);
+    }
+    const mouth=controls.Mouth.node as THREE.Mesh;
+    mouth.geometry=mouth.geometry.clone();mouth.geometry.computeBoundingBox();
+    const center=mouth.geometry.boundingBox!.getCenter(new THREE.Vector3());
+    mouth.geometry.translate(-center.x,-center.y,-center.z);
+    mouth.position.add(center.clone().multiply(mouth.scale).applyQuaternion(mouth.quaternion));mouth.updateMatrixWorld(true);
+    controls.Mouth.position.copy(mouth.position);expressionGeometries.push(mouth.geometry);
+    const front=new THREE.Vector3(0,0,1).applyQuaternion(worldFrame).applyQuaternion(mouth.getWorldQuaternion(new THREE.Quaternion()).invert());
+    const openGeometry=new THREE.CircleGeometry(1,40);
+    const openMaterial=new THREE.MeshStandardMaterial({color:"#765663",roughness:.85,transparent:true,opacity:1,depthWrite:true,side:THREE.DoubleSide});
+    const openMouth=new THREE.Mesh(openGeometry,openMaterial);openMouth.name="OpenMouthExpression";openMouth.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),front);openMouth.position.copy(front).multiplyScalar(.006);openMouth.renderOrder=5;openMouth.visible=false;mouth.add(openMouth);
+    expressionGeometries.push(openGeometry);expressionMaterials.push(openMaterial);
     return {
+      happyArcs, openMouth, expressionMaterials, expressionGeometries,
       scene,
       controls,
       skin,
@@ -170,6 +206,8 @@ export default function SculptCharacter({
     gl.domElement.dataset.characterNodes = CHARACTER_NODES.join(",");
     return () => {
       asset.bodyMesh.geometry.dispose();
+      asset.expressionGeometries.forEach(g=>g.dispose());
+      asset.expressionMaterials.forEach(m=>m.dispose());
       asset.faceMaterials.forEach((m) => m.dispose());
       asset.skin.dispose();
       asset.antennaSkin.dispose();
@@ -177,15 +215,11 @@ export default function SculptCharacter({
   }, [asset, gl, id, materialVariant, materialPreview, previewModel]);
   useFrame((_state, delta) => {
     asset.skin.userData.clock.value = materialVariant || freezePose ? 0 : time.current;
-    const animationTime = freezePose ? 1 : time.current;
-    const desired = freezePose ? { ...neutralPose, armRaise: 0, eyeOpen: 1 } : poseFor(action, time.current);
+    const animationTime = poseTime ?? (freezePose ? 1 : time.current);
+    const desired = freezePose ? { ...neutralPose, armRaise: 0, eyeOpen: 1 } : poseFor(action, animationTime, gaitTime?.current ?? animationTime);
     if (id === "water") {
       desired.scaleY = 1 + (desired.scaleY - 1) * 1.6;
       desired.roll *= 1.25;
-    }
-    if (id === "blossom" && action === "idle") {
-      desired.armForward = 0.12;
-      desired.armRaise = 0.17;
     }
     if (held?.current)
       Object.assign(desired, {
@@ -198,7 +232,7 @@ export default function SculptCharacter({
         rightLeg: -0.12,
         lift: 0,
       });
-    const p = freezePose ? Object.assign(pose.current, desired) : blendPose(pose.current, desired, delta);
+    const p = freezePose || poseTime !== undefined ? Object.assign(pose.current, desired) : blendPose(pose.current, desired, delta);
     const c = asset.controls;
     const rotate = (control: Control, x = 0, y = 0, z = 0) => {
       control.node.quaternion.copy(control.rotation);
@@ -220,7 +254,7 @@ export default function SculptCharacter({
     ] as const) {
       rotate(
         c[side + "Arm"],
-        -1.25 * p.armForward,
+        -1.25 * p.armForward + (side === "Left" ? p.leftArmSwing : p.rightArmSwing),
         -sign * p.armForward,
         sign * p.armRaise,
       );
@@ -228,11 +262,16 @@ export default function SculptCharacter({
       c[side + "Arm"].node.position.z += p.armForward * 0.62;
       c[side + "Arm"].node.position.y += p.armForward * 0.3;
       c[side + "Arm"].node.position.x -= sign * p.armForward * 0.3;
-      rotate(c[side + "Leg"], side === "Left" ? p.leftLeg : p.rightLeg);
+      const leg = c[side+"Leg"];
+      rotate(leg, side === "Left" ? p.leftLeg : p.rightLeg);
+      leg.node.position.copy(leg.position).addScaledVector(leg.parentUp,side === "Left" ? p.leftFootLift : p.rightFootLift);
       const eye = c[side + "Eye"];
       eye.node.scale.copy(eye.scale);
       eye.node.scale.x *= look.eyeScale;
-      eye.node.scale.y *= look.eyeScale * p.eyeOpen;
+      const happy=p.happyEyes>.5;
+      eye.node.scale.y *= look.eyeScale * (happy ? 1 : p.eyeOpen);
+      const surface=asset.scene.getObjectByName(side+"EyeSurface")!;
+      surface.visible=!happy;asset.happyArcs[side].visible=happy;
       const antenna = c[side + "Antenna"];
       rotate(
         antenna,
@@ -248,6 +287,26 @@ export default function SculptCharacter({
       if (m instanceof THREE.MeshStandardMaterial && m.userData.baseGlow)
         m.emissiveIntensity = m.userData.baseGlow * (.9 + .1 * Math.sin(animationTime * 1.6));
     }
+    asset.scene.getWorldQuaternion(view.rotation);
+    view.forward.set(0,0,1).applyQuaternion(view.rotation);
+    asset.scene.getWorldPosition(view.origin);camera.getWorldPosition(view.observer);
+    view.observer.sub(view.origin).normalize();
+    view.right.set(1,0,0).applyQuaternion(view.rotation);
+    const frontDot=view.forward.dot(view.observer), sideDot=view.right.dot(view.observer);
+    const showMouth=faceVisibleFrom(frontDot);
+    const showLeft=faceVisibleFrom(frontDot*.94-sideDot*.34),showRight=faceVisibleFrom(frontDot*.94+sideDot*.34);
+    const showFace=showMouth||showLeft||showRight;
+    c.LeftEye.node.visible=showLeft;c.RightEye.node.visible=showRight;c.Mouth.node.visible=showMouth;
+    c.LeftCheek.node.visible=showLeft;c.RightCheek.node.visible=showRight;
+    const mouth=c.Mouth.node as THREE.Mesh;
+    mouth.scale.copy(c.Mouth.scale);
+    const opened=p.mouthOpen>.20;
+    (mouth.material as THREE.Material).visible=!opened;
+    asset.openMouth.visible=opened;
+    asset.openMouth.scale.set(.022+p.mouthOpen*.012,.018+p.mouthOpen*.025,1);
+    if(!opened)mouth.scale.x *= 1+p.smile*.8;
+    gl.domElement.dataset.faceVisible=String(showFace);
+    gl.domElement.dataset.expression=p.happyEyes>.5?"happy":p.mouthOpen>.2?"open":p.eyeOpen<.2?"sleepy":p.smile>.4?"curious":"calm";
     gl.domElement.dataset.pose = Object.values(p)
       .map((n) => n.toFixed(4))
       .join(",");

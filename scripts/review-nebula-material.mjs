@@ -26,20 +26,20 @@ try{
   for(const world of [false,true]){
    const page=await browser.newPage({viewport:world?{width:1440,height:900}:{width:960,height:760}});
    page.on('pageerror',e=>report.errors.push(e.message));page.on('console',m=>{if(m.type()==='error'&&!/fonts\.(googleapis|gstatic)/.test(m.location().url))report.errors.push(m.text());});
-   await page.goto(`http://127.0.0.1:5173/?${world?'':'art-review&'}nebula-material=${variant}`);
+   await page.goto(`http://127.0.0.1:5173/?${world?'':'art-review&'}nebula-material=${variant}&still`);
    await expect(page.locator('canvas')).toHaveAttribute('data-material-test',variant,{timeout:60000});
    await page.waitForFunction(()=>!!document.querySelector('canvas')?.dataset.pose,null,{timeout:60000});
    await capture(page,`${variant}-${world?'planet':'close'}`,world);await page.close();
   }
   const probe=await browser.newPage({viewport:{width:960,height:760}});
   probe.on('pageerror',e=>report.errors.push(e.message));
-  await probe.goto(`http://127.0.0.1:5173/?art-review&nebula-material=${variant}&material-probe`);
+  await probe.goto(`http://127.0.0.1:5173/?art-review&nebula-material=${variant}&material-probe&still`);
   await expect(probe.locator('canvas')).toHaveAttribute('data-material-test',variant,{timeout:60000});
   await probe.waitForFunction(()=>!!document.querySelector('canvas')?.dataset.pose,null,{timeout:60000});
   await capture(probe,`${variant}-transmission-probe`,false);await probe.close();
   console.log(variant+': actual R3F closeup and live planet rendered');
  }
  const phone=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});phone.on('pageerror',e=>report.errors.push(e.message));
- await phone.goto('http://127.0.0.1:5173/?nebula-material=mist');await expect(phone.locator('canvas')).toHaveAttribute('data-material-test','mist',{timeout:60000});await phone.waitForFunction(()=>!!document.querySelector('canvas')?.dataset.pose,null,{timeout:60000});await capture(phone,'mist-phone',true);await phone.close();
+ await phone.goto('http://127.0.0.1:5173/?nebula-material=mist&still');await expect(phone.locator('canvas')).toHaveAttribute('data-material-test','mist',{timeout:60000});await phone.waitForFunction(()=>!!document.querySelector('canvas')?.dataset.pose,null,{timeout:60000});await capture(phone,'mist-phone',true);await phone.close();
 }finally{await browser.close();await writeFile('artifacts/nebula-material/visual-results.json',JSON.stringify(report,null,2));}
 if(report.errors.length||report.views.length!==10||report.views.some(v=>v.glError!==0))process.exitCode=1;

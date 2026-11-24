@@ -56,7 +56,7 @@ function NebulaMaterialPanel() {
   if (!variant) return null;
   return <aside aria-label="星雲仔材質測試" style={{ position: "fixed", top: "26%", left: 12, zIndex: 25, padding: 12, background: "#f4f1e8", color: "#4f5861", maxWidth: 260, fontSize: 14 }}>
     <strong>星雲仔・網頁材質測試</strong>
-    <p>同一模型、固定姿態，使用實際星球場景燈光。</p>
+    <p>同一模型與實際星球燈光，可旋轉查看動作和表情。</p>
     <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
       {Object.entries(nebulaMaterialVariants).map(([id,p]) => <a key={id} href={`?nebula-material=${id}`} aria-current={id === variant ? "page" : undefined}>{p.name}</a>)}
     </div>

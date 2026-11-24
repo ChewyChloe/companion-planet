@@ -23,11 +23,13 @@ function Figure({
   angle,
   companionId,
   still,
+  poseTime,
 }: {
   action: Action;
   angle: number;
   companionId: CompanionId;
   still: boolean;
+  poseTime?: number;
 }) {
   const time = useRef(0);
   const { gl, scene, camera } = useThree();
@@ -52,7 +54,7 @@ function Figure({
   });
   return (
     <group name="ReviewTurntable" rotation={[0, angle, 0]}>
-      <SculptCharacter still={still} action={action} time={time} companionId={companionId} />
+      <SculptCharacter poseTime={poseTime} still={still} action={action} time={time} companionId={companionId} />
     </group>
   );
 }
@@ -90,6 +92,7 @@ export default function ArtReview() {
         <directionalLight position={[0, 3, -4]} intensity={1.4} />
         <Suspense fallback={null}>
           <Figure
+            poseTime={params.has("pose-time") && Number.isFinite(Number(params.get("pose-time"))) ? Number(params.get("pose-time")) : undefined}
             still={params.has("still")}
             action={action}
             angle={angle}

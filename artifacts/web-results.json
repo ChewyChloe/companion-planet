@@ -4,10 +4,10 @@
       "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
       "/workspace/companion-planet/node_modules/.bin/playwright",
       "test",
-      "tests/interaction.spec.ts",
+      "tests/web.spec.ts",
       "--project=desktop",
-      "-g",
-      "grabbing moves|a tapped character"
+      "--grep",
+      "planet renders"
     ],
     "configFile": "/workspace/companion-planet/playwright.config.ts",
     "rootDir": "/workspace/companion-planet/tests",
@@ -144,18 +144,18 @@
   },
   "suites": [
     {
-      "title": "interaction.spec.ts",
-      "file": "interaction.spec.ts",
+      "title": "web.spec.ts",
+      "file": "web.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [
         {
-          "title": "grabbing moves the creature without orbiting; release stays put and taps respond",
+          "title": "planet renders, camera rotates, character responds, timer and conversation stay synchronized",
           "ok": true,
           "tags": [],
           "tests": [
             {
-              "timeout": 120000,
+              "timeout": 180000,
               "annotations": [],
               "expectedStatus": "passed",
               "projectId": "desktop",
@@ -165,12 +165,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 22110,
+                  "duration": 113895,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-11-24T09:43:04.096Z",
+                  "startTime": "2026-11-24T14:39:58.002Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -178,43 +178,9 @@
               "status": "expected"
             }
           ],
-          "id": "658d4d77d9fd28df6a81-1770143c8260b0ccdda5",
-          "file": "interaction.spec.ts",
-          "line": 28,
-          "column": 1
-        },
-        {
-          "title": "a tapped character can speak, quiet mode suppresses bubbles, mini mode retains species",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 120000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "desktop",
-              "projectName": "desktop",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 33922,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-11-24T09:43:26.799Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "658d4d77d9fd28df6a81-e8f3e05c12d416396c7c",
-          "file": "interaction.spec.ts",
-          "line": 66,
+          "id": "2948388c6448a8e5345d-704adb4d544fd1bc170a",
+          "file": "web.spec.ts",
+          "line": 5,
           "column": 1
         }
       ]
@@ -222,9 +188,9 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-11-24T09:43:03.441Z",
-    "duration": 58051.379,
-    "expected": 2,
+    "startTime": "2026-11-24T14:39:57.307Z",
+    "duration": 115322.652,
+    "expected": 1,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0

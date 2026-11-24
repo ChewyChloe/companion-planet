@@ -15,7 +15,7 @@ try{
   await p.goto('http://127.0.0.1:5173/');
   const canvas=p.locator('canvas');await expect(canvas).toHaveAttribute('data-material','mist',{timeout:60000});await expect(canvas).toHaveAttribute('data-material-test','none');
   await expect(p.getByRole('complementary',{name:'星雲仔材質測試'})).toHaveCount(0);
-  const initial=await inspect(p);if(initial.vertices!==24458||!initial.interior||!initial.attachedToBody||!initial.bloom||initial.transmission!==(mobile?0:.72)||initial.glError)throw Error('Default B invalid '+JSON.stringify(initial));
+  const initial=await inspect(p);if(initial.vertices!==24458||!initial.interior||!initial.attachedToBody||!initial.bloom||initial.transmission!==(mobile?0:.58)||initial.glError)throw Error('Default B invalid '+JSON.stringify(initial));
   await p.getByRole('button',{name:'開始專注',exact:false}).click();await expect(p.locator('main')).toHaveAttribute('data-phase','focus');
   await p.getByRole('button',{name:'暫停'}).click();await expect(p.getByRole('button',{name:'繼續專注'})).toBeVisible();
   await p.getByRole('button',{name:'更換角色',exact:true}).click();await p.getByRole('button',{name:'蕨蕨子',exact:true}).click();await expect(canvas).toHaveAttribute('data-material','resident-fern',{timeout:60000});

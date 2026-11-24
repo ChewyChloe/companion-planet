@@ -20,7 +20,7 @@ it("preview preserves the exact approved body positions and contains no animatio
 it("desktop uses three distinct physical materials; phone fallback explicitly disables transmission",()=>{
   const variants=["soft","mist","gel"] as const;
   const materials=variants.map(id=>nebulaTestMaterial(id,false));
-  expect(materials.map(m=>m.transmission)).toEqual([.28,.72,.94]);
+  expect(materials.map(m=>m.transmission)).toEqual([.28,.58,.82]);
   expect(materials.map(m=>m.roughness)).toEqual([.46,.23,.10]);
   for(const id of variants){const m=nebulaTestMaterial(id,true);expect(m.transmission).toBe(0);expect(m.userData.lightweight).toBe(true);m.dispose();}
   materials.forEach(m=>m.dispose());

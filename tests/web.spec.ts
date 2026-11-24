@@ -1,6 +1,7 @@
 import { openTimerSettings } from "./ui";
 import { test, expect } from "@playwright/test";
-test.describe.configure({ timeout: 120000 });
+// Software WebGL plus three full-scene screenshots can exceed two minutes.
+test.describe.configure({ timeout: 180000 });
 test("planet renders, camera rotates, character responds, timer and conversation stay synchronized", async ({
   page,
 }, testInfo) => {
