@@ -6,7 +6,7 @@ export default defineConfig({
   outputDir: "test-results-design",
   reporter: [
     ["list"],
-    ["json", { outputFile: "artifacts/redesign/design-results.json" }],
+    ["json", { outputFile: "artifacts/layout/design-results.json" }],
   ],
   projects: [
     { name: "wide", use: { viewport: { width: 1440, height: 900 } } },

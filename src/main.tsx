@@ -124,6 +124,18 @@ function App() {
   const [pet, setPet] = useState(false);
   const [chat, setChat] = useState(false);
   const [settings, setSettings] = useState(false);
+  const [timerOpen, setTimerOpen] = useState(false);
+  useEffect(() => {
+    const close = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setChat(false);
+        setSettings(false);
+        setTimerOpen(false);
+      }
+    };
+    window.addEventListener("keydown", close);
+    return () => window.removeEventListener("keydown", close);
+  }, []);
   const minutes = state.focusMinutes;
   const setMinutes = state.setFocusMinutes;
   const [messages, setMessages] = useState<Message[]>([]);
@@ -185,6 +197,9 @@ function App() {
   useEffect(() => () => request.current?.abort(), []);
   useEffect(() => window.desktop?.onMode((mode) => setPet(mode === "pet")), []);
   const mode = async () => {
+    setChat(false);
+    setSettings(false);
+    setTimerOpen(false);
     const next = !pet;
     if (window.desktop) await window.desktop.setMode(next ? "pet" : "planet");
     setPet(next);
@@ -200,6 +215,7 @@ function App() {
     );
     setNotice("");
     setIntent("");
+    setTimerOpen(false);
     if (phase === "focus") setChat(false);
   };
   const interact = () => {
@@ -280,205 +296,159 @@ function App() {
       data-phase={state.timer.phase}
       data-activity={activity}
     >
-      {!pet && (
-        <header>
-          <a className="brand" href="#" aria-label="同頻星球首頁">
-            <span className="brand-mark">
-              <Icon name="orbit" />
-            </span>
-            <span>
-              同頻星球<small>COMPANION PLANET</small>
-            </span>
-          </a>
-          <nav aria-label="陪伴設定">
-            {window.desktop && (
-              <>
-                <button
-                  onClick={() => window.desktop?.hide()}
-                  aria-label="最小化星球"
-                >
-                  <Icon name="minimize" />
-                </button>
-                <button
-                  onClick={() => window.desktop?.quit()}
-                  aria-label="退出應用程式"
-                >
-                  <Icon name="close" />
-                </button>
-              </>
-            )}
-            <button
-              aria-pressed={state.silent}
-              onClick={() => state.setSilent(!state.silent)}
-            >
-              <Icon name="moon" />
-              <span>{state.silent ? "已安靜" : "安靜陪我"}</span>
-            </button>
-            <button
-              className="audio-toggle"
-              aria-label={audio.on ? "關閉環境音" : "開啟環境音"}
-              aria-pressed={audio.on}
-              onClick={() => void audio.toggle()}
-            >
-              <Icon name="sound" />
-              <span className="audio-label">
-                {audio.on ? " 聲音開啟" : " 環境音"}
-              </span>
-            </button>
-            <button
-              aria-label="開啟設定"
-              aria-expanded={settings}
-              onClick={() => setSettings(!settings)}
-            >
-              <Icon name="settings" />
-            </button>
-          </nav>
-        </header>
-      )}
       <section className="world" aria-label="星雲仔的微型世界">
-        {!pet && (
-          <div className="stage-label">
-            <span>小星球觀察日誌</span>
-            <span>NO. 001</span>
-          </div>
-        )}
         <Scene pet={pet} onClick={interact} reduced={state.reduced} />
       </section>
       {!pet && (
         <>
-          <section className="intro">
-            <span className="eyebrow">一座小星球，一點剛好的陪伴。</span>
-            <h1>
-              各自忙碌，
-              <br />
-              也一起發光。
-            </h1>
-            <p>
-              你專心的時候，
-              <br />
-              牠也在做自己的事。
-            </p>
-            <div className="intro-note">
-              <Icon name="leaf" />
-              <div>
-                陪伴，不需要一直說話。
-                <small>
-                  讀幾頁書、發一會兒呆。
-                  <br />
-                  這裡沒有需要趕上的進度。
-                </small>
-              </div>
-            </div>
-          </section>
-          <section className="focus-panel" aria-label="番茄鐘">
-            <div className="panel-top">
-              <span className="status-dot" />
-              {state.timer.phase === "focus"
-                ? "一起專注"
-                : state.timer.phase === "break"
-                  ? "留一點時間休息"
-                  : "今天，慢慢來就好"}
-              <span className="tiny">專注手帖</span>
-            </div>
-            <div className="time" role="timer" aria-label="剩餘時間">
-              {display}
-            </div>
-            <p>
-              {state.timer.phase === "focus"
-                ? "星雲仔正在書桌旁陪你。"
-                : state.timer.phase === "break"
-                  ? "讓眼睛看看遠方。"
-                  : "從一小段專注開始。"}
-            </p>
-            <div className="duration">
-              <label htmlFor="duration">專注時長</label>
-              <select
-                id="duration"
-                value={minutes}
-                disabled={state.timer.running}
-                onChange={(e) => {
-                  setMinutes(Number(e.target.value));
-                  if (state.timer.phase === "idle")
-                    state.setTimer({
-                      ...state.timer,
-                      remaining: Number(e.target.value) * 60_000,
-                    });
-                }}
-              >
-                <option value={25}>25 分鐘</option>
-                <option value={45}>45 分鐘</option>
-                <option value={5}>5 分鐘</option>
-                <option value={1}>1 分鐘展示</option>
-                <option value={1 / 6}>10 秒展示</option>
-              </select>
-            </div>
-            <div className="timer-actions">
-              {state.timer.running ? (
-                <button
-                  className="primary"
-                  onClick={() => state.setTimer(pause(state.timer, Date.now()))}
-                >
-                  <Icon name="pause" /> 暫停
-                </button>
-              ) : state.timer.phase === "focus" ? (
-                <button
-                  className="primary"
-                  onClick={() =>
-                    state.setTimer(resume(state.timer, Date.now()))
-                  }
-                >
-                  繼續專注 <Icon name="play" />
-                </button>
-              ) : (
-                <button className="primary" onClick={() => begin()}>
-                  開始專注 <Icon name="arrow" />
-                </button>
-              )}
+          {window.desktop && <div className="window-drag" />}
+          <section className="focus-hud" aria-label="番茄鐘">
+            <button
+              className="time-card"
+              aria-label="計時設定"
+              aria-expanded={timerOpen}
+              aria-controls="timer-settings"
+              onClick={() => {
+                setTimerOpen(!timerOpen);
+                setSettings(false);
+              }}
+            >
+              <span className="time" role="timer" aria-label="剩餘時間">
+                {display}
+              </span>
+            </button>
+            <div className="timer-buttons">
               <button
-                aria-label="重設計時器"
-                onClick={() => {
-                  state.setTimer({
-                    ...initialTimer,
-                    remaining: minutes * 60_000,
-                    completed: state.timer.completed,
-                  });
-                  setNotice("");
-                }}
+                className="round-control"
+                aria-label={
+                  state.timer.running
+                    ? "暫停"
+                    : state.timer.phase === "focus"
+                      ? "繼續專注"
+                      : "開始專注"
+                }
+                onClick={() =>
+                  state.timer.running
+                    ? state.setTimer(pause(state.timer, Date.now()))
+                    : state.timer.phase === "focus"
+                      ? state.setTimer(resume(state.timer, Date.now()))
+                      : begin()
+                }
               >
-                <Icon name="reset" />
+                <Icon name={state.timer.running ? "pause" : "play"} />
               </button>
-            </div>
-            {state.timer.phase === "break" && !state.timer.running && (
-              <button className="text-button" onClick={() => begin("break")}>
-                開始 5 分鐘休息
+              <button
+                className="round-control"
+                aria-label="安靜陪我"
+                aria-pressed={state.silent}
+                title={state.silent ? "已開啟安靜陪伴" : "安靜陪我"}
+                onClick={() => state.setSilent(!state.silent)}
+              >
+                <Icon name={state.silent ? "moon" : "mute"} />
               </button>
-            )}
-            <div className="focus-footer">
-              <span>每一小步，都算數。</span>
-              <span>{state.timer.completed} 段完成</span>
             </div>
           </section>
-          <div className="character-caption">
-            <span className="live-dot" />
-            <b>星雲仔</b>
-            <span>· {actionNames[activity]}</span>
-            <button className="text-button" onClick={interact}>
-              打個招呼 <Icon name="hand" />
+          <nav className="scene-tools" aria-label="陪伴設定">
+            <button
+              className="round-control"
+              aria-label="開啟設定"
+              aria-expanded={settings}
+              onClick={() => {
+                setSettings(!settings);
+                setTimerOpen(false);
+              }}
+            >
+              <Icon name="settings" />
+            </button>
+            <button
+              className="round-control"
+              aria-label={audio.on ? "關閉環境音" : "開啟環境音"}
+              aria-pressed={audio.on}
+              onClick={() => void audio.toggle()}
+            >
+              <Icon name={audio.on ? "sound" : "mute"} />
+            </button>
+          </nav>
+          {timerOpen && (
+            <section
+              className="timer-popover floating-panel"
+              id="timer-settings"
+              aria-label="計時設定"
+            >
+              <div className="panel-heading">
+                <h2>留一段時間給自己</h2>
+                <button
+                  aria-label="收合計時設定"
+                  onClick={() => setTimerOpen(false)}
+                >
+                  <Icon name="close" />
+                </button>
+              </div>
+              <div className="duration">
+                <label htmlFor="duration">專注時長</label>
+                <select
+                  id="duration"
+                  value={minutes}
+                  disabled={state.timer.running}
+                  onChange={(e) => {
+                    setMinutes(Number(e.target.value));
+                    if (state.timer.phase === "idle")
+                      state.setTimer({
+                        ...state.timer,
+                        remaining: Number(e.target.value) * 60000,
+                      });
+                  }}
+                >
+                  <option value={25}>25 分鐘</option>
+                  <option value={45}>45 分鐘</option>
+                  <option value={5}>5 分鐘</option>
+                  <option value={1}>1 分鐘展示</option>
+                  <option value={1 / 6}>10 秒展示</option>
+                </select>
+              </div>
+              <div className="popover-actions">
+                <span>{state.timer.completed} 段完成</span>
+                <button
+                  aria-label="重設計時器"
+                  onClick={() => {
+                    state.setTimer({
+                      ...initialTimer,
+                      remaining: minutes * 60000,
+                      completed: state.timer.completed,
+                    });
+                    setNotice("");
+                  }}
+                >
+                  <Icon name="reset" />
+                  重新開始
+                </button>
+              </div>
+              {state.timer.phase === "break" && !state.timer.running && (
+                <button onClick={() => begin("break")}>開始 5 分鐘休息</button>
+              )}
+            </section>
+          )}
+          <div className="scene-caption">
+            <h1>同頻星球</h1>
+            <button
+              className="caption-greeting"
+              onClick={interact}
+              aria-label="打個招呼"
+            >
+              <span>星雲仔 · {actionNames[activity]}</span>
+              <Icon name="hand" />
             </button>
           </div>
-          <div className="orbit-hint">
-            <Icon name="move" /> 拖曳旋轉 <span>／</span> 滾輪或雙指縮放
-          </div>
-          <footer>
-            <span>
-              同頻星球 <span className="footer-divider">／</span>{" "}
-              各自忙碌，也一起生活。
-            </span>
-            <button onClick={() => void mode()}>
-              <Icon name="expand" />{" "}
-              {window.desktop ? "切換桌寵模式" : "體驗迷你陪伴"}
+          <div className="companion-tools">
+            <button
+              className="round-control"
+              onClick={() => void mode()}
+              aria-label={window.desktop ? "切換桌寵模式" : "體驗迷你陪伴"}
+              title="迷你陪伴"
+            >
+              <Icon name="expand" />
             </button>
-          </footer>
+          </div>
         </>
       )}
       {pet && (
@@ -522,15 +492,13 @@ function App() {
       )}
       {!pet && (
         <button
-          className="chat-launch"
+          className="chat-launch round-control"
+          aria-label="和星雲仔說說話"
+          title="和星雲仔說說話"
           aria-expanded={chat}
           onClick={() => setChat(!chat)}
         >
           <Icon name="chat" />
-          <div>
-            和星雲仔說說話<small>{provider}</small>
-          </div>
-          <Icon name={chat ? "minimize" : "arrow"} />
         </button>
       )}
       {chat && (
@@ -610,8 +578,25 @@ function App() {
         </section>
       )}
       {settings && !pet && (
-        <section className="settings" aria-label="設定">
-          <h2>舒服地待著</h2>
+        <section className="settings floating-panel" aria-label="設定">
+          <div className="panel-heading">
+            <h2>舒服地待著</h2>
+            <button aria-label="收合設定" onClick={() => setSettings(false)}>
+              <Icon name="close" />
+            </button>
+          </div>
+          <p>拖曳小島旋轉，滾輪或雙指縮放。</p>
+          {window.desktop && (
+            <div className="native-actions">
+              <button onClick={() => window.desktop?.hide()}>最小化星球</button>
+              <button
+                onClick={() => window.desktop?.quit()}
+                aria-label="退出應用程式"
+              >
+                退出應用程式
+              </button>
+            </div>
+          )}
           <label>
             <input
               type="checkbox"

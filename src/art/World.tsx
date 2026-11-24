@@ -4,6 +4,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import {
   createRockGeometry,
+  createShoreGeometry,
   createSoilGeometry,
   groundHeight,
   noise3,
@@ -154,8 +155,11 @@ function Rocks() {
     </instancedMesh>
   );
 }
-export function World() {
-  const rockGeometry = useMemo(createRockGeometry, []),
+export function World({ shoreline = false }: { shoreline?: boolean }) {
+  const rockGeometry = useMemo(
+      () => (shoreline ? createShoreGeometry() : createRockGeometry()),
+      [shoreline],
+    ),
     soilGeometry = useMemo(createSoilGeometry, []);
   const maps = useMemo(
     () => ({
@@ -183,7 +187,9 @@ export function World() {
         <meshStandardMaterial
           vertexColors
           normalMap={maps.rock.normalMap}
-          normalScale={new THREE.Vector2(0.65, 0.65)}
+          normalScale={
+            new THREE.Vector2(shoreline ? 0.18 : 0.65, shoreline ? 0.18 : 0.65)
+          }
           roughness={0.94}
         />
       </mesh>

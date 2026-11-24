@@ -1,3 +1,4 @@
+import { openTimerSettings } from "./ui";
 import { test, expect } from "@playwright/test";
 test("touch rotation, character tap, timer and mobile keyboard chat work", async ({
   page,
@@ -37,7 +38,7 @@ test("touch rotation, character tap, timer and mobile keyboard chat work", async
     const p = (await canvas.getAttribute("data-camera"))!
       .split(",")
       .map(Number);
-    return Math.hypot(p[0], p[1] + 1.1, p[2]);
+    return Math.hypot(p[0], p[1] - 0.2, p[2]);
   };
   const beforeZoom = await distance();
   await session.send("Input.dispatchTouchEvent", {
@@ -77,6 +78,7 @@ test("touch rotation, character tap, timer and mobile keyboard chat work", async
   await page.getByRole("button", { name: "開啟設定" }).tap();
   await page.getByLabel("減少動畫").check();
   await page.getByRole("button", { name: "開啟設定" }).tap();
+  await openTimerSettings(page);
   await page.getByLabel("專注時長").selectOption("1");
   await page.getByRole("button", { name: "開始專注", exact: false }).tap();
   await expect(page.locator("main")).toHaveAttribute("data-phase", "focus");

@@ -179,16 +179,18 @@ try {
       if (Math.abs(p.x - 0.72) < 0.045 && Math.abs(p.z - 0.23) < 0.15)
         underside = Math.min(underside, p.y);
     }
+    const view = s.camera.view ? { ...s.camera.view } : null;
     const old = s.camera.position.clone(),
       quaternion = s.camera.quaternion.clone();
     s.setFrameloop("never");
     await new Promise((resolve) => setTimeout(resolve, 300));
     const ratio = s.gl.getPixelRatio();
     s.gl.setPixelRatio(1);
+    s.camera.clearViewOffset();
     s.camera.position.set(-2, 1.6, 2.5);
     s.camera.lookAt(0.72, 0.8, 0.23);
     s.gl.render(s.scene, s.camera);
-    window.__ART_CAMERA = { s, old, quaternion, ratio };
+    window.__ART_CAMERA = { s, old, quaternion, ratio, view };
     return {
       intersections: Object.fromEntries(
         collisionBounds.map((b) => [b.name, b.count]),
@@ -200,7 +202,16 @@ try {
   });
   await page.locator("canvas").screenshot({ path: `${dir}/read-contact.png` });
   await page.evaluate(() => {
-    const { s, old, quaternion, ratio } = window.__ART_CAMERA;
+    const { s, old, quaternion, ratio, view } = window.__ART_CAMERA;
+    if (view?.enabled)
+      s.camera.setViewOffset(
+        view.fullWidth,
+        view.fullHeight,
+        view.offsetX,
+        view.offsetY,
+        view.width,
+        view.height,
+      );
     s.gl.setPixelRatio(ratio);
     s.camera.position.copy(old);
     s.camera.quaternion.copy(quaternion);
@@ -208,7 +219,9 @@ try {
     s.setFrameloop("always");
     delete window.__ART_CAMERA;
   });
+  await page.getByRole("button", { name: "計時設定" }).click();
   await page.getByRole("button", { name: "重設計時器" }).click();
+  await page.getByRole("button", { name: "收合計時設定" }).click();
   await page.waitForTimeout(1000);
   await page.evaluate(async () => {
     const { useWorld } = await import("/src/store.ts");

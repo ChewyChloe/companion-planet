@@ -1,3 +1,4 @@
+import { openTimerSettings } from "./ui";
 import { test, expect } from "@playwright/test";
 test("planet renders, camera rotates, character responds, timer and conversation stay synchronized", async ({
   page,
@@ -11,9 +12,7 @@ test("planet renders, camera rotates, character responds, timer and conversation
     if (m.type() === "error" && !optionalFont) errors.push(m.text());
   });
   await page.goto("/");
-  await expect(
-    page.getByRole("heading", { name: /各自忙碌，\s*也一起發光。/ }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "同頻星球" })).toBeVisible();
   const canvas = page.locator("canvas");
   await expect(canvas).toHaveAttribute("data-frames", /\d+/);
   await page.screenshot({
@@ -45,6 +44,7 @@ test("planet renders, camera rotates, character responds, timer and conversation
   await page.screenshot({
     path: `artifacts/planet-${testInfo.project.name}.png`,
   });
+  await openTimerSettings(page);
   await page.getByLabel("專注時長").selectOption("1");
   await page.getByRole("button", { name: "開始專注", exact: false }).click();
   await expect(page.locator("main")).toHaveAttribute("data-phase", "focus");
@@ -54,6 +54,7 @@ test("planet renders, camera rotates, character responds, timer and conversation
   await page.waitForTimeout(700);
   await expect(page.getByRole("timer")).toHaveText(paused);
   await page.reload();
+  await openTimerSettings(page);
   await expect(page.getByLabel("專注時長")).toHaveValue("1");
   await expect(page.getByRole("timer")).toHaveText(paused);
   await page.getByRole("button", { name: "繼續專注" }).click();
@@ -79,6 +80,7 @@ test("silent mode suppresses completion notices and AI proposals require confirm
 }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "安靜陪我" }).click();
+  await openTimerSettings(page);
   await page.getByLabel("專注時長").selectOption(String(1 / 6));
   await page.getByRole("button", { name: "開始專注", exact: false }).click();
   await expect(page.locator("main")).toHaveAttribute("data-phase", "break", {

@@ -1,3 +1,4 @@
+import { Coast } from "./art/Coast";
 import {
   Component,
   Suspense,
@@ -43,6 +44,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
   useFrame((_state, delta) => {
     const state = useWorld.getState();
     const dt = Math.min(delta, 0.1);
+    const motionDt = Math.min(delta, 0.25);
     clock.current += state.reduced ? dt * 0.18 : dt;
     behavior.current = advanceBehavior(
       behavior.current,
@@ -60,7 +62,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
     );
     const distance = position.current.distanceTo(target.current);
     waypoint(position.current, target.current, next);
-    position.current.lerp(next, 1 - Math.exp(-dt * 1.3));
+    position.current.lerp(next, 1 - Math.exp(-motionDt * 1.3));
     const actual =
       distance > 0.07 && !pet
         ? action.current === "approach"
@@ -99,7 +101,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
               CHAIR.seatedRootOffset * seatBlend.current +
               (actual === "rest" ? 0.065 : 0),
             5,
-            dt,
+            motionDt,
           ),
           position.current.z,
         );
@@ -122,7 +124,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
         Math.sin(angle - model.current.rotation.y),
         Math.cos(angle - model.current.rotation.y),
       );
-      model.current.rotation.y += difference * (1 - Math.exp(-dt * 4));
+      model.current.rotation.y += difference * (1 - Math.exp(-motionDt * 4));
     }
     if (++frames.current % 15 === 0) {
       gl.domElement.dataset.action = actual;
@@ -206,11 +208,27 @@ function CameraFraming({ pet }: { pet: boolean }) {
   const { camera, size } = useThree();
   useEffect(() => {
     if (camera instanceof THREE.PerspectiveCamera) {
-      camera.fov = pet ? 34 : size.width < 500 ? 36 : 42;
-      if (pet) camera.lookAt(0, 0.3, 0);
+      camera.fov = pet ? 34 : 40;
+      if (pet) {
+        camera.clearViewOffset();
+        camera.lookAt(0, 0.3, 0);
+      } else {
+        const aspect = size.width / size.height,
+          scale = Math.max(1, 0.75 / aspect);
+        camera.position.set(6 * scale, 3.6 * scale, 10 * scale);
+        camera.setViewOffset(
+          size.width,
+          size.height,
+          size.width * (size.width < 700 || aspect < 0.85 ? 0 : 0.25),
+          -size.height * 0.2,
+          size.width,
+          size.height,
+        );
+        camera.lookAt(0, 0.2, 0);
+      }
       camera.updateProjectionMatrix();
     }
-  }, [camera, pet, size.width]);
+  }, [camera, pet, size.width, size.height]);
   return null;
 }
 export default function Scene({
@@ -235,7 +253,7 @@ export default function Scene({
         shadows
         dpr={[1, 1.5]}
         camera={{
-          position: pet ? [0, 0.45, 3.5] : [6, 5.6, 9.6],
+          position: pet ? [0, 0.45, 3.5] : [6, 3.6, 10],
           fov: pet ? 30 : 42,
         }}
         gl={{ alpha: true, antialias: true, powerPreference: "low-power" }}
@@ -253,11 +271,12 @@ export default function Scene({
         <ArtLights pet={pet} />
         {!pet && (
           <>
-            <World />
+            <Coast reduced={reduced} />
+            <World shoreline />
             <OrbitControls
-              target={[0, -1.1, 0]}
-              minDistance={6}
-              maxDistance={14}
+              target={[0, 0.2, 0]}
+              minDistance={8}
+              maxDistance={28}
               minPolarAngle={0.45}
               maxPolarAngle={1.55}
               enablePan={false}

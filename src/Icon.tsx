@@ -3,6 +3,7 @@ type Name =
   | "orbit"
   | "moon"
   | "sound"
+  | "mute"
   | "settings"
   | "arrow"
   | "pause"
@@ -27,6 +28,7 @@ const paths: Record<Name, string[]> = {
     "M17 9a5 5 0 0 1 0 6",
     "M20 6a9 9 0 0 1 0 12",
   ],
+  mute: ["M4 10h4l5-4v12l-5-4H4Z", "m17 9 5 6m0-6-5 6"],
   settings: [
     "M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8",
     "M12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2",

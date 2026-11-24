@@ -7,6 +7,8 @@ import {
   neutralPose,
 } from "../src/art/character-animation";
 import {
+  createShoreGeometry,
+  createSoilGeometry,
   groundHeight,
   groundNormal,
   inDeskObstacle,
@@ -156,4 +158,24 @@ it("keeps the actual sculpt torso round in depth, rather than a flat front cutou
   );
   expect(report.torsoDepthToWidth).toBeGreaterThan(0.85);
   expect(report.torsoDepthToWidth).toBeLessThan(1.1);
+});
+
+it("keeps meadow and shoreline faces visible from above and submerges the outer bank", () => {
+  for (const make of [createSoilGeometry, createShoreGeometry]) {
+    const g = make();
+    const normals = g.attributes.normal;
+    let up = 0;
+    for (let i = 0; i < normals.count; i++) {
+      expect(normals.getY(i)).toBeGreaterThanOrEqual(-0.001);
+      up += normals.getY(i);
+    }
+    expect(up / normals.count).toBeGreaterThan(0.6);
+    expect(g.attributes.uv.count).toBe(g.attributes.position.count);
+    g.dispose();
+  }
+  const shore = createShoreGeometry(),
+    p = shore.attributes.position;
+  for (let i = p.count - 97; i < p.count; i++)
+    expect(p.getY(i)).toBeCloseTo(-0.24, 5);
+  shore.dispose();
 });

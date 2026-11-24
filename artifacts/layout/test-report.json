@@ -1,0 +1,61 @@
+{
+  "generatedAt": "2026-11-24T05:11:38.944Z",
+  "suites": {
+    "unit": {
+      "passed": 28,
+      "failed": 0,
+      "status": "Passed"
+    },
+    "web": {
+      "passed": 6,
+      "failed": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "evidence": "artifacts/web-results.json",
+      "status": "Passed"
+    },
+    "mobile": {
+      "passed": 3,
+      "failed": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "evidence": "artifacts/mobile-results.json",
+      "status": "Passed"
+    },
+    "design": {
+      "passed": 6,
+      "failed": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "evidence": "artifacts/layout/design-results.json",
+      "status": "Passed"
+    },
+    "electron": {
+      "passed": 1,
+      "failed": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "evidence": "artifacts/electron-results.json",
+      "status": "Passed"
+    }
+  },
+  "totalPassed": 44,
+  "visual": {
+    "views": [
+      "desktop",
+      "wide",
+      "tablet",
+      "phone",
+      "small-phone",
+      "landscape"
+    ],
+    "errors": [],
+    "actorUncovered": true,
+    "overflow": false
+  },
+  "limits": [
+    "Real iOS/Android GPU and native keyboard not tested",
+    "Native Windows compositing not tested",
+    "Render deployment not checked"
+  ]
+}

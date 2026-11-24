@@ -176,7 +176,7 @@ export function createSoilGeometry() {
   for (let r = 0; r < rings; r++)
     for (let i = 0; i < sides; i++) {
       const p = r * (sides + 1) + i;
-      indices.push(p, p + sides + 2, p + 1, p, p + sides + 1, p + sides + 2);
+      indices.push(p, p + 1, p + sides + 2, p, p + sides + 2, p + sides + 1);
     }
   const g = new THREE.BufferGeometry();
   g.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
@@ -203,4 +203,50 @@ export function mossBlend(x: number, z: number) {
 }
 export function mossAllowed(x: number, z: number) {
   return Math.hypot(x, z) < 2.43 && mossBlend(x, z) > 0.46;
+}
+/** A sloping annular bank joins the existing soil to the lake below its waterline. */
+export function createShoreGeometry() {
+  const positions: number[] = [],
+    colors: number[] = [],
+    uv: number[] = [],
+    indices: number[] = [];
+  const rings = 10,
+    sides = 96;
+  for (let r = 0; r <= rings; r++)
+    for (let i = 0; i <= sides; i++) {
+      const t = r / rings,
+        a = (i / sides) * Math.PI * 2;
+      const radius =
+        (2.3 + t * 0.45) *
+        (1 +
+          0.018 * Math.sin(a * 7) +
+          0.012 * Math.sin(a * 11) +
+          t * 0.025 * Math.sin(a * 3));
+      const x = Math.cos(a) * radius,
+        z = Math.sin(a) * radius,
+        blend = smoothstep(0, 1, t);
+      positions.push(
+        x,
+        THREE.MathUtils.lerp(groundHeight(x, z), -0.24, blend),
+        z,
+      );
+      uv.push(x * 0.3, z * 0.3);
+      const c = new THREE.Color("#bbbda6").lerp(
+        new THREE.Color("#b4c0b9"),
+        blend * 0.45,
+      );
+      colors.push(c.r, c.g, c.b);
+    }
+  for (let r = 0; r < rings; r++)
+    for (let i = 0; i < sides; i++) {
+      const n = r * (sides + 1) + i;
+      indices.push(n, n + 1, n + sides + 2, n, n + sides + 2, n + sides + 1);
+    }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  g.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+  g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
+  g.setIndex(indices);
+  g.computeVertexNormals();
+  return g;
 }

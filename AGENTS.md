@@ -53,8 +53,14 @@ See README.md and DEVELOPMENT_REPORT.md for current evidence, delivery and Windo
 - Mobile chat uses visualViewport height/offset and 16px inputs; keep safe area and small-screen scrolling usable. Real iOS/Android keyboard/WebGL behavior still needs device validation.
 - The user has viewed the initial Render deployment. Hosting is user-managed; obtain its actual URL/status before claiming live verification. No hosting credentials are present; do not create paid services without authorization.
 
-## Visual direction (user requirements)
+## Earlier paper direction (historical; superseded by the latest reference below)
 
 Use one responsive design for desktop, tablet and phone. Cream paper background, olive ink, square controls and restrained hard-edge paper shadows. No emoji controls, gradients, glass/backdrop blur, broad dark surfaces, or SaaS dashboard styling. Icons are original inline SVG (`src/Icon.tsx`). Typography is Huninn with Noto Sans TC / sans-serif fallbacks; headings must inherit the same family. Google Fonts stylesheet loads nonblocking, while the licensed local Huninn WOFF2 ensures typography survives blocked external fonts. Preserve `font-display: swap`, license and font provenance in public/fonts. The CSP exception is only Google stylesheet/font domains; no remote scripts.
 
 `npx playwright test --config=playwright.design.config.ts` checks responsive design and font failures. `node scripts/review-design.mjs` captures multiple desktop/tablet/phone sizes for inspection (requires dev server). No-rounded-panel/gradient/emoji checks apply to app controls, not the naturally rounded 3D creature or planet. Renderer uses opaque soft-skin approximation, key/fill/rim lighting and one cached directional shadow map (512 px, refreshed at 5 Hz); character/controller logic remains shared between modes. `src/art` owns sculpt/terrain/furniture/animation; see ART_AUDIT.md and VISUAL_QA.md.
+
+## Latest lakeside layout reference (2026-11-24)
+
+The user explicitly requested the newly attached full-screen lavender/peach lakeside reference. Replace the old three-column paper landing page with a full-viewport interactive 3D island near the lower left on desktop, centered lower on phones; keep broad open sky. Timer plus pause/quiet controls sit upper left; settings/audio upper right. Duration/reset are in the timer popover; chat and pet mode remain accessible. This latest reference supersedes the earlier prohibition on gradients, translucent panels and rounded HUD controls. Preserve Huninn with local fallback, original SVG icons (no emoji), timer/AI policies and native pet transparency.
+
+Scene uses the same sculpted character, shoreline bank, meadow, distant capped hills and a low-resolution throttled planar water reflection. Do not replace the interactive scene with a background image. `tests/design.spec.ts` now checks full viewport composition and corner controls, not the old square paper panels. Current layout evidence belongs in artifacts/layout and LAYOUT_QA.md; earlier ART_AUDIT / VISUAL_QA documents describe the prior art iteration.

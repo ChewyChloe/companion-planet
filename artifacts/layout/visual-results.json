@@ -1,0 +1,188 @@
+{
+  "generatedAt": "2026-11-24T04:52:54.485Z",
+  "errors": [],
+  "views": {
+    "desktop": {
+      "width": 1440,
+      "height": 900,
+      "overflow": false,
+      "hud": {
+        "x": 44,
+        "y": 42,
+        "width": 295.1875,
+        "height": 108
+      },
+      "actorScreen": [
+        0.28733351636431526,
+        0.6109996056052471
+      ],
+      "actorUncovered": true,
+      "lakePresent": true,
+      "shorelinePresent": true,
+      "engine": "three.js r181",
+      "modelReady": "sculpt-v1",
+      "characterNodes": "CharacterRoot,Body,Belly,LeftEye,RightEye,Mouth,LeftCheek,RightCheek,LeftAntenna,RightAntenna,LeftArm,RightArm,LeftLeg,RightLeg",
+      "pose": "0.9923,0.0764,0.0003,0.0067,0.0002,0.0385,-0.0087,0.0025,-0.0025,0.9199,0.0000,0.9857",
+      "qualityDpr": "0.80",
+      "sampleFps": "5.3",
+      "action": "read",
+      "reaction": "none",
+      "frames": "75",
+      "camera": "6.00,3.60,10.00",
+      "screen": "0.28733351636431526,0.6109996056052471",
+      "position": "0.713,0.000,0.229"
+    },
+    "wide": {
+      "width": 1824,
+      "height": 1361,
+      "overflow": false,
+      "hud": {
+        "x": 58,
+        "y": 55,
+        "width": 324,
+        "height": 126
+      },
+      "actorScreen": [
+        0.2938085140204736,
+        0.610953029065361
+      ],
+      "actorUncovered": true,
+      "lakePresent": true,
+      "shorelinePresent": true,
+      "engine": "three.js r181",
+      "modelReady": "sculpt-v1",
+      "characterNodes": "CharacterRoot,Body,Belly,LeftEye,RightEye,Mouth,LeftCheek,RightCheek,LeftAntenna,RightAntenna,LeftArm,RightArm,LeftLeg,RightLeg",
+      "pose": "0.9944,0.0724,0.0006,0.0088,0.0006,0.0346,-0.0060,0.0048,-0.0048,0.5684,0.0000,0.9091",
+      "qualityDpr": "0.80",
+      "sampleFps": "3.0",
+      "action": "read",
+      "reaction": "none",
+      "frames": "75",
+      "camera": "6.00,3.60,10.00",
+      "screen": "0.2938085140204736,0.610953029065361",
+      "position": "0.705,0.000,0.232"
+    },
+    "tablet": {
+      "width": 1024,
+      "height": 768,
+      "overflow": false,
+      "hud": {
+        "x": 44,
+        "y": 42,
+        "width": 295.1875,
+        "height": 108
+      },
+      "actorScreen": [
+        0.2925507571791377,
+        0.6107561271801798
+      ],
+      "actorUncovered": true,
+      "lakePresent": true,
+      "shorelinePresent": true,
+      "engine": "three.js r181",
+      "modelReady": "sculpt-v1",
+      "characterNodes": "CharacterRoot,Body,Belly,LeftEye,RightEye,Mouth,LeftCheek,RightCheek,LeftAntenna,RightAntenna,LeftArm,RightArm,LeftLeg,RightLeg",
+      "pose": "0.9932,0.0517,-0.0000,0.0042,0.0027,0.0206,-0.0040,-0.0003,0.0003,0.6453,0.0000,0.5125",
+      "action": "read",
+      "reaction": "none",
+      "frames": "75",
+      "camera": "6.00,3.60,10.00",
+      "screen": "0.2925507571791377,0.6107561271801798",
+      "position": "0.687,0.000,0.234",
+      "qualityDpr": "0.80",
+      "sampleFps": "6.0"
+    },
+    "phone": {
+      "width": 390,
+      "height": 844,
+      "overflow": false,
+      "hud": {
+        "x": 18,
+        "y": 22,
+        "width": 211.78125,
+        "height": 95
+      },
+      "actorScreen": [
+        0.5731568010658585,
+        0.6467180745640962
+      ],
+      "actorUncovered": true,
+      "lakePresent": true,
+      "shorelinePresent": true,
+      "engine": "three.js r181",
+      "modelReady": "sculpt-v1",
+      "characterNodes": "CharacterRoot,Body,Belly,LeftEye,RightEye,Mouth,LeftCheek,RightCheek,LeftAntenna,RightAntenna,LeftArm,RightArm,LeftLeg,RightLeg",
+      "pose": "0.9927,0.0694,0.0021,0.0068,0.0009,0.0283,-0.0069,0.0158,-0.0158,0.8901,0.0000,0.8534",
+      "action": "read",
+      "reaction": "none",
+      "frames": "75",
+      "camera": "9.74,5.84,16.23",
+      "screen": "0.5731568010658585,0.6467180745640962",
+      "position": "0.680,0.000,0.227",
+      "qualityDpr": "0.80",
+      "sampleFps": "10.3"
+    },
+    "small-phone": {
+      "width": 360,
+      "height": 640,
+      "overflow": false,
+      "hud": {
+        "x": 18,
+        "y": 22,
+        "width": 211.78125,
+        "height": 95
+      },
+      "actorScreen": [
+        0.5729151649472298,
+        0.6342838732594746
+      ],
+      "actorUncovered": true,
+      "lakePresent": true,
+      "shorelinePresent": true,
+      "engine": "three.js r181",
+      "modelReady": "sculpt-v1",
+      "characterNodes": "CharacterRoot,Body,Belly,LeftEye,RightEye,Mouth,LeftCheek,RightCheek,LeftAntenna,RightAntenna,LeftArm,RightArm,LeftLeg,RightLeg",
+      "pose": "0.9929,0.0704,0.0028,0.0072,0.0013,0.0269,-0.0068,0.0217,-0.0217,0.8866,0.0000,0.8731",
+      "action": "read",
+      "reaction": "none",
+      "frames": "75",
+      "camera": "8.00,4.80,13.33",
+      "screen": "0.5729151649472298,0.6342838732594746",
+      "position": "0.673,0.000,0.226",
+      "qualityDpr": "0.80",
+      "sampleFps": "10.1"
+    },
+    "landscape": {
+      "width": 844,
+      "height": 390,
+      "overflow": false,
+      "hud": {
+        "x": 22,
+        "y": 18,
+        "width": 290.359375,
+        "height": 74
+      },
+      "actorScreen": [
+        0.27632940633544706,
+        0.6105928852187555
+      ],
+      "actorUncovered": true,
+      "lakePresent": true,
+      "shorelinePresent": true,
+      "engine": "three.js r181",
+      "modelReady": "sculpt-v1",
+      "characterNodes": "CharacterRoot,Body,Belly,LeftEye,RightEye,Mouth,LeftCheek,RightCheek,LeftAntenna,RightAntenna,LeftArm,RightArm,LeftLeg,RightLeg",
+      "pose": "0.9925,0.0743,-0.0005,0.0056,0.0005,0.0390,-0.0089,-0.0036,0.0036,0.9200,0.0000,0.9421",
+      "action": "read",
+      "reaction": "none",
+      "frames": "75",
+      "camera": "6.00,3.60,10.00",
+      "screen": "0.27632940633544706,0.6105928852187555",
+      "position": "0.686,0.000,0.227",
+      "qualityDpr": "0.80",
+      "sampleFps": "10.3"
+    }
+  },
+  "screenshotDpr": 1,
+  "completed": true
+}
