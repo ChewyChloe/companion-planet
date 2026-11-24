@@ -1,0 +1,171 @@
+{
+  "generatedAt": "2026-11-24T07:21:36.105Z",
+  "unit": {
+    "passed": 31,
+    "failed": 0
+  },
+  "browserAndDesktop": [
+    {
+      "file": "web.spec.ts",
+      "title": "planet renders, camera rotates, character responds, timer and conversation stay synchronized",
+      "project": "desktop",
+      "passed": true
+    },
+    {
+      "file": "web.spec.ts",
+      "title": "planet renders, camera rotates, character responds, timer and conversation stay synchronized",
+      "project": "mobile",
+      "passed": true
+    },
+    {
+      "file": "web.spec.ts",
+      "title": "silent mode suppresses completion notices and AI proposals require confirmation",
+      "project": "desktop",
+      "passed": true
+    },
+    {
+      "file": "web.spec.ts",
+      "title": "silent mode suppresses completion notices and AI proposals require confirmation",
+      "project": "mobile",
+      "passed": true
+    },
+    {
+      "file": "web.spec.ts",
+      "title": "offline fallback and mini companion remain operable",
+      "project": "desktop",
+      "passed": true
+    },
+    {
+      "file": "web.spec.ts",
+      "title": "offline fallback and mini companion remain operable",
+      "project": "mobile",
+      "passed": true
+    },
+    {
+      "file": "interaction.spec.ts",
+      "title": "all nine residents switch real 3D geometry and persist through reload",
+      "project": "desktop",
+      "passed": true
+    },
+    {
+      "file": "interaction.spec.ts",
+      "title": "all nine residents switch real 3D geometry and persist through reload",
+      "project": "mobile",
+      "passed": true
+    },
+    {
+      "file": "interaction.spec.ts",
+      "title": "grabbing moves the creature without orbiting; release stays put and taps respond",
+      "project": "desktop",
+      "passed": true
+    },
+    {
+      "file": "interaction.spec.ts",
+      "title": "grabbing moves the creature without orbiting; release stays put and taps respond",
+      "project": "mobile",
+      "passed": true
+    },
+    {
+      "file": "interaction.spec.ts",
+      "title": "a tapped character can speak, quiet mode suppresses bubbles, mini mode retains species",
+      "project": "desktop",
+      "passed": true
+    },
+    {
+      "file": "interaction.spec.ts",
+      "title": "a tapped character can speak, quiet mode suppresses bubbles, mini mode retains species",
+      "project": "mobile",
+      "passed": true
+    },
+    {
+      "file": "mobile.spec.ts",
+      "title": "touch rotation, character tap, timer and mobile keyboard chat work",
+      "project": "phone-small",
+      "passed": true
+    },
+    {
+      "file": "mobile.spec.ts",
+      "title": "touch rotation, character tap, timer and mobile keyboard chat work",
+      "project": "phone-standard",
+      "passed": true
+    },
+    {
+      "file": "mobile.spec.ts",
+      "title": "touch rotation, character tap, timer and mobile keyboard chat work",
+      "project": "phone-landscape",
+      "passed": true
+    },
+    {
+      "file": "mobile.spec.ts",
+      "title": "touch grabs and drops the resident without moving the camera",
+      "project": "phone-small",
+      "passed": true
+    },
+    {
+      "file": "mobile.spec.ts",
+      "title": "touch grabs and drops the resident without moving the camera",
+      "project": "phone-standard",
+      "passed": true
+    },
+    {
+      "file": "mobile.spec.ts",
+      "title": "touch grabs and drops the resident without moving the camera",
+      "project": "phone-landscape",
+      "passed": true
+    },
+    {
+      "file": "design.spec.ts",
+      "title": "immersive lakeside keeps corner controls, open center and local Huninn",
+      "project": "wide",
+      "passed": true
+    },
+    {
+      "file": "design.spec.ts",
+      "title": "immersive lakeside keeps corner controls, open center and local Huninn",
+      "project": "tablet",
+      "passed": true
+    },
+    {
+      "file": "design.spec.ts",
+      "title": "immersive lakeside keeps corner controls, open center and local Huninn",
+      "project": "phone",
+      "passed": true
+    },
+    {
+      "file": "design.spec.ts",
+      "title": "timer and controls stay readable when every font download fails",
+      "project": "wide",
+      "passed": true
+    },
+    {
+      "file": "design.spec.ts",
+      "title": "timer and controls stay readable when every font download fails",
+      "project": "tablet",
+      "passed": true
+    },
+    {
+      "file": "design.spec.ts",
+      "title": "timer and controls stay readable when every font download fails",
+      "project": "phone",
+      "passed": true
+    },
+    {
+      "file": "electron.spec.ts",
+      "title": "desktop shares state, transparent topmost pet switches back and quits",
+      "project": "",
+      "passed": true
+    }
+  ],
+  "totalPassed": 56,
+  "totalFailed": 0,
+  "visual": {
+    "residents": 9,
+    "errors": []
+  },
+  "humanReview": [
+    "Reference fidelity and aesthetic quality",
+    "Physical iOS/Android",
+    "Windows native dragging and compositing"
+  ],
+  "nativeTestNote": "Real Electron preload IPC/window movement with controlled cursor; browser and CDP touch validate pointer handling."
+}

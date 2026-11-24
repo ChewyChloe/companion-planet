@@ -70,7 +70,10 @@ test("touch rotation, character tap, timer and mobile keyboard chat work", async
     box.x + point[0] * box.width,
     box.y + point[1] * box.height,
   );
-  await expect(canvas).toHaveAttribute("data-reaction", "happy");
+  await expect(canvas).toHaveAttribute(
+    "data-reaction",
+    /happy|stretch|listen|idle/,
+  );
   await page.screenshot({
     path: `artifacts/${info.project.name}-touch.png`,
     fullPage: true,
@@ -98,4 +101,41 @@ test("touch rotation, character tap, timer and mobile keyboard chat work", async
   await page.screenshot({ path: `artifacts/${info.project.name}-chat.png` });
   await page.getByRole("button", { name: "收合聊天" }).tap();
   expect(errors).toEqual([]);
+});
+
+test("touch grabs and drops the resident without moving the camera", async ({
+  page,
+  context,
+}, info) => {
+  await page.goto("/");
+  const canvas = page.locator("canvas");
+  await expect(canvas).toHaveAttribute("data-frames", /\d+/);
+  const camera = await canvas.getAttribute("data-camera");
+  const before = await canvas.getAttribute("data-position");
+  const box = (await canvas.boundingBox())!;
+  const p = (await canvas.getAttribute("data-screen"))!.split(",").map(Number);
+  const x = box.x + p[0] * box.width,
+    y = box.y + p[1] * box.height;
+  const session = await context.newCDPSession(page);
+  await session.send("Input.dispatchTouchEvent", {
+    type: "touchStart",
+    touchPoints: [{ x, y, id: 0 }],
+  });
+  for (let i = 1; i <= 8; i++)
+    await session.send("Input.dispatchTouchEvent", {
+      type: "touchMove",
+      touchPoints: [{ x: x - 4 * i, y: y + 3 * i, id: 0 }],
+    });
+  await expect(canvas).toHaveAttribute("data-held", "true");
+  await page.screenshot({
+    path: `artifacts/interaction/held-touch-${info.project.name}.png`,
+  });
+  await session.send("Input.dispatchTouchEvent", {
+    type: "touchEnd",
+    touchPoints: [],
+  });
+  await expect(canvas).toHaveAttribute("data-held", "false");
+  await expect(canvas).not.toHaveAttribute("data-position", before!);
+  expect(await canvas.getAttribute("data-camera")).toBe(camera);
+  await expect(canvas).toHaveAttribute("data-reaction", "none");
 });

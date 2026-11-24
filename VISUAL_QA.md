@@ -66,3 +66,7 @@ node scripts/report-art-tests.mjs
 | Render 最新部署網址／狀態 | Not Tested |
 
 沒有把未視覺確認或未執行的項目標成 Passed。先前下載過的 Windows ZIP 屬舊版本；本輪交付原始碼／資產並測試 Linux Electron，未宣稱舊 ZIP 已更新。
+
+## 後續九位居民驗證
+
+新互動、九種冠飾、角色切換、拖放、短句與靜音的本輪記錄獨立收於 [INTERACTION_QA.md](INTERACTION_QA.md)。原有照片屬先前美術／版面版本，不作為九位居民已驗證的證明。每一位的最新真實前視渲染與三乘三比較圖位於 artifacts/interaction；風格與參考圖一致程度仍須人工確認。

@@ -52,6 +52,36 @@ test("desktop shares state, transparent topmost pet switches back and quits", as
       "undefined",
     );
     await expect(page.locator("canvas")).toHaveAttribute("data-frames", /\d+/);
+    // Exercise the real preload IPC and native window with a controlled OS cursor.
+    // Pointer capture itself is exercised by the browser/touch suites.
+    await app.evaluate(({ screen }) => {
+      (globalThis as any).originalCursor = screen.getCursorScreenPoint;
+      screen.getCursorScreenPoint = () => ({ x: 600, y: 400 });
+    });
+    await page.evaluate(() => window.desktop!.beginGrab());
+    await app.evaluate(({ screen }) => {
+      screen.getCursorScreenPoint = () => ({ x: 650, y: 430 });
+    });
+    await page.evaluate(() => window.desktop!.moveGrab());
+    await expect
+      .poll(() =>
+        app.evaluate(
+          ({ BrowserWindow }) =>
+            BrowserWindow.getAllWindows()[0].getPosition()[0],
+        ),
+      )
+      .toBe(config.bounds.x + 50);
+    await page.evaluate(() => window.desktop!.endGrab());
+    await app.evaluate(({ screen }) => {
+      screen.getCursorScreenPoint = (globalThis as any).originalCursor;
+      delete (globalThis as any).originalCursor;
+    });
+    await page.getByRole("button", { name: "更換角色", exact: true }).click();
+    await page.getByRole("button", { name: "小星草", exact: true }).click();
+    await expect(page.locator("canvas")).toHaveAttribute(
+      "data-companion",
+      "sprout",
+    );
     const frames = await page.locator("canvas").getAttribute("data-frames");
     await expect(page.locator("canvas")).not.toHaveAttribute(
       "data-frames",

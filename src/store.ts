@@ -1,6 +1,9 @@
 import { create } from "zustand";
 import { initialTimer, restoreTimer, type Timer, type Action } from "./domain";
+import { companionFor, type CompanionId } from "./companions";
 interface State {
+  companionId: CompanionId;
+  setCompanion: (id: CompanionId) => void;
   timer: Timer;
   silent: boolean;
   reduced: boolean;
@@ -30,6 +33,8 @@ function read() {
 const saved = read();
 export const useWorld = create<State>((set) => ({
   timer: restoreTimer(saved.timer, Date.now()),
+  companionId: companionFor(saved.companionId).id,
+  setCompanion: (id) => set({ companionId: companionFor(id).id }),
   silent: saved.silent === true,
   reduced:
     saved.reduced === true ||
@@ -52,6 +57,7 @@ export const useWorld = create<State>((set) => ({
   clear: () => {
     set({
       timer: { ...initialTimer },
+      companionId: "nebula",
       silent: false,
       reduced: false,
       notifications: true,
@@ -65,6 +71,7 @@ export const useWorld = create<State>((set) => ({
 let lastPersist = 0;
 useWorld.subscribe((s, previous) => {
   const preferenceChanged =
+    s.companionId !== previous.companionId ||
     s.silent !== previous.silent ||
     s.reduced !== previous.reduced ||
     s.notifications !== previous.notifications ||
@@ -85,6 +92,7 @@ useWorld.subscribe((s, previous) => {
       key,
       JSON.stringify({
         timer: s.timer,
+        companionId: s.companionId,
         silent: s.silent,
         reduced: s.reduced,
         notifications: s.notifications,

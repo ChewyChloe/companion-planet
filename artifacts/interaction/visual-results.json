@@ -1,0 +1,76 @@
+{
+  "generatedAt": "2026-11-24T07:19:49.944Z",
+  "errors": [],
+  "residents": [
+    {
+      "id": "nebula",
+      "crowns": [],
+      "triangles": 26326,
+      "calls": 12
+    },
+    {
+      "id": "sprout",
+      "crowns": [
+        "Crown-sprout"
+      ],
+      "triangles": 24434,
+      "calls": 12
+    },
+    {
+      "id": "fern",
+      "crowns": [
+        "Crown-fern"
+      ],
+      "triangles": 30070,
+      "calls": 47
+    },
+    {
+      "id": "mushroom",
+      "crowns": [
+        "Crown-mushroom"
+      ],
+      "triangles": 24886,
+      "calls": 14
+    },
+    {
+      "id": "aurora",
+      "crowns": [
+        "Crown-aurora"
+      ],
+      "triangles": 24278,
+      "calls": 11
+    },
+    {
+      "id": "blossom",
+      "crowns": [
+        "Crown-blossom"
+      ],
+      "triangles": 26034,
+      "calls": 15
+    },
+    {
+      "id": "stardust",
+      "crowns": [
+        "Crown-stardust"
+      ],
+      "triangles": 23798,
+      "calls": 10
+    },
+    {
+      "id": "water",
+      "crowns": [
+        "Crown-water"
+      ],
+      "triangles": 24166,
+      "calls": 16
+    },
+    {
+      "id": "puff",
+      "crowns": [
+        "Crown-puff"
+      ],
+      "triangles": 23926,
+      "calls": 11
+    }
+  ]
+}

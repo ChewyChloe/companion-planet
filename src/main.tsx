@@ -1,3 +1,5 @@
+import { CompanionPicker } from "./CompanionPicker";
+import { companionFor, randomGreeting } from "./companions";
 import { Icon } from "./Icon";
 import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
@@ -18,6 +20,9 @@ import "./style.css";
 declare global {
   interface Window {
     desktop?: {
+      beginGrab: () => void;
+      moveGrab: () => void;
+      endGrab: () => void;
       setMode: (mode: string) => Promise<void>;
       hide: () => void;
       quit: () => void;
@@ -121,6 +126,18 @@ function App() {
       window.removeEventListener("resize", update);
     };
   }, []);
+  const [picker, setPicker] = useState(false);
+  const [speech, setSpeech] = useState("");
+  const lastGreeting = useRef(-1);
+  useEffect(() => {
+    if (state.silent) setSpeech("");
+  }, [state.silent]);
+  const selected = companionFor(state.companionId);
+  useEffect(() => {
+    if (!speech) return;
+    const timer = setTimeout(() => setSpeech(""), 5500);
+    return () => clearTimeout(timer);
+  }, [speech]);
   const [pet, setPet] = useState(false);
   const [chat, setChat] = useState(false);
   const [settings, setSettings] = useState(false);
@@ -128,6 +145,8 @@ function App() {
   useEffect(() => {
     const close = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
+        setPicker(false);
+        setSpeech("");
         setChat(false);
         setSettings(false);
         setTimerOpen(false);
@@ -219,9 +238,14 @@ function App() {
     if (phase === "focus") setChat(false);
   };
   const interact = () => {
-    state.react(state.timer.phase === "focus" ? "listen" : "happy");
-    if (!state.silent && state.timer.phase !== "focus")
-      setNotice("星雲仔輕輕揮了揮手。");
+    const greeting = randomGreeting(
+      lastGreeting.current,
+      state.silent,
+      state.timer.phase === "focus",
+    );
+    lastGreeting.current = greeting.index;
+    state.react(greeting.action);
+    setSpeech(greeting.text);
   };
   const send = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -243,6 +267,7 @@ function App() {
           signal: request.current.signal,
           body: JSON.stringify({
             message: text,
+            companionId: state.companionId,
             phase: state.timer.phase,
             hour: new Date().getHours(),
             history,
@@ -297,7 +322,12 @@ function App() {
       data-activity={activity}
     >
       <section className="world" aria-label="星雲仔的微型世界">
-        <Scene pet={pet} onClick={interact} reduced={state.reduced} />
+        <Scene
+          pet={pet}
+          onClick={interact}
+          reduced={state.reduced}
+          speech={speech}
+        />
       </section>
       {!pet && (
         <>
@@ -435,11 +465,22 @@ function App() {
               onClick={interact}
               aria-label="打個招呼"
             >
-              <span>星雲仔 · {actionNames[activity]}</span>
+              <span>
+                {selected.name} · {actionNames[activity]}
+              </span>
               <Icon name="hand" />
             </button>
           </div>
           <div className="companion-tools">
+            <button
+              className="round-control"
+              onClick={() => setPicker(!picker)}
+              aria-label="更換角色"
+              aria-expanded={picker}
+              title="更換角色"
+            >
+              <Icon name="orbit" />
+            </button>
             <button
               className="round-control"
               onClick={() => void mode()}
@@ -451,12 +492,26 @@ function App() {
           </div>
         </>
       )}
+      {picker && (
+        <CompanionPicker
+          selected={state.companionId}
+          onClose={() => setPicker(false)}
+          onSelect={(id) => {
+            state.setCompanion(id);
+            setSpeech("");
+            setPicker(false);
+          }}
+        />
+      )}
       {pet && (
         <>
           <div className="pet-handle" title="拖曳這裡移動桌寵">
-            <Icon name="move" /> 星雲仔 <span>{display}</span>
+            <Icon name="move" /> {selected.name} <span>{display}</span>
           </div>
           <div className="pet-controls">
+            <button onClick={() => setPicker(!picker)} aria-label="更換角色">
+              <Icon name="orbit" />
+            </button>
             <button onClick={() => void mode()} aria-label="返回星球">
               <Icon name="expand" />
             </button>
@@ -493,8 +548,8 @@ function App() {
       {!pet && (
         <button
           className="chat-launch round-control"
-          aria-label="和星雲仔說說話"
-          title="和星雲仔說說話"
+          aria-label={`和${selected.name}說說話`}
+          title={`和${selected.name}說說話`}
           aria-expanded={chat}
           onClick={() => setChat(!chat)}
         >
@@ -502,10 +557,10 @@ function App() {
         </button>
       )}
       {chat && (
-        <section className="chat-panel" aria-label="與星雲仔對話">
+        <section className="chat-panel" aria-label={`與${selected.name}對話`}>
           <div className="chat-heading">
             <div>
-              星雲仔 <small>{provider}</small>
+              {selected.name} <small>{provider}</small>
             </div>
             <button aria-label="收合聊天" onClick={() => setChat(false)}>
               <Icon name="close" />
@@ -521,7 +576,7 @@ function App() {
           <div className="messages" aria-live="polite">
             {messages.length === 0 && (
               <p className="welcome">
-                嗨，我是星雲仔。
+                嗨，我是{selected.name}。
                 <br />
                 想說點什麼，或只是一起安靜待著，都可以。
               </p>
@@ -531,7 +586,7 @@ function App() {
                 {m.content}
               </div>
             ))}
-            {busy && <p>星雲仔正在想一想…</p>}
+            {busy && <p>{selected.name}正在想一想…</p>}
             <div ref={end} />
           </div>
           {intent === "start_focus" && (
@@ -557,7 +612,7 @@ function App() {
           )}
           <form onSubmit={send}>
             <label className="sr-only" htmlFor="message">
-              想對星雲仔說的話
+              想對{selected.name}說的話
             </label>
             <input
               id="message"

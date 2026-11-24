@@ -1,3 +1,4 @@
+import { safeDrop } from "./art/placement";
 import { Coast } from "./art/Coast";
 import {
   Component,
@@ -8,7 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, Stats } from "@react-three/drei";
+import { OrbitControls, Stats, Html } from "@react-three/drei";
 import * as THREE from "three";
 import { useWorld } from "./store";
 import { type Action } from "./domain";
@@ -24,7 +25,15 @@ import {
   HOME,
   smoothstep,
 } from "./art/terrain";
-function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
+function Character({
+  pet,
+  onClick,
+  speech,
+}: {
+  pet: boolean;
+  onClick: () => void;
+  speech: string;
+}) {
   const root = useRef<THREE.Group>(null);
   const model = useRef<THREE.Group>(null);
   const clock = useRef(0);
@@ -35,7 +44,95 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
   const behavior = useRef({ ...initialBehavior, until: 8 });
   const rendered = useRef<Action>("idle");
   const [visual, setVisual] = ReactUseState<Action>("idle");
-  const { gl, camera } = useThree();
+  const { gl, camera, controls } = useThree();
+  const held = useRef(false);
+  const manualUntil = useRef(0);
+  const phase = useRef(useWorld.getState().timer.phase);
+  const drag = useRef<{
+    id: number;
+    x: number;
+    y: number;
+    offset: THREE.Vector3;
+    plane: THREE.Plane;
+  } | null>(null);
+  const petOffset = useRef(new THREE.Vector3());
+  const ray = useMemo(() => new THREE.Raycaster(), []);
+  const pointer = useMemo(() => new THREE.Vector2(), []);
+  const hit = useMemo(() => new THREE.Vector3(), []);
+  const intersect = (e: PointerEvent, plane: THREE.Plane) => {
+    const b = gl.domElement.getBoundingClientRect();
+    pointer.set(
+      ((e.clientX - b.left) / b.width) * 2 - 1,
+      (-(e.clientY - b.top) / b.height) * 2 + 1,
+    );
+    ray.setFromCamera(pointer, camera);
+    return ray.ray.intersectPlane(plane, hit);
+  };
+  useEffect(() => {
+    const orbit = controls as unknown as { enabled: boolean } | null;
+    if (orbit && drag.current) orbit.enabled = false;
+    const move = (e: PointerEvent) => {
+      const d = drag.current;
+      if (!d || e.pointerId !== d.id) return;
+      if (Math.hypot(e.clientX - d.x, e.clientY - d.y) > 6) held.current = true;
+      if (!held.current) return;
+      e.preventDefault();
+      if (pet && window.desktop) {
+        window.desktop.moveGrab();
+        gl.domElement.dataset.held = "true";
+        return;
+      }
+      const point = intersect(e, d.plane);
+      if (!point) return;
+      point.sub(d.offset);
+      if (pet) {
+        petOffset.current.set(
+          THREE.MathUtils.clamp(point.x, -0.45, 0.45),
+          THREE.MathUtils.clamp(point.y + 0.55, -0.3, 0.3),
+          0,
+        );
+      } else {
+        const [x, z] = safeDrop(point.x, point.z);
+        position.current.set(x, 0, z);
+      }
+      gl.domElement.dataset.held = "true";
+    };
+    const finish = (e?: PointerEvent) => {
+      const d = drag.current;
+      if (!d || (e && e.pointerId !== d.id)) return;
+      const moved = held.current;
+      drag.current = null;
+      held.current = false;
+      if (pet) window.desktop?.endGrab();
+      if (orbit) orbit.enabled = true;
+      gl.domElement.style.cursor = "grab";
+      gl.domElement.dataset.held = "false";
+      if (gl.domElement.hasPointerCapture(d.id))
+        gl.domElement.releasePointerCapture(d.id);
+      if (moved) {
+        manualUntil.current = Date.now() + 20000;
+        behavior.current = {
+          ...behavior.current,
+          action: "idle",
+          target: [position.current.x, position.current.z],
+          home: [position.current.x, position.current.z],
+          until: 0,
+        };
+      } else if (e && e.type === "pointerup") onClick();
+    };
+    window.addEventListener("pointermove", move, { passive: false });
+    window.addEventListener("pointerup", finish);
+    window.addEventListener("pointercancel", finish);
+    const blur = () => finish();
+    window.addEventListener("blur", blur);
+    return () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", finish);
+      window.removeEventListener("pointercancel", finish);
+      window.removeEventListener("blur", blur);
+      if (orbit) orbit.enabled = true;
+    };
+  });
   const normal = useMemo(() => new THREE.Vector3(), []);
   const screen = useMemo(() => new THREE.Vector3(), []);
   const up = useMemo(() => new THREE.Vector3(0, 1, 0), []);
@@ -46,23 +143,36 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
     const dt = Math.min(delta, 0.1);
     const motionDt = Math.min(delta, 0.25);
     clock.current += state.reduced ? dt * 0.18 : dt;
-    behavior.current = advanceBehavior(
-      behavior.current,
-      state.timer.phase,
-      state.reaction,
-      state.reactionUntil,
-      Date.now(),
-      _state.clock.elapsedTime,
-    );
-    action.current = behavior.current.action;
-    target.current.set(
-      behavior.current.target[0],
-      0,
-      behavior.current.target[1],
-    );
-    const distance = position.current.distanceTo(target.current);
+    if (phase.current !== state.timer.phase) {
+      phase.current = state.timer.phase;
+      manualUntil.current = 0;
+    }
+    const manual = held.current || Date.now() < manualUntil.current;
+    if (!manual)
+      behavior.current = advanceBehavior(
+        behavior.current,
+        state.timer.phase,
+        state.reaction,
+        state.reactionUntil,
+        Date.now(),
+        _state.clock.elapsedTime,
+      );
+    action.current = manual
+      ? state.reaction && state.reactionUntil > Date.now()
+        ? state.reaction === "read"
+          ? "listen"
+          : state.reaction
+        : "idle"
+      : behavior.current.action;
+    if (!manual)
+      target.current.set(
+        behavior.current.target[0],
+        0,
+        behavior.current.target[1],
+      );
+    const distance = manual ? 0 : position.current.distanceTo(target.current);
     waypoint(position.current, target.current, next);
-    position.current.lerp(next, 1 - Math.exp(-motionDt * 1.3));
+    if (!manual) position.current.lerp(next, 1 - Math.exp(-motionDt * 1.3));
     const actual =
       distance > 0.07 && !pet
         ? action.current === "approach"
@@ -79,7 +189,11 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
     }
     if (root.current) {
       if (pet) {
-        root.current.position.set(0, -0.55, 0);
+        root.current.position.set(
+          petOffset.current.x,
+          -0.55 + petOffset.current.y + (held.current ? 0.18 : 0),
+          0,
+        );
         root.current.quaternion.identity();
       } else {
         const surface = height(position.current.x, position.current.z);
@@ -98,6 +212,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
           THREE.MathUtils.damp(
             root.current.position.y,
             surface +
+              (held.current ? 0.28 : 0) +
               CHAIR.seatedRootOffset * seatBlend.current +
               (actual === "rest" ? 0.065 : 0),
             5,
@@ -152,19 +267,62 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
   return (
     <group
       ref={root}
-      onClick={(e) => {
+      onPointerDown={(e) => {
+        if (drag.current || e.button !== 0) return;
         e.stopPropagation();
-        onClick();
+        const plane = pet
+          ? new THREE.Plane(new THREE.Vector3(0, 0, 1), 0)
+          : new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+        const point = intersect(e.nativeEvent, plane);
+        if (!point) return;
+        const origin = pet
+          ? new THREE.Vector3(
+              petOffset.current.x,
+              -0.55 + petOffset.current.y,
+              0,
+            )
+          : position.current;
+        drag.current = {
+          id: e.pointerId,
+          x: e.clientX,
+          y: e.clientY,
+          offset: point.clone().sub(origin),
+          plane,
+        };
+        if (controls)
+          (controls as unknown as { enabled: boolean }).enabled = false;
+        if (pet) window.desktop?.beginGrab();
+        gl.domElement.setPointerCapture(e.pointerId);
+        gl.domElement.style.cursor = "grabbing";
+      }}
+      onPointerOver={(e) => {
+        e.stopPropagation();
+        if (!drag.current) gl.domElement.style.cursor = "grab";
+      }}
+      onPointerOut={() => {
+        if (!drag.current) gl.domElement.style.cursor = "auto";
       }}
     >
       <group ref={model}>
         <SculptCharacter
           action={visual}
+          held={held}
           time={clock}
           seatBlend={pet ? undefined : seatBlend}
           modelUrl={import.meta.env.VITE_CHARACTER_MODEL_URL}
         />
       </group>
+      {speech && (
+        <Html
+          position={[0, pet ? 1.55 : 1.9, 0]}
+          center
+          style={{ pointerEvents: "none", width: 190 }}
+        >
+          <div className="character-speech" role="note" aria-live="polite">
+            {speech}
+          </div>
+        </Html>
+      )}
     </group>
   );
 }
@@ -235,10 +393,12 @@ export default function Scene({
   pet,
   onClick,
   reduced,
+  speech = "",
 }: {
   pet: boolean;
   onClick: () => void;
   reduced: boolean;
+  speech?: string;
 }) {
   const [lost, setLost] = ReactUseState(false);
   return (
@@ -274,6 +434,7 @@ export default function Scene({
             <Coast reduced={reduced} />
             <World shoreline />
             <OrbitControls
+              makeDefault
               target={[0, 0.2, 0]}
               minDistance={8}
               maxDistance={28}
@@ -285,7 +446,7 @@ export default function Scene({
           </>
         )}
         <Suspense fallback={null}>
-          <Character pet={pet} onClick={onClick} />
+          <Character pet={pet} onClick={onClick} speech={speech} />
         </Suspense>
         {import.meta.env.DEV &&
           new URLSearchParams(location.search).has("stats") && <Stats />}

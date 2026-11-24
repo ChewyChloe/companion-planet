@@ -766,3 +766,116 @@ select {
     transition: none !important;
   }
 }
+
+.companion-tools {
+  display: flex;
+  gap: 10px;
+}
+.companion-picker {
+  position: absolute;
+  z-index: 30;
+  right: 30px;
+  bottom: 96px;
+  width: min(450px, calc(100vw - 32px));
+  max-height: calc(100dvh - 130px);
+  overflow: auto;
+  padding: 20px;
+  background: rgba(253, 249, 243, 0.97);
+  color: #514b61;
+  border: 1px solid #e2dae2;
+  border-radius: 22px;
+  box-shadow: 0 4px 0 #8b81a21a;
+}
+.companion-picker header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.companion-picker h2 {
+  font-size: 21px;
+  margin: 0 0 5px;
+}
+.companion-picker p {
+  margin: 0;
+  font-size: 13px;
+}
+.companion-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 16px 0;
+}
+.companion-grid button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  background: #f0edf2;
+  color: #514b61;
+  padding: 4px 5px 9px;
+  min-width: 0;
+}
+.companion-grid button[aria-pressed="true"] {
+  border-color: #8a7c9e;
+  background: #e7e1ee;
+}
+.companion-grid button > svg:not(.icon) {
+  width: 100%;
+  height: 94px;
+}
+.companion-grid button > .icon {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  width: 17px;
+}
+.companion-hint {
+  line-height: 1.6;
+}
+.character-speech {
+  position: relative;
+  background: #fffbf3f5;
+  color: #514b61;
+  padding: 13px 16px;
+  border: 1px solid #e3dae4;
+  border-radius: 16px;
+  line-height: 1.6;
+  text-align: center;
+  font-family: "Huninn", "Noto Sans TC", sans-serif;
+  font-size: 15px;
+  box-shadow: 0 3px 0 #67587918;
+}
+.character-speech:after {
+  content: "";
+  position: absolute;
+  bottom: -7px;
+  left: calc(50% - 7px);
+  width: 12px;
+  height: 12px;
+  background: #fffbf3;
+  transform: rotate(45deg);
+  border-right: 1px solid #e3dae4;
+  border-bottom: 1px solid #e3dae4;
+}
+@media (max-width: 699px) {
+  .companion-picker {
+    right: 16px;
+    bottom: 86px;
+    padding: 16px;
+  }
+  .companion-grid button > svg:not(.icon) {
+    height: 80px;
+  }
+}
+.pet .companion-picker {
+  right: 8px;
+  bottom: 52px;
+  width: calc(100% - 16px);
+  max-height: calc(100dvh - 100px);
+  padding: 12px;
+}
+.pet .companion-grid button > svg:not(.icon) {
+  height: 52px;
+}

@@ -3,6 +3,7 @@ const {
   BrowserWindow,
   ipcMain,
   Tray,
+  screen,
   Menu,
   nativeImage,
 } = require("electron");
@@ -11,12 +12,14 @@ let window,
   server,
   tray,
   mode = "planet";
+let grab = null;
 const icon = () =>
   nativeImage
     .createFromPath(path.join(__dirname, "../dist/icon.png"))
     .resize({ width: 24, height: 24 });
 function switchMode(next) {
   if (!["planet", "pet"].includes(next) || !window) return;
+  grab = null;
   mode = next;
   window.hide();
   window.setAlwaysOnTop(mode === "pet");
@@ -57,6 +60,38 @@ else {
       );
       ipcMain.handle("world:mode", (event, next) => {
         if (event.sender === window.webContents) switchMode(next);
+      });
+      ipcMain.on("world:grab", (event, action) => {
+        if (event.sender !== window.webContents || mode !== "pet") return;
+        if (action === "end") {
+          grab = null;
+          return;
+        }
+        const cursor = screen.getCursorScreenPoint();
+        if (action === "begin") {
+          const [x, y] = window.getPosition();
+          grab = { x: cursor.x - x, y: cursor.y - y };
+        } else if (action === "move" && grab) {
+          const area = screen.getDisplayNearestPoint(cursor).workArea;
+          const [width, height] = window.getSize();
+          window.setPosition(
+            Math.round(
+              Math.max(
+                area.x,
+                Math.min(area.x + area.width - width, cursor.x - grab.x),
+              ),
+            ),
+            Math.round(
+              Math.max(
+                area.y,
+                Math.min(area.y + area.height - height, cursor.y - grab.y),
+              ),
+            ),
+          );
+        }
+      });
+      window.on("blur", () => {
+        grab = null;
       });
       ipcMain.on("world:hide", (event) => {
         if (event.sender === window.webContents) {

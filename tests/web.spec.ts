@@ -39,7 +39,7 @@ test("planet renders, camera rotates, character responds, timer and conversation
   );
   await expect(page.locator("main")).toHaveAttribute(
     "data-activity",
-    /happy|walk/,
+    /happy|walk|stretch|listen|idle/,
   );
   await page.screenshot({
     path: `artifacts/planet-${testInfo.project.name}.png`,

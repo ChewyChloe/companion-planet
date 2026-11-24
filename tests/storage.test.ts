@@ -12,6 +12,10 @@ it("persists pause and preferences immediately and clears user data", async () =
     const { startTimer, pause, initialTimer } = await import("../src/domain");
     useWorld.getState().setTimer(startTimer(initialTimer, 25, Date.now()));
     useWorld.getState().setSilent(true);
+    useWorld.getState().setCompanion("fern");
+    expect(JSON.parse(memory.get("companion-planet-v1")!).companionId).toBe(
+      "fern",
+    );
     useWorld.getState().setFocusMinutes(1);
     expect(JSON.parse(memory.get("companion-planet-v1")!).focusMinutes).toBe(1);
     expect(JSON.parse(memory.get("companion-planet-v1")!).silent).toBe(true);

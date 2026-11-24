@@ -1,3 +1,4 @@
+import { companionName } from "../shared/dialogue.js";
 import { fetch as networkFetch, EnvHttpProxyAgent } from "undici";
 const dispatcher = new EnvHttpProxyAgent();
 const providerFetch = (url, options) =>
@@ -11,7 +12,7 @@ import {
 } from "../shared/dialogue.js";
 export { fallback, validateReply, urgent } from "../shared/dialogue.js";
 export async function getReply(
-  { message, phase, hour, history = [] },
+  { message, phase, hour, history = [], companionId = "nebula" },
   {
     fetcher = providerFetch,
     apiKey = process.env.LLM_API_KEY,
@@ -41,7 +42,7 @@ export async function getReply(
           messages: [
             {
               role: "system",
-              content: `你是同頻星球的星雲仔，非真人。用溫柔繁體中文簡短回應，不診斷心理狀態，不索取個資。當前狀態 ${phase}，本地時間 ${hour} 點。專注中最多一句，不延伸提問。不能操作計時器或系統。只輸出 JSON：reply_text(240字以內), user_intent(${intents.join("|")}), emotion(neutral|caring|happy|calm), suggested_action(${actions.join("|")})。`,
+              content: `你是同頻星球的${companionName(companionId)}，非真人。用溫柔繁體中文簡短回應，不診斷心理狀態，不索取個資。當前狀態 ${phase}，本地時間 ${hour} 點。專注中最多一句，不延伸提問。不能操作計時器或系統。只輸出 JSON：reply_text(240字以內), user_intent(${intents.join("|")}), emotion(neutral|caring|happy|calm), suggested_action(${actions.join("|")})。`,
             },
             ...history.slice(-6),
             { role: "user", content: message },

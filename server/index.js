@@ -34,7 +34,7 @@ export async function startServer({
     res.json({ ok: true, provider: process.env.LLM_API_KEY ? "llm" : "mock" }),
   );
   app.post("/api/chat", async (req, res) => {
-    const { message, phase, hour, history = [] } = req.body || {};
+    const { message, phase, hour, history = [], companionId } = req.body || {};
     if (
       typeof message !== "string" ||
       !message.trim() ||
@@ -63,7 +63,15 @@ export async function startServer({
         : { at: now, count: 1 };
     calls.set(ip, count);
     if (count.count > 20) return res.status(429).json({ error: "請稍候再試" });
-    res.json(await getReply({ message: message.trim(), phase, hour, history }));
+    res.json(
+      await getReply({
+        message: message.trim(),
+        phase,
+        hour,
+        history,
+        companionId,
+      }),
+    );
   });
   if (staticFiles) {
     app.use((_req, res, next) => {

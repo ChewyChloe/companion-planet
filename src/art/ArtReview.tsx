@@ -2,6 +2,7 @@ import { Suspense, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import SculptCharacter from "./SculptCharacter";
+import { companionFor, type CompanionId } from "../companions";
 import type { Action } from "../domain";
 const actions: Action[] = [
   "idle",
@@ -14,7 +15,15 @@ const actions: Action[] = [
   "approach",
   "return",
 ];
-function Figure({ action, angle }: { action: Action; angle: number }) {
+function Figure({
+  action,
+  angle,
+  companionId,
+}: {
+  action: Action;
+  angle: number;
+  companionId: CompanionId;
+}) {
   const time = useRef(0);
   const { gl, scene, camera } = useThree();
   const count = useRef(0);
@@ -38,7 +47,7 @@ function Figure({ action, angle }: { action: Action; angle: number }) {
   });
   return (
     <group rotation={[0, angle, 0]}>
-      <SculptCharacter action={action} time={time} />
+      <SculptCharacter action={action} time={time} companionId={companionId} />
     </group>
   );
 }
@@ -59,9 +68,9 @@ export default function ArtReview() {
       <Canvas
         shadows
         dpr={1}
-        camera={{ position: [0, 0.82, 3.6], fov: 33 }}
+        camera={{ position: [0, 1, 4.1], fov: 33 }}
         onCreated={({ camera, gl }) => {
-          camera.lookAt(0, 0.78, 0);
+          camera.lookAt(0, 0.92, 0);
           gl.setClearColor("#f4f1e8", 1);
         }}
       >
@@ -71,7 +80,11 @@ export default function ArtReview() {
         <directionalLight position={[3, 2, 1]} intensity={0.7} />
         <directionalLight position={[0, 3, -4]} intensity={1.4} />
         <Suspense fallback={null}>
-          <Figure action={action} angle={angle} />
+          <Figure
+            action={action}
+            angle={angle}
+            companionId={companionFor(params.get("companion")).id}
+          />
         </Suspense>
       </Canvas>
     </div>

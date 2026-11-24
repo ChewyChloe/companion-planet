@@ -1,3 +1,19 @@
+export const companionNames = Object.freeze({
+  nebula: "星雲仔",
+  sprout: "小星草",
+  fern: "蕨蕨子",
+  mushroom: "菇菇獸",
+  aurora: "極光仔",
+  blossom: "花苞寶",
+  stardust: "星塵獸",
+  water: "水球仔",
+  puff: "蓬蓬仔",
+});
+export function companionName(id) {
+  return typeof id === "string" && Object.hasOwn(companionNames, id)
+    ? companionNames[id]
+    : companionNames.nebula;
+}
 export const intents = [
   "chat",
   "start_focus",
