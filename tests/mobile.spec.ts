@@ -85,9 +85,9 @@ test("touch rotation, character tap, timer and mobile keyboard chat work", async
     path: `artifacts/${info.project.name}-touch.png`,
     fullPage: true,
   });
-  await page.getByRole("button", { name: "開啟設定" }).tap();
-  await page.getByLabel("減少動畫").check();
-  await page.getByRole("button", { name: "開啟設定" }).tap();
+  await page.getByRole("button", { name: "切換為夜晚" }).tap();
+  await expect(page.locator("main")).toHaveAttribute("data-time-of-day", "night");
+  await page.getByRole("button", { name: "切換為白天" }).tap();
   await openTimerSettings(page);
   await page.getByLabel("專注時長").selectOption("1");
   await page.getByRole("button", { name: "開始專注", exact: false }).tap();

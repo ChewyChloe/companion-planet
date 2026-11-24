@@ -21,6 +21,8 @@ interface State {
   companionId: CompanionId;
   setCompanion: (id: CompanionId) => void;
   timer: Timer;
+  night: boolean;
+  toggleNight: () => void;
   silent: boolean;
   reduced: boolean;
   notifications: boolean;
@@ -93,6 +95,8 @@ export const useWorld = create<State>((set) => ({
     })),
   companionId: companionFor(saved.companionId).id,
   setCompanion: (id) => set({ companionId: companionFor(id).id }),
+  night: saved.night === true,
+  toggleNight: () => set(s => ({ night: !s.night })),
   silent: saved.silent === true,
   reduced:
     saved.reduced === true ||
@@ -139,6 +143,7 @@ useWorld.subscribe((s, previous) => {
     s.planetId !== previous.planetId ||
     s.lampOn !== previous.lampOn ||
     s.companionId !== previous.companionId ||
+    s.night !== previous.night ||
     s.silent !== previous.silent ||
     s.reduced !== previous.reduced ||
     s.notifications !== previous.notifications ||
@@ -162,6 +167,7 @@ useWorld.subscribe((s, previous) => {
         companionId: s.companionId,
         planetId: s.planetId,
         lampOn: s.lampOn,
+        night: s.night,
         silent: s.silent,
         reduced: s.reduced,
         notifications: s.notifications,

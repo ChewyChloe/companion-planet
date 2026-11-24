@@ -1,8 +1,17 @@
+import { useWorld } from "../store";
 import { useEffect, useMemo } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 export function Atmosphere({ reduced }: { reduced: boolean }) {
-  const { scene } = useThree();
+  const { scene, gl } = useThree();
+  const night = useWorld(s => s.night);
+  const palette = useMemo(() => ({
+    upper: new THREE.Color(night ? "#242d58" : "#9daed2"),
+    middle: new THREE.Color(night ? "#4c4d77" : "#d0c1db"),
+    horizon: new THREE.Color(night ? "#81748f" : "#f1d1b8"),
+    water: new THREE.Color(night ? "#535876" : "#c3bdd7"),
+    fog: new THREE.Color(night ? "#5f5e7c" : "#ddcbd5"),
+  }), [night]);
   const sky = useMemo(
     () =>
       new THREE.ShaderMaterial({
@@ -64,7 +73,12 @@ export function Atmosphere({ reduced }: { reduced: boolean }) {
       water.dispose();
     };
   }, [scene, sky, cloud, water]);
-  useFrame((s) => {
+  useFrame((s, delta) => {
+    const blend = 1 - Math.exp(-Math.min(delta,.1)*3);
+    for (const key of ["upper", "middle", "horizon"] as const) sky.uniforms[key].value.lerp(palette[key], blend);
+    water.uniforms.color.value.lerp(palette.water,blend);
+    if (scene.fog) scene.fog.color.lerp(palette.fog,blend);
+    gl.domElement.dataset.timeOfDay = night ? "night" : "day";
     water.uniforms.time.value = reduced ? 0 : s.clock.elapsedTime;
   });
   return (
@@ -91,7 +105,7 @@ export function Atmosphere({ reduced }: { reduced: boolean }) {
           >
             <spriteMaterial
               map={cloud}
-              color={i % 2 ? "#e5d9e3" : "#d8d2e3"}
+              color={night ? "#74708f" : i % 2 ? "#e5d9e3" : "#d8d2e3"}
               transparent
               opacity={0.6}
               depthWrite={false}

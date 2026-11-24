@@ -1,3 +1,5 @@
+import { useFrame } from "@react-three/fiber";
+import { useWorld } from "../store";
 import { useEffect } from "react";
 import { useThree } from "@react-three/fiber";
 import * as THREE from "three";
@@ -18,5 +20,9 @@ export function SoftEnvironment() {
       environment.dispose();
     };
   }, [gl, scene]);
+  useFrame((_s, delta) => {
+    const target = useWorld.getState().night ? .12 : .32;
+    scene.environmentIntensity += (target-scene.environmentIntensity)*(1-Math.exp(-Math.min(delta,.1)*3));
+  });
   return null;
 }

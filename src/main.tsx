@@ -161,7 +161,6 @@ function App() {
   }, [speech]);
   const [pet, setPet] = useState(false);
   const [chat, setChat] = useState(false);
-  const [settings, setSettings] = useState(false);
   const [timerOpen, setTimerOpen] = useState(false);
   useEffect(() => {
     const close = (e: KeyboardEvent) => {
@@ -169,7 +168,6 @@ function App() {
         setPicker(false);
         setSpeech("");
         setChat(false);
-        setSettings(false);
         setTimerOpen(false);
       }
     };
@@ -238,7 +236,6 @@ function App() {
   useEffect(() => window.desktop?.onMode((mode) => setPet(mode === "pet")), []);
   const mode = async () => {
     setChat(false);
-    setSettings(false);
     setTimerOpen(false);
     const next = !pet;
     if (window.desktop) await window.desktop.setMode(next ? "pet" : "planet");
@@ -340,6 +337,7 @@ function App() {
     <main
       className={pet ? "app pet" : "app"}
       data-planet={state.planetId}
+      data-time-of-day={state.night ? "night" : "day"}
       data-phase={state.timer.phase}
       data-activity={activity}
     >
@@ -362,7 +360,6 @@ function App() {
               aria-controls="timer-settings"
               onClick={() => {
                 setTimerOpen(!timerOpen);
-                setSettings(false);
               }}
             >
               <span className="time" role="timer" aria-label="剩餘時間">
@@ -403,14 +400,12 @@ function App() {
           <nav className="scene-tools" aria-label="陪伴設定">
             <button
               className="round-control"
-              aria-label="開啟設定"
-              aria-expanded={settings}
-              onClick={() => {
-                setSettings(!settings);
-                setTimerOpen(false);
-              }}
+              aria-label={state.night ? "切換為白天" : "切換為夜晚"}
+              aria-pressed={state.night}
+              title={state.night ? "切換為白天" : "切換為夜晚"}
+              onClick={() => state.toggleNight()}
             >
-              <Icon name="settings" />
+              <Icon name={state.night ? "moon" : "settings"} />
             </button>
             <button
               className="round-control"
@@ -696,57 +691,6 @@ function App() {
               <Icon name="arrow" style={{ transform: "rotate(-90deg)" }} />
             </button>
           </form>
-        </section>
-      )}
-      {settings && !pet && (
-        <section className="settings floating-panel" aria-label="設定">
-          <div className="panel-heading">
-            <h2>舒服地待著</h2>
-            <button aria-label="收合設定" onClick={() => setSettings(false)}>
-              <Icon name="close" />
-            </button>
-          </div>
-          <p>拖曳小島旋轉，滾輪或雙指縮放。</p>
-          {window.desktop && (
-            <div className="native-actions">
-              <button onClick={() => window.desktop?.hide()}>最小化星球</button>
-              <button
-                onClick={() => window.desktop?.quit()}
-                aria-label="退出應用程式"
-              >
-                退出應用程式
-              </button>
-            </div>
-          )}
-          <label>
-            <input
-              type="checkbox"
-              checked={state.reduced}
-              onChange={(e) => state.setReduced(e.target.checked)}
-            />
-            減少動畫
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={state.notifications}
-              onChange={(e) => state.setNotifications(e.target.checked)}
-            />
-            專注結束時提醒一次
-          </label>
-          <p>計時和偏好儲存在此裝置；不使用攝影機或麥克風。</p>
-          <button
-            onClick={() => {
-              generation.current++;
-              request.current?.abort();
-              state.clear();
-              setMessages([]);
-              setIntent("");
-              setNotice("");
-            }}
-          >
-            清除本機資料與對話
-          </button>
         </section>
       )}
     </main>

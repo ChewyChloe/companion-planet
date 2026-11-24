@@ -237,6 +237,7 @@ export function World({ shoreline = false }: { shoreline?: boolean }) {
   );
 }
 export function ArtLights({ pet = false }: { pet?: boolean }) {
+  const night = useWorld(s => s.night) && !pet;
   const { gl } = useThree();
   const last = useRef(-1);
   const ambient = useRef<THREE.AmbientLight>(null),
@@ -246,14 +247,14 @@ export function ArtLights({ pet = false }: { pet?: boolean }) {
     if (ambient.current)
       ambient.current.intensity = THREE.MathUtils.damp(
         ambient.current.intensity,
-        on ? 0.32 : 0.44,
+        night ? (on ? .13 : .19) : on ? 0.32 : 0.44,
         3,
         Math.min(delta, 0.1),
       );
     if (hemisphere.current)
       hemisphere.current.intensity = THREE.MathUtils.damp(
         hemisphere.current.intensity,
-        on ? 0.55 : 0.68,
+        night ? (on ? .26 : .34) : on ? 0.55 : 0.68,
         3,
         Math.min(delta, 0.1),
       );
@@ -272,7 +273,8 @@ export function ArtLights({ pet = false }: { pet?: boolean }) {
       <directionalLight
         name="KeyLight"
         position={[-3.5, 6, 4.5]}
-        intensity={1.6}
+        intensity={night ? .42 : 1.6}
+        color={night ? "#b5c9ef" : "#fff3df"}
         castShadow={!pet}
         shadow-mapSize={[512, 512]}
         shadow-camera-left={-6}
@@ -287,13 +289,13 @@ export function ArtLights({ pet = false }: { pet?: boolean }) {
       <directionalLight
         name="FillLight"
         position={[4, 2.5, 2]}
-        intensity={0.65}
+        intensity={night ? .24 : .65}
         color="#cbdce8"
       />
       <directionalLight
         name="RimLight"
         position={[-1, 4, -4]}
-        intensity={0.9}
+        intensity={night ? .5 : .9}
         color="#ffe2bb"
       />
     </>

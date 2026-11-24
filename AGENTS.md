@@ -90,3 +90,7 @@ The user subsequently said 「所有角色跟著完成」, explicitly extending 
 ### Articulated motion and expressions authorized (current)
 
 The latest user explicitly requests heading-correct travel, articulated limbs, expressions and slightly less transparency for all nine. This supersedes the earlier animation pause. Preserve approved rest meshes. Material URLs now animate normally; only explicit `still` freezes comparison pose/autonomy. Face visibility uses camera-relative facing to prevent rear ghost eyes. Gait phase follows actual distance; review-only `pose-time` samples reproducible poses. See MOTION_QA.md.
+
+### Day/night control (latest)
+
+The user replaces the upper-right sun/settings popover with a direct day/night toggle and removes its old contents. Do not restore the settings panel. `night` is a persisted preference; sky/fog/water, scene lighting and environment intensity respond without remounting the character or changing timer/planet/lamp state. Keep the independent lamp toggle. `scripts/check-daynight.mjs` validates desktop and touch-phone switching, actual light changes and reload persistence.

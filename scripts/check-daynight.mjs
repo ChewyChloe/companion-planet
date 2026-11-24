@@ -1,0 +1,12 @@
+import {chromium,expect} from '@playwright/test';
+import {writeFile} from 'node:fs/promises';
+const b=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-webgl','--ignore-gpu-blocklist']});
+const report={cases:[],errors:[]};
+async function renderState(p){return p.evaluate(async()=>{const url=performance.getEntriesByType('resource').map(x=>x.name).find(n=>n.includes('/@react-three_fiber.js'));const {_roots}=await import(url);const s=_roots.get(document.querySelector('canvas')).store.getState();return {key:s.scene.getObjectByName('KeyLight').intensity,environment:s.scene.environmentIntensity,fog:s.scene.fog.color.getHexString()};});}
+try{for(const mobile of [false,true]){
+ const context=await b.newContext({viewport:mobile?{width:390,height:844}:{width:1100,height:800},isMobile:mobile,hasTouch:mobile});const p=await context.newPage();p.on('pageerror',e=>report.errors.push(e.message));await p.goto('http://127.0.0.1:5173');
+ const canvas=p.locator('canvas');await expect(canvas).toHaveAttribute('data-time-of-day','day',{timeout:60000});const before=await renderState(p);await p.screenshot({path:`artifacts/daynight/${mobile?'phone':'desktop'}-day.png`});
+ const toggle=p.getByRole('button',{name:'切換為夜晚'});if(mobile)await toggle.tap();else await toggle.click();await expect(p.locator('main')).toHaveAttribute('data-time-of-day','night');await expect(canvas).toHaveAttribute('data-time-of-day','night');await expect(p.getByRole('region',{name:'設定',exact:true})).toHaveCount(0);
+ await expect.poll(async()=>(await renderState(p)).environment,{timeout:30000}).toBeLessThan(.16);const after=await renderState(p);expect(after.key).toBeLessThan(before.key);expect(after.fog).not.toBe(before.fog);await p.screenshot({path:`artifacts/daynight/${mobile?'phone':'desktop'}-night.png`});
+ await p.reload();await expect(p.getByRole('button',{name:'切換為白天'})).toBeVisible();await expect(canvas).toHaveAttribute('data-time-of-day','night',{timeout:60000});await p.getByRole('button',{name:'切換為白天'}).click();await expect(canvas).toHaveAttribute('data-time-of-day','day');report.cases.push({mobile,before,after,persisted:true,toggleBack:true});await context.close();console.log(mobile?'Phone passed':'Desktop passed');
+}}finally{await b.close();await writeFile('artifacts/daynight/results.json',JSON.stringify(report,null,2));}if(report.errors.length||report.cases.length!==2)process.exitCode=1;
