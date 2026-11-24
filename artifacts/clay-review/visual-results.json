@@ -1,0 +1,71 @@
+{
+  "generatedAt": "2026-11-24T13:06:20.730Z",
+  "errors": [],
+  "views": [
+    {
+      "id": "nebula",
+      "view": "front",
+      "vertices": 24458,
+      "triangles": 57210,
+      "glError": 0
+    },
+    {
+      "id": "nebula",
+      "view": "quarter",
+      "vertices": 24458,
+      "triangles": 57210,
+      "glError": 0
+    },
+    {
+      "id": "nebula",
+      "view": "side",
+      "vertices": 24458,
+      "triangles": 57210,
+      "glError": 0
+    },
+    {
+      "id": "fern",
+      "view": "front",
+      "vertices": 23815,
+      "triangles": 119324,
+      "glError": 0
+    },
+    {
+      "id": "fern",
+      "view": "quarter",
+      "vertices": 23815,
+      "triangles": 119324,
+      "glError": 0
+    },
+    {
+      "id": "fern",
+      "view": "side",
+      "vertices": 23815,
+      "triangles": 119324,
+      "glError": 0
+    },
+    {
+      "id": "mushroom",
+      "view": "front",
+      "vertices": 23297,
+      "triangles": 65120,
+      "glError": 0
+    },
+    {
+      "id": "mushroom",
+      "view": "quarter",
+      "vertices": 23297,
+      "triangles": 65120,
+      "glError": 0
+    },
+    {
+      "id": "mushroom",
+      "view": "side",
+      "vertices": 23297,
+      "triangles": 65120,
+      "glError": 0
+    }
+  ],
+  "scope": "Only nebula, fern and mushroom clay. No production integration or animation.",
+  "visualApproval": "Needs Human Review"
+}

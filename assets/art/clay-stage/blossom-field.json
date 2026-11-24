@@ -1,0 +1,15 @@
+{
+  "id": "blossom",
+  "method": "ellipsoid signed-distance approximation + smooth union, marching cubes",
+  "voxelStep": 0.01,
+  "vertices": 42612,
+  "triangles": 85220,
+  "geometrySHA256": "0b17b25f953f002681f6c6ac40292ac46aea94e279f9959ae1b984a6864f0896",
+  "face": {
+    "z": 0.79,
+    "spacing": 0.13,
+    "eye": 0.033
+  },
+  "brief": "Petite rounded teardrop, soft large face and small hands curling toward chest.",
+  "bodyTop": 1.1449528932571411
+}

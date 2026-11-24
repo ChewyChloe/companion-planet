@@ -1,0 +1,15 @@
+{
+  "id": "stardust",
+  "method": "ellipsoid signed-distance approximation + smooth union, marching cubes",
+  "voxelStep": 0.01,
+  "vertices": 59562,
+  "triangles": 119120,
+  "geometrySHA256": "ae18de9fbe927d89c4d289ecad5988c42aba120d338ac31efb1100b403c8cc37",
+  "face": {
+    "z": 0.785,
+    "spacing": 0.185,
+    "eye": 0.033
+  },
+  "brief": "Heavy rounded-square guardian, broad shoulders, deep chest and substantial paws.",
+  "bodyTop": 1.0800002813339233
+}

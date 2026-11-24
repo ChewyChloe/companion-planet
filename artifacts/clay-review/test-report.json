@@ -1,0 +1,36 @@
+{
+  "assetChecks": "Passed",
+  "distinctBodyGeometry": 3,
+  "models": [
+    {
+      "id": "nebula",
+      "bodyComponents": 1,
+      "nonManifoldEdges": 0,
+      "bodyGeometrySHA256": "50efb36d5c405b73b7432fd33d2926092204b31ea311139e2fd8c9835bf8c729",
+      "bodyTriangles": 48912,
+      "staticClayOnly": true
+    },
+    {
+      "id": "fern",
+      "bodyComponents": 1,
+      "nonManifoldEdges": 0,
+      "bodyGeometrySHA256": "b8b6387e980f2b9d46b996ea75060fd335a9f1019458c9c80e068766ae2acfb3",
+      "bodyTriangles": 47626,
+      "staticClayOnly": true
+    },
+    {
+      "id": "mushroom",
+      "bodyComponents": 1,
+      "nonManifoldEdges": 0,
+      "bodyGeometrySHA256": "c1043490bfba3b38360814b54965f3c6d76fe5a98a315d2f63cd2a9efda613aa",
+      "bodyTriangles": 46590,
+      "staticClayOnly": true
+    }
+  ],
+  "renderedViews": 9,
+  "renderErrors": [],
+  "productionSourceChanges": false,
+  "visualApproval": "Needs Human Review",
+  "animation": "Not Tested \u2014 outside this stage",
+  "otherSix": "Not Started \u2014 awaiting shape approval"
+}

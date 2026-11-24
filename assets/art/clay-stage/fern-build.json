@@ -1,0 +1,18 @@
+{
+  "id": "fern",
+  "method": "ellipsoid signed-distance approximation + smooth union, marching cubes",
+  "voxelStep": 0.01,
+  "vertices": 49614,
+  "triangles": 99224,
+  "geometrySHA256": "5546b07fc635cedbde9007fadc6995a8bc823c6d61ef5ce81ad571537683c45a",
+  "face": {
+    "z": 0.57,
+    "spacing": 0.172,
+    "eye": 0.03
+  },
+  "brief": "Wide low mochi, thick leaf paddles, broad planted stance, calm small face.",
+  "bodyTop": 0.8499749302864075,
+  "bodyComponents": 1,
+  "nonManifoldEdges": 0,
+  "exportedBodyTriangles": 47626
+}

@@ -1,3 +1,5 @@
+import { NebulaBloom } from "./art/NebulaBloom";
+import { getNebulaMaterialVariant } from "./art/nebula-material-test";
 import { JourneyCamera } from "./art/JourneyCamera";
 import { CanvasGestures } from "./art/CanvasGestures";
 import { Atmosphere } from "./art/Atmosphere";
@@ -31,6 +33,7 @@ import {
   smoothstep,
 } from "./art/terrain";
 function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
+  const materialPreview = !!getNebulaMaterialVariant();
   const root = useRef<THREE.Group>(null);
   const model = useRef<THREE.Group>(null);
   const clock = useRef(0);
@@ -198,7 +201,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
         action: arrivalAction.current,
       };
     }
-    const manual = held.current || Date.now() < manualUntil.current;
+    const manual = materialPreview || held.current || Date.now() < manualUntil.current;
     if (!manual)
       behavior.current = advanceBehavior(
         behavior.current,
@@ -339,6 +342,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
   });
   return (
     <group
+      name="CharacterPlacement"
       ref={root}
       onClick={(e) => e.stopPropagation()}
       onPointerDown={(e) => {
@@ -378,7 +382,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
         if (!drag.current) gl.domElement.style.cursor = "auto";
       }}
     >
-      <group ref={model}>
+      <group name="CharacterFacing" ref={model}>
         <SculptCharacter
           action={visual}
           held={held}
@@ -494,6 +498,7 @@ export default function Scene({
           );
         }}
       >
+        {getNebulaMaterialVariant() && <NebulaBloom />}
         <CanvasGestures />
         <CameraFraming pet={pet} />
         <RenderQuality />

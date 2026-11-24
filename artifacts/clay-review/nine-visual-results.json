@@ -1,0 +1,260 @@
+{
+  "generatedAt": "2026-11-24T13:14:00.571Z",
+  "errors": [],
+  "views": [
+    {
+      "id": "nebula",
+      "view": "front",
+      "vertices": 24458,
+      "triangles": 57210,
+      "glError": 0
+    },
+    {
+      "id": "nebula",
+      "view": "quarter",
+      "vertices": 24458,
+      "triangles": 57210,
+      "glError": 0
+    },
+    {
+      "id": "nebula",
+      "view": "side",
+      "vertices": 24458,
+      "triangles": 57210,
+      "glError": 0
+    },
+    {
+      "id": "nebula",
+      "view": "back",
+      "vertices": 24458,
+      "triangles": 57210,
+      "glError": 0
+    },
+    {
+      "id": "sprout",
+      "view": "front",
+      "vertices": 22493,
+      "triangles": 52764,
+      "glError": 0
+    },
+    {
+      "id": "sprout",
+      "view": "quarter",
+      "vertices": 22493,
+      "triangles": 52764,
+      "glError": 0
+    },
+    {
+      "id": "sprout",
+      "view": "side",
+      "vertices": 22493,
+      "triangles": 52764,
+      "glError": 0
+    },
+    {
+      "id": "sprout",
+      "view": "back",
+      "vertices": 22493,
+      "triangles": 52764,
+      "glError": 0
+    },
+    {
+      "id": "fern",
+      "view": "front",
+      "vertices": 23815,
+      "triangles": 119324,
+      "glError": 0
+    },
+    {
+      "id": "fern",
+      "view": "quarter",
+      "vertices": 23815,
+      "triangles": 119324,
+      "glError": 0
+    },
+    {
+      "id": "fern",
+      "view": "side",
+      "vertices": 23815,
+      "triangles": 119324,
+      "glError": 0
+    },
+    {
+      "id": "fern",
+      "view": "back",
+      "vertices": 23815,
+      "triangles": 119324,
+      "glError": 0
+    },
+    {
+      "id": "mushroom",
+      "view": "front",
+      "vertices": 23297,
+      "triangles": 65120,
+      "glError": 0
+    },
+    {
+      "id": "mushroom",
+      "view": "quarter",
+      "vertices": 23297,
+      "triangles": 65120,
+      "glError": 0
+    },
+    {
+      "id": "mushroom",
+      "view": "side",
+      "vertices": 23297,
+      "triangles": 65120,
+      "glError": 0
+    },
+    {
+      "id": "mushroom",
+      "view": "back",
+      "vertices": 23297,
+      "triangles": 65120,
+      "glError": 0
+    },
+    {
+      "id": "aurora",
+      "view": "front",
+      "vertices": 22707,
+      "triangles": 52436,
+      "glError": 0
+    },
+    {
+      "id": "aurora",
+      "view": "quarter",
+      "vertices": 22707,
+      "triangles": 52436,
+      "glError": 0
+    },
+    {
+      "id": "aurora",
+      "view": "side",
+      "vertices": 22707,
+      "triangles": 52436,
+      "glError": 0
+    },
+    {
+      "id": "aurora",
+      "view": "back",
+      "vertices": 22707,
+      "triangles": 52436,
+      "glError": 0
+    },
+    {
+      "id": "blossom",
+      "view": "front",
+      "vertices": 20454,
+      "triangles": 53762,
+      "glError": 0
+    },
+    {
+      "id": "blossom",
+      "view": "quarter",
+      "vertices": 20454,
+      "triangles": 53762,
+      "glError": 0
+    },
+    {
+      "id": "blossom",
+      "view": "side",
+      "vertices": 20454,
+      "triangles": 53762,
+      "glError": 0
+    },
+    {
+      "id": "blossom",
+      "view": "back",
+      "vertices": 20454,
+      "triangles": 53762,
+      "glError": 0
+    },
+    {
+      "id": "stardust",
+      "view": "front",
+      "vertices": 28590,
+      "triangles": 66818,
+      "glError": 0
+    },
+    {
+      "id": "stardust",
+      "view": "quarter",
+      "vertices": 28590,
+      "triangles": 66818,
+      "glError": 0
+    },
+    {
+      "id": "stardust",
+      "view": "side",
+      "vertices": 28590,
+      "triangles": 66818,
+      "glError": 0
+    },
+    {
+      "id": "stardust",
+      "view": "back",
+      "vertices": 28590,
+      "triangles": 66818,
+      "glError": 0
+    },
+    {
+      "id": "water",
+      "view": "front",
+      "vertices": 21854,
+      "triangles": 47282,
+      "glError": 0
+    },
+    {
+      "id": "water",
+      "view": "quarter",
+      "vertices": 21854,
+      "triangles": 47282,
+      "glError": 0
+    },
+    {
+      "id": "water",
+      "view": "side",
+      "vertices": 21854,
+      "triangles": 47282,
+      "glError": 0
+    },
+    {
+      "id": "water",
+      "view": "back",
+      "vertices": 21854,
+      "triangles": 47282,
+      "glError": 0
+    },
+    {
+      "id": "puff",
+      "view": "front",
+      "vertices": 21636,
+      "triangles": 59574,
+      "glError": 0
+    },
+    {
+      "id": "puff",
+      "view": "quarter",
+      "vertices": 21636,
+      "triangles": 59574,
+      "glError": 0
+    },
+    {
+      "id": "puff",
+      "view": "side",
+      "vertices": 21636,
+      "triangles": 59574,
+      "glError": 0
+    },
+    {
+      "id": "puff",
+      "view": "back",
+      "vertices": 21636,
+      "triangles": 59574,
+      "glError": 0
+    }
+  ],
+  "scope": "Nine independent clay models. Approved nebula/fern/mushroom assets unchanged; other six need review. No production integration or animation.",
+  "visualApproval": "Needs Human Review"
+}

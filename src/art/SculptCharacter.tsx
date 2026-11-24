@@ -1,3 +1,5 @@
+import { NebulaInterior, NebulaTransmissionProbe } from "./NebulaInterior";
+import { getNebulaMaterialVariant, nebulaTestMaterial } from "./nebula-material-test";
 import { companionSkin, shouldUseThinShell } from "./companion-skin";
 import { useEffect, useMemo, useRef } from "react";
 import {
@@ -46,7 +48,7 @@ export default function SculptCharacter({
   held,
   time,
   seatBlend,
-  modelUrl = import.meta.env.BASE_URL + "models/nebula-sculpt.glb",
+  modelUrl,
 }: {
   action: Action;
   companionId?: CompanionId;
@@ -58,7 +60,9 @@ export default function SculptCharacter({
   const selected = useWorld((s) => s.companionId);
   const id = companionId || selected;
   const species = companionFor(id);
-  const gltf = useLoader(GLTFLoader, modelUrl);
+  const materialVariant = id === "nebula" ? getNebulaMaterialVariant() : undefined;
+  const previewModel = materialVariant ? "models/material-preview/nebula.glb" : "models/nebula-sculpt.glb";
+  const gltf = useLoader(GLTFLoader, modelUrl || import.meta.env.BASE_URL + previewModel);
   const { gl } = useThree();
   const pose = useRef({ ...neutralPose });
   const root = useRef<THREE.Group>(null);
@@ -95,7 +99,10 @@ export default function SculptCharacter({
       window.matchMedia("(pointer: coarse)").matches,
       renderer,
     );
-    const skin = companionSkin(id, lightweight);
+    // Compare actual transmission on desktop including software WebGL; phones
+    // use the same explicit thin-shell fallback as the real application.
+    const testThinShell = window.innerWidth < 700 || window.matchMedia("(pointer: coarse)").matches;
+    const skin = materialVariant ? nebulaTestMaterial(materialVariant, testThinShell) : companionSkin(id, lightweight);
     const antennaSkin = skin.clone();
     antennaSkin.vertexColors = false;
     antennaSkin.color.set("#96bfd6");
@@ -130,6 +137,16 @@ export default function SculptCharacter({
               colors.setXYZ(i, shade.r, shade.g, shade.b);
             }
           }
+        } else if (materialVariant && (object.name.includes("EyeSurface") || object.name.includes("Cheek") || object.name === "Mouth")) {
+          // Alpha stays one. Sorting the face after transmission keeps its own
+          // eyes out of the refraction buffer and prevents ghost pupils.
+          const face = (object.material as THREE.MeshStandardMaterial).clone();
+          face.transparent = true;
+          face.opacity = 1;
+          face.depthWrite = true;
+          object.renderOrder = 5;
+          object.material = face;
+          faceMaterials.push(face);
         } else if (
           id !== "nebula" &&
           (object.name.includes("EyeSurface") ||
@@ -206,10 +223,11 @@ export default function SculptCharacter({
       faceMaterials,
       marks,
     };
-  }, [gltf.scene, id, species, gl]);
+  }, [gltf.scene, id, species, gl, materialVariant]);
   useEffect(() => {
     gl.domElement.dataset.modelReady = "sculpt-v1";
     gl.domElement.dataset.companion = id;
+    gl.domElement.dataset.materialTest = materialVariant || "none";
     gl.domElement.dataset.skinMode = asset.skin.userData.lightweight
       ? "thin-shell"
       : "transmission";
@@ -220,10 +238,11 @@ export default function SculptCharacter({
       asset.skin.dispose();
       asset.antennaSkin.dispose();
     };
-  }, [asset, gl, id]);
+  }, [asset, gl, id, materialVariant]);
   useFrame((_state, delta) => {
-    asset.skin.userData.clock.value = time.current;
-    const desired = poseFor(action, time.current);
+    asset.skin.userData.clock.value = materialVariant ? 0 : time.current;
+    const animationTime = materialVariant ? 1 : time.current;
+    const desired = materialVariant ? { ...neutralPose, armRaise: 0, eyeOpen: 1 } : poseFor(action, time.current);
     if (id === "water") {
       desired.scaleY = 1 + (desired.scaleY - 1) * 1.6;
       desired.roll *= 1.25;
@@ -243,7 +262,7 @@ export default function SculptCharacter({
         rightLeg: -0.12,
         lift: 0,
       });
-    const p = blendPose(pose.current, desired, delta);
+    const p = materialVariant ? Object.assign(pose.current, desired) : blendPose(pose.current, desired, delta);
     const c = asset.controls;
     const rotate = (control: Control, x = 0, y = 0, z = 0) => {
       control.node.quaternion.copy(control.rotation);
@@ -281,9 +300,9 @@ export default function SculptCharacter({
       const antenna = c[side + "Antenna"];
       rotate(
         antenna,
-        Math.sin(time.current * 1.8 - 0.35) * 0.025,
+        Math.sin(animationTime * 1.8 - 0.35) * 0.025,
         0,
-        sign * (p.antenna + Math.sin(time.current * 1.8 - 0.7) * 0.025),
+        sign * (p.antenna + Math.sin(animationTime * 1.8 - 0.7) * 0.025),
       );
       antenna.node.scale.copy(antenna.scale);
       antenna.node.scale.y *= look.antennaLength;
@@ -295,6 +314,8 @@ export default function SculptCharacter({
   return (
     <group ref={root} scale={[look.bodyWidth, look.bodyHeight, 1]}>
       <primitive object={asset.scene} />
+      {materialVariant && <NebulaInterior variant={materialVariant} />}
+      {materialVariant && new URLSearchParams(location.search).has("material-probe") && <NebulaTransmissionProbe />}
       {id === "water" &&
         createPortal(
           <group name="WaterBubbleMarks">

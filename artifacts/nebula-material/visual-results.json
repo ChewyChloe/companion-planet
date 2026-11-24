@@ -1,0 +1,207 @@
+{
+  "generatedAt": "2026-11-24T13:32:52.039Z",
+  "errors": [],
+  "views": [
+    {
+      "name": "soft-close",
+      "camera": [
+        0,
+        1,
+        4.1
+      ],
+      "pose": "1.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,1.0000,0.0000,0.0000",
+      "spatialStars": 18,
+      "bloom": true,
+      "variant": "soft",
+      "transmission": 0.28,
+      "roughness": 0.46,
+      "thickness": 0.72,
+      "opacity": 1,
+      "skinMode": "transmission",
+      "glError": 0,
+      "bodyVertices": 24458,
+      "model": "nebula"
+    },
+    {
+      "name": "soft-planet",
+      "camera": [
+        6,
+        4.2,
+        10
+      ],
+      "pose": "1.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,1.0000,0.0000,0.0000",
+      "spatialStars": 18,
+      "bloom": true,
+      "variant": "soft",
+      "transmission": 0.28,
+      "roughness": 0.46,
+      "thickness": 0.72,
+      "opacity": 1,
+      "skinMode": "transmission",
+      "glError": 0,
+      "bodyVertices": 24458,
+      "model": "nebula"
+    },
+    {
+      "name": "soft-transmission-probe",
+      "camera": [
+        0,
+        1,
+        4.1
+      ],
+      "pose": "1.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,1.0000,0.0000,0.0000",
+      "spatialStars": 18,
+      "bloom": true,
+      "variant": "soft",
+      "transmission": 0.28,
+      "roughness": 0.46,
+      "thickness": 0.72,
+      "opacity": 1,
+      "skinMode": "transmission",
+      "glError": 0,
+      "bodyVertices": 24458,
+      "model": "nebula"
+    },
+    {
+      "name": "mist-close",
+      "camera": [
+        0,
+        1,
+        4.1
+      ],
+      "pose": "1.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,1.0000,0.0000,0.0000",
+      "spatialStars": 18,
+      "bloom": true,
+      "variant": "mist",
+      "transmission": 0.72,
+      "roughness": 0.23,
+      "thickness": 0.68,
+      "opacity": 1,
+      "skinMode": "transmission",
+      "glError": 0,
+      "bodyVertices": 24458,
+      "model": "nebula"
+    },
+    {
+      "name": "mist-planet",
+      "camera": [
+        6,
+        4.2,
+        10
+      ],
+      "pose": "1.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,1.0000,0.0000,0.0000",
+      "spatialStars": 18,
+      "bloom": true,
+      "variant": "mist",
+      "transmission": 0.72,
+      "roughness": 0.23,
+      "thickness": 0.68,
+      "opacity": 1,
+      "skinMode": "transmission",
+      "glError": 0,
+      "bodyVertices": 24458,
+      "model": "nebula"
+    },
+    {
+      "name": "mist-transmission-probe",
+      "camera": [
+        0,
+        1,
+        4.1
+      ],
+      "pose": "1.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,1.0000,0.0000,0.0000",
+      "spatialStars": 18,
+      "bloom": true,
+      "variant": "mist",
+      "transmission": 0.72,
+      "roughness": 0.23,
+      "thickness": 0.68,
+      "opacity": 1,
+      "skinMode": "transmission",
+      "glError": 0,
+      "bodyVertices": 24458,
+      "model": "nebula"
+    },
+    {
+      "name": "gel-close",
+      "camera": [
+        0,
+        1,
+        4.1
+      ],
+      "pose": "1.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,1.0000,0.0000,0.0000",
+      "spatialStars": 18,
+      "bloom": true,
+      "variant": "gel",
+      "transmission": 0.94,
+      "roughness": 0.1,
+      "thickness": 0.58,
+      "opacity": 1,
+      "skinMode": "transmission",
+      "glError": 0,
+      "bodyVertices": 24458,
+      "model": "nebula"
+    },
+    {
+      "name": "gel-planet",
+      "camera": [
+        6,
+        4.2,
+        10
+      ],
+      "pose": "1.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,1.0000,0.0000,0.0000",
+      "spatialStars": 18,
+      "bloom": true,
+      "variant": "gel",
+      "transmission": 0.94,
+      "roughness": 0.1,
+      "thickness": 0.58,
+      "opacity": 1,
+      "skinMode": "transmission",
+      "glError": 0,
+      "bodyVertices": 24458,
+      "model": "nebula"
+    },
+    {
+      "name": "gel-transmission-probe",
+      "camera": [
+        0,
+        1,
+        4.1
+      ],
+      "pose": "1.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,1.0000,0.0000,0.0000",
+      "spatialStars": 18,
+      "bloom": true,
+      "variant": "gel",
+      "transmission": 0.94,
+      "roughness": 0.1,
+      "thickness": 0.58,
+      "opacity": 1,
+      "skinMode": "transmission",
+      "glError": 0,
+      "bodyVertices": 24458,
+      "model": "nebula"
+    },
+    {
+      "name": "mist-phone",
+      "camera": [
+        6,
+        4.2,
+        10
+      ],
+      "pose": "1.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,1.0000,0.0000,0.0000",
+      "spatialStars": 18,
+      "bloom": true,
+      "variant": "mist",
+      "transmission": 0,
+      "roughness": 0.23,
+      "thickness": 0.68,
+      "opacity": 0.68,
+      "skinMode": "thin-shell",
+      "glError": 0,
+      "bodyVertices": 24458,
+      "model": "nebula"
+    }
+  ],
+  "scope": "Nebula material test only, approved shape; no new animations."
+}

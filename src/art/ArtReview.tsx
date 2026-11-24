@@ -1,3 +1,6 @@
+import { NebulaBloom } from "./NebulaBloom";
+import { getNebulaMaterialVariant } from "./nebula-material-test";
+import { OrbitControls } from "@react-three/drei";
 import { SoftEnvironment } from "./SoftEnvironment";
 import { Suspense, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
@@ -67,6 +70,7 @@ export default function ArtReview() {
   return (
     <div style={{ height: "100dvh", width: "100%", background: "#f4f1e8" }}>
       <Canvas
+        gl={{ preserveDrawingBuffer: true }}
         shadows
         dpr={1}
         camera={{ position: [0, 1, 4.1], fov: 33 }}
@@ -75,6 +79,8 @@ export default function ArtReview() {
           gl.setClearColor("#f4f1e8", 1);
         }}
       >
+        <OrbitControls makeDefault target={[0,.92,0]} enablePan={false} />
+        {getNebulaMaterialVariant() && <NebulaBloom />}
         <SoftEnvironment />
         <ambientLight intensity={0.55} />
         <hemisphereLight args={["#dce8ef", "#9c9488", 0.7]} />

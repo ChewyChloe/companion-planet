@@ -1,0 +1,18 @@
+{
+  "id": "sprout",
+  "method": "ellipsoid signed-distance approximation + smooth union, marching cubes",
+  "voxelStep": 0.01,
+  "vertices": 46860,
+  "triangles": 93716,
+  "geometrySHA256": "d30e89681b23d3fd645927632983b28f91325325c7debad1bf676711366f85c3",
+  "face": {
+    "z": 0.85,
+    "spacing": 0.125,
+    "eye": 0.032
+  },
+  "brief": "Butter pear with narrow shoulders, generous low belly, one gently lifted mitten.",
+  "bodyTop": 1.2499406337738037,
+  "bodyComponents": 1,
+  "nonManifoldEdges": 0,
+  "exportedBodyTriangles": 44982
+}

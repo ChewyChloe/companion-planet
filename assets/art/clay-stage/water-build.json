@@ -1,0 +1,18 @@
+{
+  "id": "water",
+  "method": "ellipsoid signed-distance approximation + smooth union, marching cubes",
+  "voxelStep": 0.01,
+  "vertices": 45528,
+  "triangles": 91052,
+  "geometrySHA256": "c197d9409cfaf3a256aa440a2f7db9ab1af4de258772f55853cbb8051aff7816",
+  "face": {
+    "z": 0.65,
+    "spacing": 0.145,
+    "eye": 0.031
+  },
+  "brief": "Low round water belly with a continuous curved liquid tip and upturned flowing fins.",
+  "bodyTop": 1.4696192741394043,
+  "bodyComponents": 1,
+  "nonManifoldEdges": 0,
+  "exportedBodyTriangles": 43704
+}

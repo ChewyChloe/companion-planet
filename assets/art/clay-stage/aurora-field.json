@@ -1,0 +1,15 @@
+{
+  "id": "aurora",
+  "method": "ellipsoid signed-distance approximation + smooth union, marching cubes",
+  "voxelStep": 0.01,
+  "vertices": 47305,
+  "triangles": 94606,
+  "geometrySHA256": "a8dd2e967835ad7064440443d26a8dfd69c7d4167f23e90f8abd239b4b13ae24",
+  "face": {
+    "z": 0.82,
+    "spacing": 0.125,
+    "eye": 0.03
+  },
+  "brief": "Asymmetric leaning bean, raised left flipper, low right flipper and offset hips.",
+  "bodyTop": 1.2240567207336426
+}

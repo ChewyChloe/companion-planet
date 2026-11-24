@@ -1,0 +1,15 @@
+{
+  "id": "nebula",
+  "method": "ellipsoid signed-distance approximation + smooth union, marching cubes",
+  "voxelStep": 0.01,
+  "vertices": 50952,
+  "triangles": 101900,
+  "geometrySHA256": "be0ece5f4f70305d68a6b01a4dac573dcc1430a86caaaca5a294cbc71826f536",
+  "face": {
+    "z": 0.82,
+    "spacing": 0.145,
+    "eye": 0.034
+  },
+  "brief": "Full round egg, soft shoulder flippers, tucked short feet, quiet curious face.",
+  "bodyTop": 1.1949527263641357
+}

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="data:,"><title>同頻星球｜九角色灰模確認</title>
+<style>[hidden]{display:none!important}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#eeece7;font-family:sans-serif;color:#454c51}canvas{display:block;touch-action:none}nav{position:fixed;bottom:12px;left:12px;right:12px;padding:12px;background:#eeece7;display:flex;flex-wrap:wrap;gap:12px;align-items:center;max-height:28dvh;overflow:auto}a{color:inherit}button{font:inherit;padding:7px;background:#e3e0d9;border:1px solid #a9a9a0}#error{position:absolute;top:20px;left:20px}</style></head><body><div id="error" role="alert"></div><nav aria-label="灰模檢視"><a href="?id=nebula">星雲仔</a><a href="?id=fern">蕨蕨子</a><a href="?id=mushroom">菇菇獸</a><a href="?id=sprout">小星草</a><a href="?id=aurora">極光仔</a><a href="?id=blossom">花苞寶</a><a href="?id=stardust">星塵獸</a><a href="?id=water">水球仔</a><a href="?id=puff">蓬蓬仔</a><button data-angle="0">正面</button><button data-angle="0.7853981634">45 度</button><button data-angle="1.5707963268">側面</button><button data-angle="3.1415926536">背面</button><button id="bare">顯示／隱藏頭飾</button><a id="download" download>下載灰模 GLB</a><span>拖曳旋轉・雙指縮放。此頁僅供外觀確認，未接入網站角色。</span></nav>
+<script type="module">
+import * as THREE from 'three';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+const q=new URLSearchParams(location.search),id=['nebula','sprout','fern','mushroom','aurora','blossom','stardust','water','puff'].includes(q.get('id'))?q.get('id'):'nebula';
+if(q.has('capture'))document.querySelector('nav').hidden=true;
+const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});renderer.setPixelRatio(1);renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1;renderer.setClearColor('#eeece7');document.body.prepend(renderer.domElement);
+const scene=new THREE.Scene(),aspect=innerWidth/innerHeight,halfHeight=1.1/Math.min(aspect,1),camera=new THREE.OrthographicCamera(-halfHeight*aspect,halfHeight*aspect,halfHeight,-halfHeight,.01,30);camera.position.set(0,.82,5);camera.lookAt(0,.82,0);
+const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(0,.82,0);controls.update();controls.enablePan=false;controls.minZoom=.6;controls.maxZoom=2;
+scene.add(new THREE.HemisphereLight('#ffffff','#a6a8a9',1.2));
+const key=new THREE.DirectionalLight('#ffffff',2);key.position.set(-3,4,5);key.castShadow=true;key.shadow.mapSize.set(1024,1024);key.shadow.camera.left=-2;key.shadow.camera.right=2;key.shadow.camera.top=2;key.shadow.camera.bottom=-2;key.shadow.bias=-.0002;key.shadow.radius=4;scene.add(key);
+const fill=new THREE.DirectionalLight('#ffffff',.8);fill.position.set(3,2,1);scene.add(fill);
+const rim=new THREE.DirectionalLight('#ffffff',1.1);rim.position.set(1,3,-4);scene.add(rim);
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(200,200),new THREE.MeshStandardMaterial({color:'#eeece7',roughness:1}));floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;floor.position.y=.005;scene.add(floor);
+let model;const render=()=>renderer.render(scene,camera);controls.addEventListener('change',render);
+const url=`/assets/art/clay-stage/${id}.glb`;document.querySelector('#download').href=url;
+try{const gltf=await new GLTFLoader().loadAsync(url);model=gltf.scene;model.name='ReviewModel';model.rotation.y=Number(q.get('angle')||0);scene.add(model);model.traverse(n=>{if(n.isMesh){n.castShadow=true;n.receiveShadow=true;}if(q.has('bare')&&n.name.startsWith('Crown-'))n.visible=false;});render();renderer.domElement.dataset.ready=id;renderer.domElement.dataset.triangles=renderer.info.render.triangles;renderer.domElement.dataset.geometry=model.getObjectByName('Body').geometry.attributes.position.count;
+window.clayReview={scene,renderer,camera,controls,model,render};}
+catch(e){document.querySelector('#error').textContent=`模型載入失敗：${e.message}`;throw e;}
+for(const b of document.querySelectorAll('[data-angle]'))b.onclick=()=>{model.rotation.y=Number(b.dataset.angle);camera.position.set(0,.82,5);controls.target.set(0,.82,0);controls.update();render();};
+document.querySelector('#bare').onclick=()=>{const crown=model.getObjectByName(`Crown-${id}`);crown.visible=!crown.visible;render();};
+addEventListener('resize',()=>{const a=innerWidth/innerHeight,h=1.1/Math.min(a,1);camera.left=-h*a;camera.right=h*a;camera.top=h;camera.bottom=-h;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);render();});
+</script></body></html>

@@ -1,0 +1,15 @@
+{
+  "id": "puff",
+  "method": "ellipsoid signed-distance approximation + smooth union, marching cubes",
+  "voxelStep": 0.01,
+  "vertices": 45074,
+  "triangles": 90144,
+  "geometrySHA256": "929013b6a82e8ffbb6ab1f1843f5bf63c6e2ad10e9ffc8ecc7bd7667a26ec82a",
+  "face": {
+    "z": 0.635,
+    "spacing": 0.15,
+    "eye": 0.031
+  },
+  "brief": "Low soft cloud, subtle round lobes, little mitten hands and tucked tiny feet.",
+  "bodyTop": 0.9289078712463379
+}

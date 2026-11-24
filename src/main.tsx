@@ -1,3 +1,4 @@
+import { getNebulaMaterialVariant, nebulaMaterialVariants } from "./art/nebula-material-test";
 import { planetFor } from "./planets";
 import { CompanionPicker } from "./CompanionPicker";
 import { companionFor, randomGreeting } from "./companions";
@@ -46,6 +47,23 @@ const actionNames: Record<Action, string> = {
   approach: "靠近陪你",
   return: "回到小角落",
 };
+function NebulaMaterialPanel() {
+  const variant = getNebulaMaterialVariant();
+  const companion = useWorld(s => s.companionId);
+  useEffect(() => {
+    if (variant && companion !== "nebula") useWorld.getState().setCompanion("nebula");
+  }, [variant, companion]);
+  if (!variant) return null;
+  return <aside aria-label="星雲仔材質測試" style={{ position: "fixed", top: "26%", left: 12, zIndex: 25, padding: 12, background: "#f4f1e8", color: "#4f5861", maxWidth: 260, fontSize: 14 }}>
+    <strong>星雲仔・網頁材質測試</strong>
+    <p>同一模型、固定姿態，使用實際星球場景燈光。</p>
+    <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+      {Object.entries(nebulaMaterialVariants).map(([id,p]) => <a key={id} href={`?nebula-material=${id}`} aria-current={id === variant ? "page" : undefined}>{p.name}</a>)}
+    </div>
+    <p><a href={`?art-review&nebula-material=${variant}`}>近照／旋轉檢視</a> · <a href="/">離開測試</a></p>
+    <small>手機使用輕量薄殼；桌面使用實際透射。尚未製作新動畫。</small>
+  </aside>;
+}
 function useAmbient() {
   const context = useRef<AudioContext | null>(null);
   const [on, setOn] = useState(false);
@@ -734,12 +752,11 @@ function App() {
     </main>
   );
 }
-const Review = import.meta.env.DEV
-  ? React.lazy(() => import("./art/ArtReview"))
-  : () => null;
+const Review = React.lazy(() => import("./art/ArtReview"));
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    {import.meta.env.DEV &&
+    <NebulaMaterialPanel />
+    {(import.meta.env.DEV || getNebulaMaterialVariant()) &&
     new URLSearchParams(location.search).has("art-review") ? (
       <React.Suspense fallback={<p>載入 3D 驗收場景…</p>}>
         <Review />

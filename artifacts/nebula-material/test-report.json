@@ -1,0 +1,22 @@
+{
+  "generatedAt": "2026-11-24T13:39:27.143Z",
+  "browserRenders": 10,
+  "renderErrors": [],
+  "sameCameraAndPose": true,
+  "bodyGeometryUnchanged": true,
+  "bodyGeometrySHA256": "50efb36d5c405b73b7432fd33d2926092204b31ea311139e2fd8c9835bf8c729",
+  "spatialStars": 18,
+  "renderer": "Actual R3F with MeshPhysical transmission, 3D density field and UnrealBloomPass",
+  "otherResidentsMaterialChanges": false,
+  "newAnimationClips": 0,
+  "visualApproval": "Needs Human Review",
+  "hardwarePerformance": "Not Tested",
+  "defaultWebsiteRegression": {
+    "passed": 3,
+    "failed": 0
+  },
+  "productionPreview": {
+    "passed": 2,
+    "errors": []
+  }
+}

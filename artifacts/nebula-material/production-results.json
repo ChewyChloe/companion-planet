@@ -1,0 +1,13 @@
+{
+  "cases": [
+    {
+      "query": "?nebula-material=mist",
+      "passed": true
+    },
+    {
+      "query": "?art-review&nebula-material=mist",
+      "passed": true
+    }
+  ],
+  "errors": []
+}
