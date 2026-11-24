@@ -35,7 +35,7 @@ export const skinProfiles: Record<
   },
   sprout: {
     roughness: 0.38,
-    transmission: 0.44,
+    transmission: 0.30,
     metalness: 0,
     glow: "#ffe1a6",
     scatter: 0.5,
@@ -44,7 +44,7 @@ export const skinProfiles: Record<
   },
   fern: {
     roughness: 0.3,
-    transmission: 0.53,
+    transmission: 0.37,
     metalness: 0,
     glow: "#bbdc92",
     scatter: 0.36,
@@ -53,7 +53,7 @@ export const skinProfiles: Record<
   },
   mushroom: {
     roughness: 0.46,
-    transmission: 0.40,
+    transmission: 0.28,
     metalness: 0,
     glow: "#ffe2a0",
     scatter: 0.46,
@@ -62,7 +62,7 @@ export const skinProfiles: Record<
   },
   aurora: {
     roughness: 0.2,
-    transmission: 0.66,
+    transmission: 0.38,
     metalness: 0.03,
     glow: "#9cddd5",
     scatter: 0.36,
@@ -71,7 +71,7 @@ export const skinProfiles: Record<
   },
   blossom: {
     roughness: 0.4,
-    transmission: 0.50,
+    transmission: 0.35,
     metalness: 0,
     glow: "#ffd3ca",
     scatter: 0.5,
@@ -80,7 +80,7 @@ export const skinProfiles: Record<
   },
   stardust: {
     roughness: 0.32,
-    transmission: 0.48,
+    transmission: 0.34,
     metalness: 0.02,
     glow: "#9caaf0",
     scatter: 0.28,
@@ -89,7 +89,7 @@ export const skinProfiles: Record<
   },
   water: {
     roughness: 0.1,
-    transmission: 0.80,
+    transmission: 0.32,
     metalness: 0,
     glow: "#a9e3f1",
     scatter: 0.22,
@@ -98,7 +98,7 @@ export const skinProfiles: Record<
   },
   puff: {
     roughness: 0.70,
-    transmission: 0.20,
+    transmission: 0.14,
     metalness: 0,
     glow: "#ffdfb9",
     scatter: 0.48,
@@ -120,11 +120,11 @@ export function companionSkin(id: CompanionId, lightweight = false) {
     transparent: lightweight,
     depthWrite: false,
     opacity:
-      look.materialOpacity * (lightweight ? (id === "water" ? 0.62 : id === "aurora" ? 0.76 : id === "puff" ? 0.96 : 0.86) : 1),
-    thickness: id === "water" ? 0.45 : id === "stardust" ? 1.1 : 0.8,
+      look.materialOpacity * (lightweight ? (id === "water" ? 0.91 : id === "aurora" ? 0.94 : id === "puff" ? 0.98 : 0.96) : 1),
+    thickness: id === "water" ? 0.75 : id === "stardust" ? 1.1 : 0.8,
     ior: id === "water" ? 1.33 : 1.38,
     attenuationColor: p.glow,
-    attenuationDistance: 2.8,
+    attenuationDistance: id === "water" ? 1.2 : 2.8,
     iridescence: p.iridescence,
     iridescenceIOR: 1.32,
     iridescenceThicknessRange: [100, 380],

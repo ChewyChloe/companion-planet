@@ -98,3 +98,7 @@ The user replaces the upper-right sun/settings popover with a direct day/night t
 ### Simplified picker and hidden mini entry
 
 The user removes the picker model-review link and drag instruction and temporarily hides the mini/pet entry button. Keep the underlying desktop mode implementation for future restoration. Health provider=llm means configured only; show AI connected only after a validated provider reply. Provider logs must contain bounded reason/status codes only, never keys, user text or provider response bodies. See API_CONNECTION_QA.md.
+
+### Larger residents, supported seated pose and denser jelly (latest)
+
+The user explicitly requests taller/larger residents, no chair penetration, and less transparency. Planet characters now have a uniform 1.18 presentation scale (approved rest GLB POSITION remains unchanged); focus/drag anchors follow that scale. The runtime Seated corrective supports the whole underside and recomputes its normals; do not restore the old center-only lift. The chair is wider/deeper, the back and desk have more clearance, and the terrain station pad matches its footprint. Climbing uses an arc and avoids lagging below the support height. See SEATING_QA.md and actual R3F mesh/furniture measurements in artifacts/seating.

@@ -1,5 +1,5 @@
 import { headingFromStep, turnToward } from "./art/locomotion";
-import { residentFocusHeight, residentSeatLift } from "./art/resident-assets";
+import { RESIDENT_SCALE, residentFocusHeight } from "./art/resident-assets";
 import { NebulaBloom } from "./art/NebulaBloom";
 import { JourneyCamera } from "./art/JourneyCamera";
 import { CanvasGestures } from "./art/CanvasGestures";
@@ -266,26 +266,21 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
           1 -
           smoothstep(
             0.12,
-            0.65,
+            1.10,
             Math.hypot(
               position.current.x - CHAIR.x,
               position.current.z - CHAIR.z,
             ),
           );
+        const climb = 1 - smoothstep(.12,1.45,Math.hypot(position.current.x-CHAIR.x,position.current.z-CHAIR.z));
+        const supportY = surface + (held.current ? .28 : 0) + CHAIR.seatedRootOffset*climb + Math.sin(Math.PI*climb)*.40 + (actual === "rest" ? .065 : 0);
         root.current.position.set(
           position.current.x,
-          THREE.MathUtils.damp(
-            root.current.position.y,
-            surface +
-              (held.current ? 0.28 : 0) +
-              (CHAIR.seatedRootOffset + residentSeatLift(state.companionId)) * seatBlend.current +
-              (actual === "rest" ? 0.065 : 0),
-            5,
-            motionDt,
-          ),
+          Math.max(supportY, THREE.MathUtils.damp(root.current.position.y,supportY,5,motionDt)),
           position.current.z,
         );
         groundNormal(position.current.x, position.current.z, normal);
+        normal.lerp(up, seatBlend.current).normalize();
         root.current.quaternion.setFromUnitVectors(up, normal);
       }
     }
@@ -381,7 +376,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
         if (!drag.current) gl.domElement.style.cursor = "auto";
       }}
     >
-      <group name="CharacterFacing" ref={model}>
+      <group name="CharacterFacing" ref={model} scale={pet ? 1 : RESIDENT_SCALE}>
         <SculptCharacter
           pet={pet}
           still={poseLocked}

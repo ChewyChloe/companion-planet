@@ -1,0 +1,59 @@
+{
+  "method": "Bounds from nine unchanged seated bodies; chair back subsequently moved farther to -1.02. Seat top and desk front unchanged. Final arrival renders verify latest geometry.",
+  "cases": [
+    {
+      "id": "nebula",
+      "seatGap": 0.02326372331431592,
+      "backGap": 0.4938963594457104,
+      "deskGap": 0.1881250507708676
+    },
+    {
+      "id": "sprout",
+      "seatGap": 0.02046310554496844,
+      "backGap": 0.5420937121781468,
+      "deskGap": 0.23177913651953752
+    },
+    {
+      "id": "fern",
+      "seatGap": 0.018415217004182027,
+      "backGap": 0.4301637741805584,
+      "deskGap": 0.15225758363647146
+    },
+    {
+      "id": "mushroom",
+      "seatGap": 0.021381265567532504,
+      "backGap": 0.4718003428099594,
+      "deskGap": 0.1299987088761061
+    },
+    {
+      "id": "aurora",
+      "seatGap": 0.02257451170933522,
+      "backGap": 0.5492261301093149,
+      "deskGap": 0.25690277109807347
+    },
+    {
+      "id": "blossom",
+      "seatGap": 0.023417085632348345,
+      "backGap": 0.5346738896570715,
+      "deskGap": 0.12622737213426705
+    },
+    {
+      "id": "stardust",
+      "seatGap": 0.020195057294777996,
+      "backGap": 0.44527297149551837,
+      "deskGap": 0.1611701898410306
+    },
+    {
+      "id": "water",
+      "seatGap": 0.021979018350234525,
+      "backGap": 0.5547749371331676,
+      "deskGap": 0.2523480902232138
+    },
+    {
+      "id": "puff",
+      "seatGap": 0.024596369308376498,
+      "backGap": 0.4819776815522331,
+      "deskGap": 0.22961678274439157
+    }
+  ]
+}

@@ -5,11 +5,11 @@ export const CHAIR = {
   x: 0.72,
   z: 0.23,
   seatHeight: 0.38,
-  seatDepth: 0.9,
-  seatCenterZ: -0.08,
-  backZ: -0.51,
-  deskZ: 0.9,
-  rearLegZ: -0.4,
+  seatDepth: 1.5,
+  seatCenterZ: -0.22,
+  backZ: -1.02,
+  deskZ: 1.1,
+  rearLegZ: -0.83,
   frontLegZ: 0.24,
   seatedRootOffset: 0.24,
 };
@@ -54,7 +54,7 @@ export function groundHeight(x: number, z: number) {
     0.13 +
     0.35 * (Math.sqrt(Math.max(0.001, 4.95 ** 2 - radius ** 2)) - 4.95) +
     hills;
-  const pad = Math.max(Math.abs((x - 0.72) / 0.95), Math.abs((z - 0.58) / 1.1));
+  const pad = Math.max(Math.abs((x - 0.72) / 0.95), Math.abs((z - 0.58) / 1.6));
   const station = 0.14 + (natural - 0.14) * smoothstep(0.8, 1.25, pad);
   const dx = x + 1.1,
     dz = z - 0.65,

@@ -158,7 +158,6 @@ export function Book({
   );
 }
 export function ReadingStation({ wood }: { wood: Maps }) {
-  const selectedResident = useWorld(s => s.companionId);
   const { gl } = useThree();
   const lampOn = useWorld((s) => s.lampOn);
   const light = useRef<THREE.PointLight>(null),
@@ -194,37 +193,37 @@ export function ReadingStation({ wood }: { wood: Maps }) {
   return (
     <group name="ReadingStation" position={[CHAIR.x, floor, CHAIR.z]}>
       <group name="ReadingChair">
-        {residentSeatLift(selectedResident) > 0 && <RoundedBox name="ResidentSeatCushion" args={[.68,residentSeatLift(selectedResident),.70]} radius={.035} smoothness={4} position={[0,.38+residentSeatLift(selectedResident)/2,CHAIR.seatCenterZ]}>
+        {residentSeatLift() > 0 && <RoundedBox name="ResidentSeatCushion" args={[.68,residentSeatLift(),.70]} radius={.035} smoothness={4} position={[0,.38+residentSeatLift()/2,CHAIR.seatCenterZ]}>
           <meshStandardMaterial color="#d7cfb9" roughness={.92} />
         </RoundedBox>}
         <Wood
           name="Seat"
           wood={wood}
           position={[0, 0.335, CHAIR.seatCenterZ]}
-          size={[0.78, 0.09, CHAIR.seatDepth]}
+          size={[1.55, 0.09, CHAIR.seatDepth]}
           radius={0.045}
         />
         <Wood
           name="ChairBack"
           wood={wood}
           position={[0, 0.81, CHAIR.backZ]}
-          size={[0.74, 0.58, 0.11]}
+          size={[1.30, 0.58, 0.11]}
           radius={0.055}
         />
-        {[-0.26, 0.26].flatMap((x) =>
+        {[-0.57, 0.57].flatMap((x) =>
           [CHAIR.rearLegZ, CHAIR.frontLegZ].map((z) => (
             <Leg key={`${x}${z}`} x={x} z={z} top={0.3} wood={wood} />
           )),
         )}
         <Wood
           wood={wood}
-          position={[-0.3, 0.57, CHAIR.backZ + 0.06]}
+          position={[-0.56, 0.57, CHAIR.backZ + 0.06]}
           size={[0.045, 0.6, 0.045]}
           radius={0.02}
         />
         <Wood
           wood={wood}
-          position={[0.3, 0.57, CHAIR.backZ + 0.06]}
+          position={[0.56, 0.57, CHAIR.backZ + 0.06]}
           size={[0.045, 0.6, 0.045]}
           radius={0.02}
         />

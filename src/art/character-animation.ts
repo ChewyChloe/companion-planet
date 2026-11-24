@@ -56,7 +56,7 @@ export function poseFor(action: Action, time: number, gaitTime = time): ArtPose 
     p.pitch = 0.025;
   }
   if (action === "read") {
-    p.pitch = 0.085 + Math.sin(time * 0.8) * 0.008;
+    p.pitch = 0.025 + Math.sin(time * 0.8) * 0.004;
     p.armForward = Math.sin(time * 0.65) * 0.012;
     p.seated = 1;
     p.armRaise = 0.04;

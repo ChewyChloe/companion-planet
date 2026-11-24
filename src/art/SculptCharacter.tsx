@@ -155,6 +155,35 @@ export default function SculptCharacter({
     const bodyMesh = scene.getObjectByName("Body") as THREE.SkinnedMesh;
     if (bodyMesh.morphTargetDictionary?.Seated === undefined)
       throw Error("Missing seated corrective");
+    // A seated corrective supports the entire underside, including the feet.
+    // Work in character coordinates because GLB vertices retain Blender's axes.
+    const base = bodyMesh.geometry.attributes.position;
+    const seatedIndex = bodyMesh.morphTargetDictionary!.Seated;
+    const seated = new Float32Array(base.count * 3);
+    const toCharacter = scene.matrixWorld.clone().invert().multiply(bodyMesh.matrixWorld);
+    const toBody = toCharacter.clone().invert();
+    const point = new THREE.Vector3(), original = new THREE.Vector3();
+    for (let i=0;i<base.count;i++) {
+      original.fromBufferAttribute(base,i);point.copy(original).applyMatrix4(toCharacter);
+      const dy=point.y-.14;
+      point.y=.14+.5*(dy+Math.sqrt(dy*dy+.000225));
+      point.applyMatrix4(toBody);
+      if(bodyMesh.geometry.morphTargetsRelative)point.sub(original);
+      point.toArray(seated,i*3);
+    }
+    bodyMesh.geometry.morphAttributes.position![seatedIndex]=new THREE.Float32BufferAttribute(seated,3);
+    const absoluteSeat = new Float32Array(seated);
+    if(bodyMesh.geometry.morphTargetsRelative)for(let i=0;i<absoluteSeat.length;i++)absoluteSeat[i]+=base.array[i];
+    const normalMesh = new THREE.BufferGeometry();
+    normalMesh.setIndex(bodyMesh.geometry.index);
+    normalMesh.setAttribute("position",new THREE.Float32BufferAttribute(absoluteSeat,3));
+    normalMesh.computeVertexNormals();
+    const normals = new Float32Array(normalMesh.attributes.normal.array);
+    if(bodyMesh.geometry.morphTargetsRelative)for(let i=0;i<normals.length;i++)normals[i]-=bodyMesh.geometry.attributes.normal.array[i];
+    bodyMesh.geometry.morphAttributes.normal ||= [];
+    bodyMesh.geometry.morphAttributes.normal[seatedIndex]=new THREE.Float32BufferAttribute(normals,3);
+    normalMesh.dispose();
+
     const expressionMaterials: THREE.Material[] = [];
     const expressionGeometries: THREE.BufferGeometry[] = [];
     const happyArcs: Record<string,THREE.Mesh> = {};

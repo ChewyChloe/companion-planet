@@ -1,0 +1,196 @@
+[
+  {
+    "mobile": false,
+    "samples": [
+      {
+        "action": "idle",
+        "counts": {
+          "Seat": 0,
+          "ChairBack": 0,
+          "DeskSurface": 0
+        }
+      },
+      {
+        "action": "idle",
+        "counts": {
+          "Seat": 0,
+          "ChairBack": 0,
+          "DeskSurface": 0
+        }
+      },
+      {
+        "action": "walk",
+        "counts": {
+          "Seat": 0,
+          "ChairBack": 0,
+          "DeskSurface": 0
+        }
+      },
+      {
+        "action": "walk",
+        "counts": {
+          "Seat": 0,
+          "ChairBack": 0,
+          "DeskSurface": 0
+        }
+      },
+      {
+        "action": "walk",
+        "counts": {
+          "Seat": 0,
+          "ChairBack": 0,
+          "DeskSurface": 0
+        }
+      },
+      {
+        "action": "walk",
+        "counts": {
+          "Seat": 0,
+          "ChairBack": 0,
+          "DeskSurface": 0
+        }
+      },
+      {
+        "action": "walk",
+        "counts": {
+          "Seat": 0,
+          "ChairBack": 0,
+          "DeskSurface": 0
+        }
+      },
+      {
+        "action": "walk",
+        "counts": {
+          "Seat": 0,
+          "ChairBack": 0,
+          "DeskSurface": 0
+        }
+      },
+      {
+        "action": "read",
+        "counts": {
+          "Seat": 0,
+          "ChairBack": 0,
+          "DeskSurface": 0
+        }
+      },
+      {
+        "action": "read",
+        "counts": {
+          "Seat": 0,
+          "ChairBack": 0,
+          "DeskSurface": 0
+        }
+      },
+      {
+        "action": "read",
+        "counts": {
+          "Seat": 0,
+          "ChairBack": 0,
+          "DeskSurface": 0
+        }
+      }
+    ],
+    "opacity": 1,
+    "transmission": 0.32,
+    "scale": [
+      1.18,
+      1.18,
+      1.18
+    ],
+    "glError": 0
+  },
+  {
+    "mobile": true,
+    "samples": [
+      {
+        "action": "idle",
+        "counts": {
+          "Seat": 0,
+          "ChairBack": 0,
+          "DeskSurface": 0
+        }
+      },
+      {
+        "action": "idle",
+        "counts": {
+          "Seat": 0,
+          "ChairBack": 0,
+          "DeskSurface": 0
+        }
+      },
+      {
+        "action": "walk",
+        "counts": {
+          "Seat": 0,
+          "ChairBack": 0,
+          "DeskSurface": 0
+        }
+      },
+      {
+        "action": "walk",
+        "counts": {
+          "Seat": 0,
+          "ChairBack": 0,
+          "DeskSurface": 0
+        }
+      },
+      {
+        "action": "walk",
+        "counts": {
+          "Seat": 0,
+          "ChairBack": 0,
+          "DeskSurface": 0
+        }
+      },
+      {
+        "action": "walk",
+        "counts": {
+          "Seat": 0,
+          "ChairBack": 0,
+          "DeskSurface": 0
+        }
+      },
+      {
+        "action": "walk",
+        "counts": {
+          "Seat": 0,
+          "ChairBack": 0,
+          "DeskSurface": 0
+        }
+      },
+      {
+        "action": "read",
+        "counts": {
+          "Seat": 0,
+          "ChairBack": 0,
+          "DeskSurface": 0
+        }
+      },
+      {
+        "action": "read",
+        "counts": {
+          "Seat": 0,
+          "ChairBack": 0,
+          "DeskSurface": 0
+        }
+      },
+      {
+        "action": "read",
+        "counts": {
+          "Seat": 0,
+          "ChairBack": 0,
+          "DeskSurface": 0
+        }
+      }
+    ],
+    "opacity": 0.91,
+    "transmission": 0,
+    "scale": [
+      1.18,
+      1.18,
+      1.18
+    ],
+    "glError": 0
+  }
+]

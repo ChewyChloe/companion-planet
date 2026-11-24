@@ -1,0 +1,131 @@
+{
+  "cases": [
+    {
+      "id": "nebula",
+      "hits": {
+        "Seat": 0,
+        "ChairBack": 0,
+        "DeskSurface": 0
+      },
+      "minY": 0.4032637233143159,
+      "maxY": 1.6506722341941895,
+      "minZ": -0.47110364055428955,
+      "maxZ": 0.5118749492291323,
+      "transmission": 0.4,
+      "opacity": 1
+    },
+    {
+      "id": "sprout",
+      "hits": {
+        "Seat": 0,
+        "ChairBack": 0,
+        "DeskSurface": 0
+      },
+      "minY": 0.40046310554496845,
+      "maxY": 1.7212271234296574,
+      "minZ": -0.42290628782185313,
+      "maxZ": 0.46822086348046243,
+      "transmission": 0.3,
+      "opacity": 1
+    },
+    {
+      "id": "fern",
+      "hits": {
+        "Seat": 0,
+        "ChairBack": 0,
+        "DeskSurface": 0
+      },
+      "minY": 0.39841521700418203,
+      "maxY": 1.2471660301447902,
+      "minZ": -0.5348362258194416,
+      "maxZ": 0.5477424163635285,
+      "transmission": 0.37,
+      "opacity": 1
+    },
+    {
+      "id": "mushroom",
+      "hits": {
+        "Seat": 0,
+        "ChairBack": 0,
+        "DeskSurface": 0
+      },
+      "minY": 0.4013812655675325,
+      "maxY": 1.4563688416717646,
+      "minZ": -0.49319965719004055,
+      "maxZ": 0.5700012911238939,
+      "transmission": 0.28,
+      "opacity": 1
+    },
+    {
+      "id": "aurora",
+      "hits": {
+        "Seat": 0,
+        "ChairBack": 0,
+        "DeskSurface": 0
+      },
+      "minY": 0.4025745117093352,
+      "maxY": 1.6816338215910607,
+      "minZ": -0.4157738698906851,
+      "maxZ": 0.4430972289019265,
+      "transmission": 0.38,
+      "opacity": 1
+    },
+    {
+      "id": "blossom",
+      "hits": {
+        "Seat": 0,
+        "ChairBack": 0,
+        "DeskSurface": 0
+      },
+      "minY": 0.40341708563234835,
+      "maxY": 1.5850258397902692,
+      "minZ": -0.4303261103429284,
+      "maxZ": 0.5737726278657329,
+      "transmission": 0.35,
+      "opacity": 1
+    },
+    {
+      "id": "stardust",
+      "hits": {
+        "Seat": 0,
+        "ChairBack": 0,
+        "DeskSurface": 0
+      },
+      "minY": 0.400195057294778,
+      "maxY": 1.5144054978798365,
+      "minZ": -0.5197270285044816,
+      "maxZ": 0.5388298101589694,
+      "transmission": 0.34,
+      "opacity": 1
+    },
+    {
+      "id": "water",
+      "hits": {
+        "Seat": 0,
+        "ChairBack": 0,
+        "DeskSurface": 0
+      },
+      "minY": 0.40197901835023453,
+      "maxY": 1.9750503955178975,
+      "minZ": -0.4102250628668323,
+      "maxZ": 0.44765190977678615,
+      "transmission": 0.32,
+      "opacity": 1
+    },
+    {
+      "id": "puff",
+      "hits": {
+        "Seat": 0,
+        "ChairBack": 0,
+        "DeskSurface": 0
+      },
+      "minY": 0.4045963693083765,
+      "maxY": 1.3356780150786824,
+      "minZ": -0.4830223184477669,
+      "maxZ": 0.4703832172556084,
+      "transmission": 0.14,
+      "opacity": 1
+    }
+  ],
+  "errors": []
+}

@@ -75,7 +75,7 @@ it("blends every animation transition continuously, with bounded finite transfor
         expect(Math.abs(next[key] - previous[key])).toBeLessThan(0.45);
       }
     }
-  expect(poseFor("read", 1).pitch).toBeGreaterThan(0.05);
+  expect(poseFor("read", 1).pitch).toBeGreaterThan(0.02);
   expect(poseFor("rest", 1).eyeOpen).toBeLessThan(0.2);
   expect(poseFor("walk", 1).leftLeg).toBe(-poseFor("walk", 1).rightLeg);
   expect(blendPose({ ...neutralPose }, poseFor("stretch", 1), 0)).toEqual(
