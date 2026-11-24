@@ -1,0 +1,112 @@
+
+> companion-planet@0.1.0 test:mobile
+> playwright test --config=playwright.mobile.config.ts
+
+[WebServer] (node:75963) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] .env not found. Continuing without it.
+[WebServer] (node:75976) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 9 tests using 1 worker
+
+(node:75988) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [phone-small] › tests/mobile.spec.ts:4:1 › touch rotation, character tap, timer and mobile keyboard chat work (57.6s)
+  ✓  2 [phone-small] › tests/mobile.spec.ts:122:1 › touch grabs and drops the resident without moving the camera (12.6s)
+  ✓  3 [phone-small] › tests/mobile.spec.ts:159:1 › touch distant planets and the physical lamp while keeping the timer (14.9s)
+(node:76320) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  4 [phone-standard] › tests/mobile.spec.ts:4:1 › touch rotation, character tap, timer and mobile keyboard chat work (42.3s)
+(node:76734) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  5 [phone-standard] › tests/mobile.spec.ts:122:1 › touch grabs and drops the resident without moving the camera (14.0s)
+  ✓  6 [phone-standard] › tests/mobile.spec.ts:159:1 › touch distant planets and the physical lamp while keeping the timer (16.5s)
+(node:76926) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  7 [phone-landscape] › tests/mobile.spec.ts:4:1 › touch rotation, character tap, timer and mobile keyboard chat work (51.6s)
+  ✓  8 [phone-landscape] › tests/mobile.spec.ts:122:1 › touch grabs and drops the resident without moving the camera (12.9s)
+  ✓  9 [phone-landscape] › tests/mobile.spec.ts:159:1 › touch distant planets and the physical lamp while keeping the timer (13.5s)
+
+
+  1) [phone-standard] › tests/mobile.spec.ts:4:1 › touch rotation, character tap, timer and mobile keyboard chat work 
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator: locator('canvas')
+    Expected pattern: /happy|stretch|listen|idle/
+    Received string:  "read"
+    Timeout: 15000ms
+
+    Call log:
+      - Expect "toHaveAttribute" locator('canvas') with timeout 15000ms
+      - waiting for locator('canvas')
+        5 × locator resolved to <canvas width="312" height="675" data-frames="75" data-action="walk" data-planet="b612" data-lamp-on="true" data-reaction="read" data-sample-fps="2.9" data-companion="nebula" data-quality-dpr="0.80" data-multi-touch="false" aria-label="可拖曳旋轉的 3D 星球" data-engine="three.js r181" data-skin-mode="thin-shell" data-model-ready="sculpt-v1" data-camera="10.97,5.50,7.04" data-planet2="moon,0.825,0.35" data-planet1="forest,0.54,0.18" data-position="-0.151,0.000,2.487" data-planet0="rose,0.18,0.41000000000000003…>…</canvas>
+          - unexpected value "read"
+        2 × locator resolved to <canvas width="312" height="675" data-frames="78" data-action="walk" data-planet="b612" data-lamp-on="true" data-reaction="read" data-sample-fps="2.9" data-companion="nebula" data-quality-dpr="0.80" data-multi-touch="false" aria-label="可拖曳旋轉的 3D 星球" data-engine="three.js r181" data-skin-mode="thin-shell" data-model-ready="sculpt-v1" data-camera="10.98,5.50,7.01" data-planet2="moon,0.825,0.35" data-planet1="forest,0.54,0.18" data-position="-0.343,0.000,2.276" data-planet0="rose,0.18,0.41000000000000003…>…</canvas>
+          - unexpected value "read"
+        2 × locator resolved to <canvas width="312" height="675" data-frames="81" data-action="walk" data-planet="b612" data-lamp-on="true" data-reaction="read" data-sample-fps="2.9" data-companion="nebula" data-quality-dpr="0.80" data-multi-touch="false" aria-label="可拖曳旋轉的 3D 星球" data-engine="three.js r181" data-skin-mode="thin-shell" data-model-ready="sculpt-v1" data-camera="11.00,5.51,6.99" data-planet2="moon,0.825,0.35" data-planet1="forest,0.54,0.18" data-position="-0.472,0.000,1.642" data-planet0="rose,0.18,0.41000000000000003…>…</canvas>
+          - unexpected value "read"
+        - locator resolved to <canvas width="273" height="590" data-frames="84" data-action="walk" data-planet="b612" data-lamp-on="true" data-reaction="read" data-sample-fps="3.4" data-companion="nebula" data-quality-dpr="0.70" data-multi-touch="false" aria-label="可拖曳旋轉的 3D 星球" data-engine="three.js r181" data-skin-mode="thin-shell" data-model-ready="sculpt-v1" data-camera="11.01,5.51,6.97" data-planet2="moon,0.825,0.35" data-planet1="forest,0.54,0.18" data-position="-0.515,0.000,0.880" data-planet0="rose,0.18,0.41000000000000003…>…</canvas>
+        2 × unexpected value "read"
+          - locator resolved to <canvas width="273" height="590" data-frames="87" data-action="walk" data-planet="b612" data-lamp-on="true" data-reaction="read" data-sample-fps="3.4" data-companion="nebula" data-quality-dpr="0.70" data-multi-touch="false" aria-label="可拖曳旋轉的 3D 星球" data-engine="three.js r181" data-skin-mode="thin-shell" data-model-ready="sculpt-v1" data-camera="11.02,5.51,6.95" data-planet2="moon,0.825,0.35" data-planet1="forest,0.54,0.18" data-position="-0.528,0.000,0.658" data-planet0="rose,0.18,0.41000000000000003…>…</canvas>
+        - unexpected value "read"
+        - locator resolved to <canvas width="273" height="590" data-frames="90" data-action="walk" data-planet="b612" data-lamp-on="true" data-reaction="read" data-sample-fps="3.4" data-companion="nebula" data-quality-dpr="0.70" data-multi-touch="false" aria-label="可拖曳旋轉的 3D 星球" data-engine="three.js r181" data-skin-mode="thin-shell" data-model-ready="sculpt-v1" data-camera="11.02,5.51,6.94" data-planet2="moon,0.825,0.35" data-planet1="forest,0.54,0.18" data-position="-0.542,0.000,0.418" data-planet0="rose,0.18,0.41000000000000003…>…</canvas>
+        2 × unexpected value "read"
+          - locator resolved to <canvas width="273" height="590" data-frames="93" data-action="walk" data-planet="b612" data-lamp-on="true" data-reaction="read" data-sample-fps="4.6" data-companion="nebula" data-quality-dpr="0.70" data-multi-touch="false" aria-label="可拖曳旋轉的 3D 星球" data-engine="three.js r181" data-skin-mode="thin-shell" data-model-ready="sculpt-v1" data-camera="11.03,5.52,6.92" data-planet2="moon,0.825,0.35" data-planet1="forest,0.54,0.18" data-position="-0.547,0.000,0.327" data-planet0="rose,0.18,0.41000000000000003…>…</canvas>
+        - unexpected value "read"
+        - locator resolved to <canvas width="273" height="590" data-frames="96" data-action="walk" data-planet="b612" data-lamp-on="true" data-reaction="read" data-sample-fps="4.6" data-companion="nebula" data-quality-dpr="0.70" data-multi-touch="false" aria-label="可拖曳旋轉的 3D 星球" data-engine="three.js r181" data-skin-mode="thin-shell" data-model-ready="sculpt-v1" data-camera="11.04,5.52,6.91" data-planet2="moon,0.825,0.35" data-planet1="forest,0.54,0.18" data-position="0.220,0.000,0.268" data-planet0="rose,0.18,0.41000000000000003"…>…</canvas>
+        - unexpected value "read"
+        - locator resolved to <canvas width="273" height="590" data-frames="99" data-action="walk" data-planet="b612" data-lamp-on="true" data-reaction="read" data-sample-fps="4.6" data-companion="nebula" data-quality-dpr="0.70" data-multi-touch="false" aria-label="可拖曳旋轉的 3D 星球" data-engine="three.js r181" data-skin-mode="thin-shell" data-model-ready="sculpt-v1" data-camera="11.04,5.52,6.90" data-planet2="moon,0.825,0.35" data-planet1="forest,0.54,0.18" data-position="0.524,0.000,0.245" data-planet0="rose,0.18,0.41000000000000003"…>…</canvas>
+        - unexpected value "read"
+        - locator resolved to <canvas width="273" height="590" data-frames="99" data-action="walk" data-planet="b612" data-lamp-on="true" data-reaction="read" data-sample-fps="3.8" data-companion="nebula" data-quality-dpr="0.70" data-multi-touch="false" aria-label="可拖曳旋轉的 3D 星球" data-engine="three.js r181" data-skin-mode="thin-shell" data-model-ready="sculpt-v1" data-camera="11.04,5.52,6.90" data-planet2="moon,0.825,0.35" data-planet1="forest,0.54,0.18" data-position="0.524,0.000,0.245" data-planet0="rose,0.18,0.41000000000000003"…>…</canvas>
+        2 × unexpected value "read"
+          - locator resolved to <canvas width="273" height="590" data-frames="102" data-action="walk" data-planet="b612" data-lamp-on="true" data-reaction="read" data-sample-fps="3.8" data-companion="nebula" data-quality-dpr="0.70" data-multi-touch="false" aria-label="可拖曳旋轉的 3D 星球" data-engine="three.js r181" data-skin-mode="thin-shell" data-model-ready="sculpt-v1" data-camera="11.05,5.52,6.90" data-planet2="moon,0.825,0.35" data-planet1="forest,0.54,0.18" data-position="0.645,0.000,0.236" data-planet0="rose,0.18,0.41000000000000003…>…</canvas>
+        - unexpected value "read"
+        - locator resolved to <canvas width="390" height="844" data-frames="105" data-action="read" data-planet="b612" data-lamp-on="true" data-reaction="read" data-sample-fps="3.8" data-companion="nebula" data-quality-dpr="0.70" data-multi-touch="false" aria-label="可拖曳旋轉的 3D 星球" data-engine="three.js r181" data-skin-mode="thin-shell" data-model-ready="sculpt-v1" data-camera="11.05,5.52,6.89" data-planet2="moon,0.825,0.35" data-planet1="forest,0.54,0.18" data-position="0.666,0.000,0.234" data-planet0="rose,0.18,0.41000000000000003…>…</canvas>
+        2 × unexpected value "read"
+          - locator resolved to <canvas width="312" height="675" data-frames="108" data-action="read" data-planet="b612" data-lamp-on="true" data-reaction="read" data-sample-fps="3.0" data-companion="nebula" data-quality-dpr="0.80" data-multi-touch="false" aria-label="可拖曳旋轉的 3D 星球" data-engine="three.js r181" data-skin-mode="thin-shell" data-model-ready="sculpt-v1" data-camera="11.05,5.52,6.88" data-planet2="moon,0.825,0.35" data-planet1="forest,0.54,0.18" data-position="0.666,0.000,0.234" data-planet0="rose,0.18,0.41000000000000003…>…</canvas>
+        2 × unexpected value "read"
+          - locator resolved to <canvas width="312" height="675" data-frames="111" data-action="read" data-planet="b612" data-lamp-on="true" data-reaction="read" data-sample-fps="3.0" data-companion="nebula" data-quality-dpr="0.80" data-multi-touch="false" aria-label="可拖曳旋轉的 3D 星球" data-engine="three.js r181" data-skin-mode="thin-shell" data-model-ready="sculpt-v1" data-camera="11.06,5.52,6.88" data-planet2="moon,0.825,0.35" data-planet1="forest,0.54,0.18" data-position="0.666,0.000,0.234" data-planet0="rose,0.18,0.41000000000000003…>…</canvas>
+        - unexpected value "read"
+        - locator resolved to <canvas width="273" height="590" data-frames="114" data-action="read" data-planet="b612" data-lamp-on="true" data-reaction="read" data-sample-fps="3.3" data-companion="nebula" data-quality-dpr="0.70" data-multi-touch="false" aria-label="可拖曳旋轉的 3D 星球" data-engine="three.js r181" data-skin-mode="thin-shell" data-model-ready="sculpt-v1" data-camera="11.06,5.52,6.87" data-planet2="moon,0.825,0.35" data-planet1="forest,0.54,0.18" data-position="0.666,0.000,0.234" data-planet0="rose,0.18,0.41000000000000003…>…</canvas>
+        3 × unexpected value "read"
+          - locator resolved to <canvas width="273" height="590" data-frames="117" data-action="read" data-planet="b612" data-lamp-on="true" data-reaction="read" data-sample-fps="3.3" data-companion="nebula" data-quality-dpr="0.70" data-multi-touch="false" aria-label="可拖曳旋轉的 3D 星球" data-engine="three.js r181" data-skin-mode="thin-shell" data-model-ready="sculpt-v1" data-camera="11.06,5.52,6.87" data-planet2="moon,0.825,0.35" data-planet1="forest,0.54,0.18" data-position="0.666,0.000,0.234" data-planet0="rose,0.18,0.41000000000000003…>…</canvas>
+        2 × unexpected value "read"
+          - locator resolved to <canvas width="273" height="590" data-frames="120" data-action="read" data-planet="b612" data-lamp-on="true" data-reaction="read" data-sample-fps="2.4" data-companion="nebula" data-quality-dpr="0.70" data-multi-touch="false" aria-label="可拖曳旋轉的 3D 星球" data-engine="three.js r181" data-skin-mode="thin-shell" data-model-ready="sculpt-v1" data-camera="11.06,5.52,6.87" data-planet2="moon,0.825,0.35" data-planet1="forest,0.54,0.18" data-position="0.666,0.000,0.234" data-planet0="rose,0.18,0.41000000000000003…>…</canvas>
+        - unexpected value "read"
+        - locator resolved to <canvas width="273" height="590" data-frames="123" data-action="read" data-planet="b612" data-lamp-on="true" data-reaction="read" data-sample-fps="2.4" data-companion="nebula" data-quality-dpr="0.70" data-multi-touch="false" aria-label="可拖曳旋轉的 3D 星球" data-engine="three.js r181" data-skin-mode="thin-shell" data-model-ready="sculpt-v1" data-camera="11.06,5.52,6.86" data-planet2="moon,0.825,0.35" data-planet1="forest,0.54,0.18" data-position="0.666,0.000,0.234" data-planet0="rose,0.18,0.41000000000000003…>…</canvas>
+        - unexpected value "read"
+
+
+      87 |     box.y + point[1] * box.height,
+      88 |   );
+    > 89 |   await expect(canvas).toHaveAttribute(
+         |                        ^
+      90 |     "data-reaction",
+      91 |     /happy|stretch|listen|idle/,
+      92 |   );
+        at /workspace/companion-planet/tests/mobile.spec.ts:89:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-mobile/mobile-touch-rotation-char-db61a-d-mobile-keyboard-chat-work-phone-standard/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-mobile/mobile-touch-rotation-char-db61a-d-mobile-keyboard-chat-work-phone-standard/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results-mobile/mobile-touch-rotation-char-db61a-d-mobile-keyboard-chat-work-phone-standard/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results-mobile/mobile-touch-rotation-char-db61a-d-mobile-keyboard-chat-work-phone-standard/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [phone-standard] › tests/mobile.spec.ts:4:1 › touch rotation, character tap, timer and mobile keyboard chat work 
+  8 passed (4.0m)
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice
