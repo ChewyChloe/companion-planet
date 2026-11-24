@@ -1,3 +1,4 @@
+import { HOME, APPROACH, CHAIR } from "./art/terrain";
 import { allowedAction, chooseAction, type Action, type Phase } from "./domain";
 export interface Behavior {
   action: Action;
@@ -9,13 +10,13 @@ export interface Behavior {
 }
 export const initialBehavior: Behavior = {
   action: "idle",
-  target: [-0.4, 0.5],
-  home: [-0.4, 0.5],
+  target: [...HOME],
+  home: [...HOME],
   until: 0,
   phase: "idle",
   reactionId: 0,
 };
-const desk: [number, number] = [0.72, 0.23];
+const desk: [number, number] = [CHAIR.x, CHAIR.z];
 /** High-level planner; render frames only interpolate its bounded destinations. */
 export function advanceBehavior(
   current: Behavior,
@@ -55,10 +56,14 @@ export function advanceBehavior(
         phase === "focus"
           ? desk
           : action === "approach"
-            ? [0, 1.1]
+            ? [...APPROACH]
             : action === "return"
               ? current.home
-              : current.target,
+              : action === "rest"
+                ? [-1.1, 0.65]
+                : action === "read"
+                  ? desk
+                  : current.target,
       until: elapsed + 3.2,
     };
   }
@@ -78,7 +83,10 @@ export function advanceBehavior(
   else if (action === "walk") {
     const angle = 0.15 + random() * (Math.PI - 0.3);
     const radius = 0.55 + random() * 0.5;
-    target = [Math.cos(angle) * radius, 0.3 + Math.sin(angle) * radius * 0.7];
+    target = [
+      -0.7 - Math.abs(Math.cos(angle)) * radius * 0.45,
+      -0.35 + Math.sin(angle) * radius * 0.65,
+    ];
   }
   return { ...current, action, target, until: elapsed + 5 + random() * 7 };
 }

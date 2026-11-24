@@ -1,3 +1,7 @@
+# 2026-11-23 美術重製補充
+
+本文件下方保留首版開發紀錄；當中「程序化基本模型／無 GLB／舊 FPS 與 DPR」是歷史狀態。現版改為原創 Blender 連續皮膚、GLB 骨架動畫、自訂岩體與分材質家具，DPR 上限 1.5。新版本實際測試、截圖、效能與人工驗收限制，以 [VISUAL_QA.md](VISUAL_QA.md) 與 artifacts/art/visual-results.json 為準。
+
 # 同頻星球開發與驗收報告
 
 日期：2026-11-23（台灣時間）。本次由空白儲存庫建立可執行的網頁與 Electron 原型。所有原始碼與產物在目前工作區，未推送 GitHub。環境設定草稿已保存 `install_script`、`start_skill`；尚未發布或在全新任務驗證還原。

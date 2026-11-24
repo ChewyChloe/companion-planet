@@ -242,12 +242,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 6946,
+                  "duration": 8743,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-11-23T14:32:43.226Z",
+                  "startTime": "2026-11-24T02:44:52.977Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -265,12 +265,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 6339,
+                  "duration": 7337,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-11-23T14:32:54.784Z",
+                  "startTime": "2026-11-24T02:45:07.264Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -288,12 +288,12 @@
                   "workerIndex": 2,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 6842,
+                  "duration": 6590,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-11-23T14:33:05.938Z",
+                  "startTime": "2026-11-24T02:45:19.528Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -322,12 +322,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3296,
+                  "duration": 4362,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-11-23T14:32:50.719Z",
+                  "startTime": "2026-11-24T02:45:02.441Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -345,12 +345,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3339,
+                  "duration": 3715,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-11-23T14:33:01.878Z",
+                  "startTime": "2026-11-24T02:45:15.091Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -368,12 +368,12 @@
                   "workerIndex": 2,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2997,
+                  "duration": 3462,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-11-23T14:33:13.540Z",
+                  "startTime": "2026-11-24T02:45:26.634Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -391,8 +391,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-11-23T14:32:42.723Z",
-    "duration": 33983.310000000005,
+    "startTime": "2026-11-24T02:44:52.344Z",
+    "duration": 37883.76,
     "expected": 6,
     "skipped": 0,
     "unexpected": 0,

@@ -646,8 +646,18 @@ function App() {
     </main>
   );
 }
+const Review = import.meta.env.DEV
+  ? React.lazy(() => import("./art/ArtReview"))
+  : () => null;
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <App />
+    {import.meta.env.DEV &&
+    new URLSearchParams(location.search).has("art-review") ? (
+      <React.Suspense fallback={<p>載入 3D 驗收場景…</p>}>
+        <Review />
+      </React.Suspense>
+    ) : (
+      <App />
+    )}
   </React.StrictMode>,
 );

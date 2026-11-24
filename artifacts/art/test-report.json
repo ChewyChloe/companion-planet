@@ -1,0 +1,78 @@
+{
+  "generatedAt": "2026-11-24T03:13:42.416Z",
+  "suites": {
+    "unit": {
+      "passed": 27,
+      "failed": 0,
+      "status": "Passed"
+    },
+    "web": {
+      "passed": 6,
+      "failed": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "evidence": "artifacts/web-results.json"
+    },
+    "mobile": {
+      "passed": 3,
+      "failed": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "evidence": "artifacts/mobile-results.json"
+    },
+    "design": {
+      "passed": 6,
+      "failed": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "evidence": "artifacts/redesign/design-results.json"
+    },
+    "electron": {
+      "passed": 1,
+      "failed": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "evidence": "artifacts/electron-results.json"
+    }
+  },
+  "totalPassed": 43,
+  "visual": {
+    "actions": [
+      "idle",
+      "walk",
+      "read",
+      "rest",
+      "happy",
+      "listen",
+      "stretch",
+      "approach",
+      "return"
+    ],
+    "views": [
+      "front",
+      "side",
+      "back",
+      "quarter"
+    ],
+    "errors": [],
+    "performance": 7.4915719815207895,
+    "contact": {
+      "intersections": {
+        "DeskSurface": 0,
+        "ChairBack": 0
+      },
+      "seatTop": 0.52000500112772,
+      "bodyUnderside": 0.5008746812342645,
+      "gap": -0.019130319893455483
+    }
+  },
+  "limits": [
+    "Visual similarity and material quality require human approval",
+    "SwiftShader FPS is not a real-device GPU benchmark",
+    "Real iOS/Android and native Windows compositing are not tested"
+  ]
+}

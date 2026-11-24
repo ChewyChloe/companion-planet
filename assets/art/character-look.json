@@ -1,0 +1,15 @@
+{
+  "bodyWidth": 1.0,
+  "bodyHeight": 1.0,
+  "bodyRoundness": 0.72,
+  "antennaLength": 1.0,
+  "antennaCurvature": 1.0,
+  "eyeSpacing": 1.0,
+  "eyeScale": 1.0,
+  "armLength": 0.2,
+  "legLength": 0.18,
+  "materialOpacity": 1.0,
+  "surfaceRoughness": 0.42,
+  "subsurfaceAppearance": 0.35,
+  "bodyDepth": 1.25
+}

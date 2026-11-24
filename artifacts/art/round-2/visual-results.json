@@ -1,0 +1,342 @@
+{
+  "errors": [],
+  "views": {
+    "front": {
+      "engine": "three.js r181",
+      "modelReady": "sculpt-v1",
+      "characterNodes": "CharacterRoot,Body,Belly,LeftEye,RightEye,Mouth,LeftCheek,RightCheek,LeftAntenna,RightAntenna,LeftArm,RightArm,LeftLeg,RightLeg",
+      "pose": "0.9929,0.0000,0.0000,0.0000,0.0000,0.0400,0.0000,0.0000,0.0000,1.0000,0.0000",
+      "frames": "45",
+      "action": "idle",
+      "triangles": "24382",
+      "calls": "12",
+      "bounds": "{\"min\":[-0.6434801387148584,0.014473736235973207,-0.35773593187332153],\"max\":[0.6434800195989133,1.5313548745831087,0.3517395853996277]}"
+    },
+    "side": {
+      "engine": "three.js r181",
+      "modelReady": "sculpt-v1",
+      "characterNodes": "CharacterRoot,Body,Belly,LeftEye,RightEye,Mouth,LeftCheek,RightCheek,LeftAntenna,RightAntenna,LeftArm,RightArm,LeftLeg,RightLeg",
+      "pose": "0.9961,0.0000,0.0000,0.0000,0.0000,0.0400,0.0000,0.0000,0.0000,1.0000,0.0000",
+      "frames": "45",
+      "action": "idle",
+      "triangles": "24382",
+      "calls": "12",
+      "bounds": "{\"min\":[-0.3577359318733217,0.014480376243805706,-0.6434800195989134],\"max\":[0.35173958539962785,1.5387273199033145,0.6434801387148585]}"
+    },
+    "back": {
+      "engine": "three.js r181",
+      "modelReady": "sculpt-v1",
+      "characterNodes": "CharacterRoot,Body,Belly,LeftEye,RightEye,Mouth,LeftCheek,RightCheek,LeftAntenna,RightAntenna,LeftArm,RightArm,LeftLeg,RightLeg",
+      "pose": "0.9938,0.0000,0.0000,0.0000,0.0000,0.0400,0.0000,0.0000,0.0000,1.0000,0.0000",
+      "frames": "45",
+      "action": "idle",
+      "triangles": "24382",
+      "calls": "12",
+      "bounds": "{\"min\":[-0.6434800195989134,0.014481065677402085,-0.35173958539962774],\"max\":[0.6434801387148584,1.5332851750096412,0.3577359318733216]}"
+    },
+    "quarter": {
+      "engine": "three.js r181",
+      "modelReady": "sculpt-v1",
+      "characterNodes": "CharacterRoot,Body,Belly,LeftEye,RightEye,Mouth,LeftCheek,RightCheek,LeftAntenna,RightAntenna,LeftArm,RightArm,LeftLeg,RightLeg",
+      "pose": "0.9926,0.0000,0.0000,0.0000,0.0000,0.0400,0.0000,0.0000,0.0000,1.0000,0.0000",
+      "frames": "45",
+      "action": "idle",
+      "triangles": "24382",
+      "calls": "12",
+      "bounds": "{\"min\":[-0.7079666729458511,0.014478174169426275,-0.7079665887181585],\"max\":[0.7037265314642656,1.5315656624948544,0.7037266156919582]}"
+    }
+  },
+  "animations": {
+    "idle": {
+      "status": "Passed",
+      "poseA": "0.9941,0.0000,0.0000,0.0000,0.0000,0.0400,0.0000,0.0000,0.0000,1.0000,0.0000",
+      "poseB": "0.9936,0.0000,0.0000,0.0000,0.0000,0.0400,0.0000,0.0000,0.0000,1.0000,0.0000"
+    },
+    "walk": {
+      "status": "Passed",
+      "poseA": "0.9935,0.0250,-0.0171,0.0000,0.0098,0.0487,0.0000,-0.1316,0.1316,1.0000,0.0000",
+      "poseB": "0.9929,0.0250,-0.0252,0.0000,0.0132,0.0719,0.0000,-0.1940,0.1940,1.0000,0.0000"
+    },
+    "read": {
+      "status": "Passed",
+      "poseA": "0.9956,0.0929,0.0000,0.0144,0.0000,0.0800,0.7200,-0.7000,-0.7000,0.9200,0.0000",
+      "poseB": "0.9950,0.0929,0.0000,0.0147,0.0000,0.0800,0.7200,-0.7000,-0.7000,0.9200,0.0000"
+    },
+    "rest": {
+      "status": "Passed",
+      "poseA": "0.9458,0.1000,0.0000,0.0000,0.0000,-0.0800,0.0000,0.0000,0.0000,0.1200,0.0900",
+      "poseB": "0.9457,0.1000,0.0000,0.0000,0.0000,-0.0800,0.0000,0.0000,0.0000,0.1200,0.0900"
+    },
+    "happy": {
+      "status": "Passed",
+      "poseA": "0.9914,0.0000,0.0000,0.0000,0.0050,0.9000,0.0000,-0.1200,0.1200,1.0000,0.0080",
+      "poseB": "0.9859,0.0000,0.0000,0.0000,0.0031,0.9000,0.0000,-0.1200,0.1200,1.0000,-0.0226"
+    },
+    "listen": {
+      "status": "Passed",
+      "poseA": "0.9929,-0.0250,0.0450,0.1225,0.0000,0.0400,0.0000,0.0000,0.0000,1.0300,0.0400",
+      "poseB": "0.9925,-0.0250,0.0450,0.1198,0.0000,0.0400,0.0000,0.0000,0.0000,1.0300,0.0400"
+    },
+    "stretch": {
+      "status": "Passed",
+      "poseA": "1.0631,0.0000,0.0000,0.0000,0.0000,1.0500,0.1200,0.0000,0.0000,0.6500,-0.0800",
+      "poseB": "1.0628,0.0000,0.0000,0.0000,0.0000,1.0500,0.1200,0.0000,0.0000,0.6500,-0.0800"
+    },
+    "approach": {
+      "status": "Passed",
+      "poseA": "0.9968,0.0250,0.0261,0.0000,0.0128,-0.0746,0.0000,0.2015,-0.2015,1.0000,0.0000",
+      "poseB": "0.9959,0.0250,0.0227,0.0000,0.0092,-0.0647,0.0000,0.1748,-0.1748,1.0000,0.0000"
+    },
+    "return": {
+      "status": "Passed",
+      "poseA": "0.9956,0.0250,0.0185,0.0000,0.0074,-0.0528,0.0000,0.1427,-0.1427,1.0000,0.0000",
+      "poseB": "0.9949,0.0250,0.0092,0.0000,0.0044,-0.0262,0.0000,0.0708,-0.0708,1.0000,0.0000"
+    }
+  },
+  "scenes": {
+    "planet": {
+      "triangles": 68244,
+      "calls": 46,
+      "geometryCount": 46,
+      "nodes": [
+        {
+          "name": "Body",
+          "type": "SkinnedMesh"
+        },
+        {
+          "name": "MotionRoot",
+          "type": "Bone"
+        },
+        {
+          "name": "BodyControl",
+          "type": "Bone"
+        },
+        {
+          "name": "LeftArm",
+          "type": "Bone"
+        },
+        {
+          "name": "RightArm",
+          "type": "Bone"
+        },
+        {
+          "name": "LeftLeg",
+          "type": "Bone"
+        },
+        {
+          "name": "RightLeg",
+          "type": "Bone"
+        }
+      ],
+      "webgl": "WebKit WebGL",
+      "engine": "three.js r181",
+      "modelReady": "sculpt-v1",
+      "characterNodes": "CharacterRoot,Body,Belly,LeftEye,RightEye,Mouth,LeftCheek,RightCheek,LeftAntenna,RightAntenna,LeftArm,RightArm,LeftLeg,RightLeg",
+      "pose": "1.0068,0.0000,0.0000,0.0000,0.0000,0.0400,0.0000,0.0000,0.0000,1.0000,0.0000",
+      "action": "idle",
+      "reaction": "none",
+      "frames": "45",
+      "camera": "6.00,5.60,9.60",
+      "screen": "0.4255272930270281,0.3054222806334567",
+      "position": "-0.720,0.000,0.120",
+      "qualityDpr": "0.70",
+      "sampleFps": "8.3",
+      "fps": 9.337649402390438
+    },
+    "read": {
+      "triangles": 68244,
+      "calls": 46,
+      "geometryCount": 46,
+      "nodes": [
+        {
+          "name": "Body",
+          "type": "SkinnedMesh"
+        },
+        {
+          "name": "MotionRoot",
+          "type": "Bone"
+        },
+        {
+          "name": "BodyControl",
+          "type": "Bone"
+        },
+        {
+          "name": "LeftArm",
+          "type": "Bone"
+        },
+        {
+          "name": "RightArm",
+          "type": "Bone"
+        },
+        {
+          "name": "LeftLeg",
+          "type": "Bone"
+        },
+        {
+          "name": "RightLeg",
+          "type": "Bone"
+        }
+      ],
+      "webgl": "WebKit WebGL",
+      "engine": "three.js r181",
+      "modelReady": "sculpt-v1",
+      "characterNodes": "CharacterRoot,Body,Belly,LeftEye,RightEye,Mouth,LeftCheek,RightCheek,LeftAntenna,RightAntenna,LeftArm,RightArm,LeftLeg,RightLeg",
+      "pose": "1.0077,0.0800,0.0000,0.0070,0.0000,0.0800,0.7198,-0.6997,-0.6998,0.9200,0.0000",
+      "action": "read",
+      "reaction": "none",
+      "frames": "165",
+      "camera": "6.00,5.60,9.60",
+      "screen": "0.5541216084930413,0.3150864850134375",
+      "position": "0.679,0.000,0.224",
+      "qualityDpr": "0.80",
+      "sampleFps": "5.2"
+    },
+    "readContact": {
+      "seatTop": 0.52000500112772,
+      "bodyUnderside": 0.46286861525471484,
+      "gap": -0.057136385873005124
+    },
+    "rest": {
+      "triangles": 68244,
+      "calls": 46,
+      "geometryCount": 46,
+      "nodes": [
+        {
+          "name": "Body",
+          "type": "SkinnedMesh"
+        },
+        {
+          "name": "MotionRoot",
+          "type": "Bone"
+        },
+        {
+          "name": "BodyControl",
+          "type": "Bone"
+        },
+        {
+          "name": "LeftArm",
+          "type": "Bone"
+        },
+        {
+          "name": "RightArm",
+          "type": "Bone"
+        },
+        {
+          "name": "LeftLeg",
+          "type": "Bone"
+        },
+        {
+          "name": "RightLeg",
+          "type": "Bone"
+        }
+      ],
+      "webgl": "WebKit WebGL",
+      "engine": "three.js r181",
+      "modelReady": "sculpt-v1",
+      "characterNodes": "CharacterRoot,Body,Belly,LeftEye,RightEye,Mouth,LeftCheek,RightCheek,LeftAntenna,RightAntenna,LeftArm,RightArm,LeftLeg,RightLeg",
+      "pose": "0.9404,0.1000,0.0000,0.0000,0.0000,-0.0800,0.0000,0.0000,-0.0000,0.1200,0.0900",
+      "action": "rest",
+      "reaction": "rest",
+      "frames": "225",
+      "camera": "6.00,5.60,9.60",
+      "screen": "0.3593916834984152,0.3160687396551325",
+      "position": "-1.077,0.000,0.638",
+      "qualityDpr": "0.80",
+      "sampleFps": "5.2"
+    },
+    "pet": {
+      "triangles": 24382,
+      "calls": 12,
+      "geometryCount": 12,
+      "nodes": [
+        {
+          "name": "Body",
+          "type": "SkinnedMesh"
+        },
+        {
+          "name": "MotionRoot",
+          "type": "Bone"
+        },
+        {
+          "name": "BodyControl",
+          "type": "Bone"
+        },
+        {
+          "name": "LeftArm",
+          "type": "Bone"
+        },
+        {
+          "name": "RightArm",
+          "type": "Bone"
+        },
+        {
+          "name": "LeftLeg",
+          "type": "Bone"
+        },
+        {
+          "name": "RightLeg",
+          "type": "Bone"
+        }
+      ],
+      "webgl": "WebKit WebGL",
+      "engine": "three.js r181",
+      "modelReady": "sculpt-v1",
+      "characterNodes": "CharacterRoot,Body,Belly,LeftEye,RightEye,Mouth,LeftCheek,RightCheek,LeftAntenna,RightAntenna,LeftArm,RightArm,LeftLeg,RightLeg",
+      "pose": "0.9431,0.1000,0.0000,0.0000,0.0000,-0.0800,0.0000,0.0000,0.0000,0.1200,0.0900",
+      "action": "rest",
+      "reaction": "rest",
+      "frames": "45",
+      "camera": "0.00,0.45,3.50",
+      "screen": "0.5,0.5465838623181871",
+      "position": "-1.092,0.000,0.639"
+    },
+    "mobile": {
+      "triangles": 68244,
+      "calls": 46,
+      "geometryCount": 46,
+      "nodes": [
+        {
+          "name": "Body",
+          "type": "SkinnedMesh"
+        },
+        {
+          "name": "MotionRoot",
+          "type": "Bone"
+        },
+        {
+          "name": "BodyControl",
+          "type": "Bone"
+        },
+        {
+          "name": "LeftArm",
+          "type": "Bone"
+        },
+        {
+          "name": "RightArm",
+          "type": "Bone"
+        },
+        {
+          "name": "LeftLeg",
+          "type": "Bone"
+        },
+        {
+          "name": "RightLeg",
+          "type": "Bone"
+        }
+      ],
+      "webgl": "WebKit WebGL",
+      "engine": "three.js r181",
+      "modelReady": "sculpt-v1",
+      "characterNodes": "CharacterRoot,Body,Belly,LeftEye,RightEye,Mouth,LeftCheek,RightCheek,LeftAntenna,RightAntenna,LeftArm,RightArm,LeftLeg,RightLeg",
+      "pose": "0.9391,0.1000,-0.0000,0.0000,0.0000,-0.0800,0.0000,-0.0000,0.0000,0.1200,0.0900",
+      "action": "rest",
+      "reaction": "rest",
+      "frames": "45",
+      "camera": "6.00,5.60,9.60",
+      "screen": "0.3240550627597007,0.28239669175931414",
+      "position": "-1.098,0.000,0.647",
+      "qualityDpr": "0.80",
+      "sampleFps": "10.1"
+    }
+  }
+}

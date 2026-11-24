@@ -60,7 +60,7 @@ E2E 預設使用 `/usr/bin/chromium`；其他系統請設定 `CHROMIUM_PATH` 為
 
 ## 素材與架構
 
-未提供可匯入的 GLB；目前所有模型為原創程序化基本幾何，不使用影片冒充 3D。後續可將正規化、腳底位於原點、高約 0.9 單位的 GLB 放在 `public/models/`，設定 `VITE_CHARACTER_MODEL_URL=/models/nebula.glb`。這會沿用位置與姿態控制；骨架 clips 仍需針對正式模型製作 adapter，未驗證任意 GLB 相容性。
+星雲仔已重製為原創 Blender 連續皮膚骨架模型 `public/models/nebula-sculpt.glb`，可編輯來源、真實外觀參數與重建指令見 [assets/art/README.md](assets/art/README.md)。場景包含自訂月岩地形、坑洞、苔蘚、木桌／靠背椅／曲面書頁／彎頸桌燈與休息區。模型替換需提供相同命名骨架與控制節點，不能直接換任意 GLB。美術診斷見 [ART_AUDIT.md](ART_AUDIT.md)，四視角、參考對照與驗收狀態見 [VISUAL_QA.md](VISUAL_QA.md)。
 
 - `src/domain.ts`：純計時與行為規則。
 - `src/behavior.ts`：動作優先權、冷卻、活動目標與返回路徑。

@@ -1,0 +1,7 @@
+{
+  "renderer": "WebKit WebGL",
+  "triangles": 13744,
+  "calls": 17,
+  "geometry": "LatheGeometry",
+  "skinned": false
+}

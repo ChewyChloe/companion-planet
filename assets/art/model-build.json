@@ -1,0 +1,51 @@
+{
+  "bodyVertices": 10029,
+  "bodyTriangles": 20054,
+  "continuousSkin": true,
+  "torsoWidth": 0.9754281342029572,
+  "torsoDepth": 0.9059875011444092,
+  "torsoDepthToWidth": 0.9288100982290312,
+  "shapeKeys": [
+    "Basis",
+    "Seated"
+  ],
+  "bones": [
+    "MotionRoot",
+    "BodyControl",
+    "LeftArm",
+    "RightArm",
+    "LeftLeg",
+    "RightLeg"
+  ],
+  "requiredNodes": [
+    "CharacterRoot",
+    "Body",
+    "Belly",
+    "LeftEye",
+    "RightEye",
+    "Mouth",
+    "LeftCheek",
+    "RightCheek",
+    "LeftAntenna",
+    "RightAntenna",
+    "LeftArm",
+    "RightArm",
+    "LeftLeg",
+    "RightLeg"
+  ],
+  "sourceConfig": {
+    "bodyWidth": 1.0,
+    "bodyHeight": 1.0,
+    "bodyRoundness": 0.72,
+    "antennaLength": 1.0,
+    "antennaCurvature": 1.0,
+    "eyeSpacing": 1.0,
+    "eyeScale": 1.0,
+    "armLength": 0.2,
+    "legLength": 0.18,
+    "materialOpacity": 1.0,
+    "surfaceRoughness": 0.42,
+    "subsurfaceAppearance": 0.35,
+    "bodyDepth": 1.25
+  }
+}
