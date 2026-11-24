@@ -1,0 +1,23 @@
+{
+  "id": "stardust",
+  "sourceClaySHA256": "d8a4ea86a991e7613ca0dc09774a4e92c0f1d7e9b14f3da55a3c3cf652325262",
+  "restBodyVertices": 28590,
+  "restBodyTriangles": 57176,
+  "bones": [
+    "MotionRoot",
+    "BodyControl",
+    "LeftArm",
+    "RightArm",
+    "LeftLeg",
+    "RightLeg"
+  ],
+  "shapeKeys": [
+    "Basis",
+    "Seated"
+  ],
+  "portableClips": [],
+  "color": "#324a76",
+  "roughness": 0.32,
+  "transmission": 0.58,
+  "geometryUnchangedFromApprovedClay": true
+}

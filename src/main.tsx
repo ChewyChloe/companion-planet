@@ -756,8 +756,7 @@ const Review = React.lazy(() => import("./art/ArtReview"));
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <NebulaMaterialPanel />
-    {(import.meta.env.DEV || getNebulaMaterialVariant()) &&
-    new URLSearchParams(location.search).has("art-review") ? (
+    {new URLSearchParams(location.search).has("art-review") ? (
       <React.Suspense fallback={<p>載入 3D 驗收場景…</p>}>
         <Review />
       </React.Suspense>

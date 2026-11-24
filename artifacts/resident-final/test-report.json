@@ -1,0 +1,74 @@
+{
+  "generatedAt": "2026-11-24T14:09:38.934Z",
+  "models": [
+    {
+      "id": "nebula",
+      "approvedBodyUnchanged": true,
+      "bodySHA256": "50efb36d5c405b73b7432fd33d2926092204b31ea311139e2fd8c9835bf8c729",
+      "newClips": 0
+    },
+    {
+      "id": "sprout",
+      "approvedBodyUnchanged": true,
+      "bodySHA256": "3afcdce0d5dd3f213b35f552e5fb5bdd4a0b0138836ce3385f26fbeb7877cd7e",
+      "newClips": 0
+    },
+    {
+      "id": "fern",
+      "approvedBodyUnchanged": true,
+      "bodySHA256": "b8b6387e980f2b9d46b996ea75060fd335a9f1019458c9c80e068766ae2acfb3",
+      "newClips": 0
+    },
+    {
+      "id": "mushroom",
+      "approvedBodyUnchanged": true,
+      "bodySHA256": "c1043490bfba3b38360814b54965f3c6d76fe5a98a315d2f63cd2a9efda613aa",
+      "newClips": 0
+    },
+    {
+      "id": "aurora",
+      "approvedBodyUnchanged": true,
+      "bodySHA256": "5319f4e0337459c42e361584239df844b2b6814c75bbdbc57dec804a02ff78ab",
+      "newClips": 0
+    },
+    {
+      "id": "blossom",
+      "approvedBodyUnchanged": true,
+      "bodySHA256": "3e339d9605de42ace4d166e1f1edc1a9454fb593fcd4d77a5514cce243aad9e5",
+      "newClips": 0
+    },
+    {
+      "id": "stardust",
+      "approvedBodyUnchanged": true,
+      "bodySHA256": "ff817bd9e5874e9a65f6fc48c2c2060a1b1eb5b6aa4195232f6daff071b1e26f",
+      "newClips": 0
+    },
+    {
+      "id": "water",
+      "approvedBodyUnchanged": true,
+      "bodySHA256": "ab8ac44c5d1159eb205e3a445355f7e109f8e606e3301cd6365b24067b5bef61",
+      "newClips": 0
+    },
+    {
+      "id": "puff",
+      "approvedBodyUnchanged": true,
+      "bodySHA256": "ec4d4b71f5238257939f9cd9f257b4ec13c9b78b68224b96f7710bda8caccafb",
+      "newClips": 0
+    }
+  ],
+  "distinctBodyGeometry": 9,
+  "materialViews": 36,
+  "planetViews": 9,
+  "browserPlatforms": 2,
+  "selectedResidentsPerPlatform": 9,
+  "actualTouchDrag": "Passed",
+  "renderErrors": [],
+  "unitChecks": {
+    "passed": 40,
+    "command": "npm run check"
+  },
+  "appearance": "Needs Human Review",
+  "hardwarePerformance": "Not Tested",
+  "remoteRenderDeployment": "Not Tested",
+  "note": "Existing controller/behaviors retained; no new animation clips. Latest result per view; Stardust re-rendered after visibility adjustment."
+}

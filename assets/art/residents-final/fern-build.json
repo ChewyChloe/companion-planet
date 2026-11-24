@@ -1,0 +1,23 @@
+{
+  "id": "fern",
+  "sourceClaySHA256": "4f55c016bad62530a0ea2d12368f2d27d87eeb53f3a3901e03a04918f370c3fe",
+  "restBodyVertices": 23815,
+  "restBodyTriangles": 47626,
+  "bones": [
+    "MotionRoot",
+    "BodyControl",
+    "LeftArm",
+    "RightArm",
+    "LeftLeg",
+    "RightLeg"
+  ],
+  "shapeKeys": [
+    "Basis",
+    "Seated"
+  ],
+  "portableClips": [],
+  "color": "#91b765",
+  "roughness": 0.3,
+  "transmission": 0.65,
+  "geometryUnchangedFromApprovedClay": true
+}

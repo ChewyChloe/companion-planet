@@ -1,0 +1,23 @@
+{
+  "id": "sprout",
+  "sourceClaySHA256": "5fcf50ae6d6a300ad21f3c796c4ec2c36848fb4f43439a77a15bc84a6d65642a",
+  "restBodyVertices": 22493,
+  "restBodyTriangles": 44982,
+  "bones": [
+    "MotionRoot",
+    "BodyControl",
+    "LeftArm",
+    "RightArm",
+    "LeftLeg",
+    "RightLeg"
+  ],
+  "shapeKeys": [
+    "Basis",
+    "Seated"
+  ],
+  "portableClips": [],
+  "color": "#e6d7ae",
+  "roughness": 0.38,
+  "transmission": 0.52,
+  "geometryUnchangedFromApprovedClay": true
+}

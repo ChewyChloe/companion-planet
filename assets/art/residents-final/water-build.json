@@ -1,0 +1,24 @@
+{
+  "id": "water",
+  "sourceClaySHA256": "26c777b072fb723acef81adf149b62c5628cfa916003409eeaab5d4c13ef3e18",
+  "restBodyVertices": 21854,
+  "restBodyTriangles": 43704,
+  "bones": [
+    "MotionRoot",
+    "BodyControl",
+    "LeftArm",
+    "RightArm",
+    "LiquidTip",
+    "LeftLeg",
+    "RightLeg"
+  ],
+  "shapeKeys": [
+    "Basis",
+    "Seated"
+  ],
+  "portableClips": [],
+  "color": "#74bfd9",
+  "roughness": 0.1,
+  "transmission": 0.9,
+  "geometryUnchangedFromApprovedClay": true
+}

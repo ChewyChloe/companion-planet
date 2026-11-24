@@ -1,0 +1,23 @@
+{
+  "id": "mushroom",
+  "sourceClaySHA256": "63ca82aa53ae80dd517c0bd87c2b2b82c3e68038e76183861a04c1ccd8d53b5b",
+  "restBodyVertices": 23297,
+  "restBodyTriangles": 46590,
+  "bones": [
+    "MotionRoot",
+    "BodyControl",
+    "LeftArm",
+    "RightArm",
+    "LeftLeg",
+    "RightLeg"
+  ],
+  "shapeKeys": [
+    "Basis",
+    "Seated"
+  ],
+  "portableClips": [],
+  "color": "#e5ca7e",
+  "roughness": 0.46,
+  "transmission": 0.48,
+  "geometryUnchangedFromApprovedClay": true
+}

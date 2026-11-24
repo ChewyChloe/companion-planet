@@ -1,0 +1,331 @@
+{
+  "generatedAt": "2026-11-24T14:08:22.918Z",
+  "errors": [],
+  "views": [
+    {
+      "id": "sprout",
+      "view": "front",
+      "vertices": 22493,
+      "roughness": 0.38,
+      "transmission": 0.52,
+      "glError": 0,
+      "model": "models/residents/sprout.glb"
+    },
+    {
+      "id": "sprout",
+      "view": "quarter",
+      "vertices": 22493,
+      "roughness": 0.38,
+      "transmission": 0.52,
+      "glError": 0,
+      "model": "models/residents/sprout.glb"
+    },
+    {
+      "id": "sprout",
+      "view": "side",
+      "vertices": 22493,
+      "roughness": 0.38,
+      "transmission": 0.52,
+      "glError": 0,
+      "model": "models/residents/sprout.glb"
+    },
+    {
+      "id": "sprout",
+      "view": "back",
+      "vertices": 22493,
+      "roughness": 0.38,
+      "transmission": 0.52,
+      "glError": 0,
+      "model": "models/residents/sprout.glb"
+    },
+    {
+      "id": "fern",
+      "view": "front",
+      "vertices": 23815,
+      "roughness": 0.3,
+      "transmission": 0.65,
+      "glError": 0,
+      "model": "models/residents/fern.glb"
+    },
+    {
+      "id": "fern",
+      "view": "quarter",
+      "vertices": 23815,
+      "roughness": 0.3,
+      "transmission": 0.65,
+      "glError": 0,
+      "model": "models/residents/fern.glb"
+    },
+    {
+      "id": "fern",
+      "view": "side",
+      "vertices": 23815,
+      "roughness": 0.3,
+      "transmission": 0.65,
+      "glError": 0,
+      "model": "models/residents/fern.glb"
+    },
+    {
+      "id": "fern",
+      "view": "back",
+      "vertices": 23815,
+      "roughness": 0.3,
+      "transmission": 0.65,
+      "glError": 0,
+      "model": "models/residents/fern.glb"
+    },
+    {
+      "id": "mushroom",
+      "view": "front",
+      "vertices": 23297,
+      "roughness": 0.46,
+      "transmission": 0.48,
+      "glError": 0,
+      "model": "models/residents/mushroom.glb"
+    },
+    {
+      "id": "mushroom",
+      "view": "quarter",
+      "vertices": 23297,
+      "roughness": 0.46,
+      "transmission": 0.48,
+      "glError": 0,
+      "model": "models/residents/mushroom.glb"
+    },
+    {
+      "id": "mushroom",
+      "view": "side",
+      "vertices": 23297,
+      "roughness": 0.46,
+      "transmission": 0.48,
+      "glError": 0,
+      "model": "models/residents/mushroom.glb"
+    },
+    {
+      "id": "mushroom",
+      "view": "back",
+      "vertices": 23297,
+      "roughness": 0.46,
+      "transmission": 0.48,
+      "glError": 0,
+      "model": "models/residents/mushroom.glb"
+    },
+    {
+      "id": "blossom",
+      "view": "front",
+      "vertices": 20454,
+      "roughness": 0.4,
+      "transmission": 0.6,
+      "glError": 0,
+      "model": "models/residents/blossom.glb"
+    },
+    {
+      "id": "blossom",
+      "view": "quarter",
+      "vertices": 20454,
+      "roughness": 0.4,
+      "transmission": 0.6,
+      "glError": 0,
+      "model": "models/residents/blossom.glb"
+    },
+    {
+      "id": "blossom",
+      "view": "side",
+      "vertices": 20454,
+      "roughness": 0.4,
+      "transmission": 0.6,
+      "glError": 0,
+      "model": "models/residents/blossom.glb"
+    },
+    {
+      "id": "blossom",
+      "view": "back",
+      "vertices": 20454,
+      "roughness": 0.4,
+      "transmission": 0.6,
+      "glError": 0,
+      "model": "models/residents/blossom.glb"
+    },
+    {
+      "id": "water",
+      "view": "front",
+      "vertices": 21854,
+      "roughness": 0.1,
+      "transmission": 0.9,
+      "glError": 0,
+      "model": "models/residents/water.glb"
+    },
+    {
+      "id": "water",
+      "view": "quarter",
+      "vertices": 21854,
+      "roughness": 0.1,
+      "transmission": 0.9,
+      "glError": 0,
+      "model": "models/residents/water.glb"
+    },
+    {
+      "id": "water",
+      "view": "side",
+      "vertices": 21854,
+      "roughness": 0.1,
+      "transmission": 0.9,
+      "glError": 0,
+      "model": "models/residents/water.glb"
+    },
+    {
+      "id": "water",
+      "view": "back",
+      "vertices": 21854,
+      "roughness": 0.1,
+      "transmission": 0.9,
+      "glError": 0,
+      "model": "models/residents/water.glb"
+    },
+    {
+      "id": "puff",
+      "view": "front",
+      "vertices": 21636,
+      "roughness": 0.7,
+      "transmission": 0.24,
+      "glError": 0,
+      "model": "models/residents/puff.glb"
+    },
+    {
+      "id": "puff",
+      "view": "quarter",
+      "vertices": 21636,
+      "roughness": 0.7,
+      "transmission": 0.24,
+      "glError": 0,
+      "model": "models/residents/puff.glb"
+    },
+    {
+      "id": "puff",
+      "view": "side",
+      "vertices": 21636,
+      "roughness": 0.7,
+      "transmission": 0.24,
+      "glError": 0,
+      "model": "models/residents/puff.glb"
+    },
+    {
+      "id": "puff",
+      "view": "back",
+      "vertices": 21636,
+      "roughness": 0.7,
+      "transmission": 0.24,
+      "glError": 0,
+      "model": "models/residents/puff.glb"
+    },
+    {
+      "id": "stardust",
+      "view": "front",
+      "vertices": 28590,
+      "roughness": 0.32,
+      "transmission": 0.58,
+      "glError": 0,
+      "model": "models/residents/stardust.glb"
+    },
+    {
+      "id": "stardust",
+      "view": "quarter",
+      "vertices": 28590,
+      "roughness": 0.32,
+      "transmission": 0.58,
+      "glError": 0,
+      "model": "models/residents/stardust.glb"
+    },
+    {
+      "id": "stardust",
+      "view": "side",
+      "vertices": 28590,
+      "roughness": 0.32,
+      "transmission": 0.58,
+      "glError": 0,
+      "model": "models/residents/stardust.glb"
+    },
+    {
+      "id": "stardust",
+      "view": "back",
+      "vertices": 28590,
+      "roughness": 0.32,
+      "transmission": 0.58,
+      "glError": 0,
+      "model": "models/residents/stardust.glb"
+    },
+    {
+      "id": "nebula",
+      "view": "front",
+      "vertices": 24458,
+      "roughness": 0.23,
+      "transmission": 0.72,
+      "glError": 0,
+      "model": "models/material-preview/nebula.glb"
+    },
+    {
+      "id": "nebula",
+      "view": "quarter",
+      "vertices": 24458,
+      "roughness": 0.23,
+      "transmission": 0.72,
+      "glError": 0,
+      "model": "models/material-preview/nebula.glb"
+    },
+    {
+      "id": "nebula",
+      "view": "side",
+      "vertices": 24458,
+      "roughness": 0.23,
+      "transmission": 0.72,
+      "glError": 0,
+      "model": "models/material-preview/nebula.glb"
+    },
+    {
+      "id": "nebula",
+      "view": "back",
+      "vertices": 24458,
+      "roughness": 0.23,
+      "transmission": 0.72,
+      "glError": 0,
+      "model": "models/material-preview/nebula.glb"
+    },
+    {
+      "id": "aurora",
+      "view": "front",
+      "vertices": 22707,
+      "roughness": 0.2,
+      "transmission": 0.78,
+      "glError": 0,
+      "model": "models/residents/aurora.glb"
+    },
+    {
+      "id": "aurora",
+      "view": "quarter",
+      "vertices": 22707,
+      "roughness": 0.2,
+      "transmission": 0.78,
+      "glError": 0,
+      "model": "models/residents/aurora.glb"
+    },
+    {
+      "id": "aurora",
+      "view": "side",
+      "vertices": 22707,
+      "roughness": 0.2,
+      "transmission": 0.78,
+      "glError": 0,
+      "model": "models/residents/aurora.glb"
+    },
+    {
+      "id": "aurora",
+      "view": "back",
+      "vertices": 22707,
+      "roughness": 0.2,
+      "transmission": 0.78,
+      "glError": 0,
+      "model": "models/residents/aurora.glb"
+    }
+  ],
+  "scope": "Approved nine distinct clay shapes, colored with Nebula B as family reference; existing controller retained, no new clips."
+}

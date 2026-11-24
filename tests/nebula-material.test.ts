@@ -1,7 +1,7 @@
 import { expect, it } from "vitest";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { getNebulaMaterialVariant, nebulaTestMaterial } from "../src/art/nebula-material-test";
+import { getNebulaMaterialVariant, nebulaTestMaterial, resolveNebulaMaterial } from "../src/art/nebula-material-test";
 it("material test requires an explicit valid variant and does not accept prototype names", () => {
   for (const q of ["", "?nebula-material=bad", "?nebula-material=toString", "?nebula-material=__proto__"])
     expect(getNebulaMaterialVariant(q)).toBeUndefined();
@@ -24,4 +24,11 @@ it("desktop uses three distinct physical materials; phone fallback explicitly di
   expect(materials.map(m=>m.roughness)).toEqual([.46,.23,.10]);
   for(const id of variants){const m=nebulaTestMaterial(id,true);expect(m.transmission).toBe(0);expect(m.userData.lightweight).toBe(true);m.dispose();}
   materials.forEach(m=>m.dispose());
+});
+
+it("uses approved B by default only for Nebula while retaining explicit comparison routes",()=>{
+  expect(resolveNebulaMaterial("nebula","")).toBe("mist");
+  expect(resolveNebulaMaterial("nebula","?nebula-material=gel")).toBe("gel");
+  for(const id of ["sprout","fern","mushroom","aurora","blossom","stardust","water","puff"])
+    expect(resolveNebulaMaterial(id, "?nebula-material=gel")).toBeUndefined();
 });

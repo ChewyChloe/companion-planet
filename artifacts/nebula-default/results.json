@@ -1,0 +1,68 @@
+{
+  "generatedAt": "2026-11-24T13:47:56.386Z",
+  "errors": [],
+  "cases": [
+    {
+      "name": "desktop",
+      "passed": true,
+      "initial": {
+        "variant": "mist",
+        "vertices": 24458,
+        "transmission": 0.72,
+        "interior": true,
+        "attachedToBody": true,
+        "bloom": true,
+        "glError": 0
+      },
+      "fern": {
+        "vertices": 10029,
+        "transmission": 0,
+        "interior": false,
+        "attachedToBody": false,
+        "bloom": false,
+        "glError": 0
+      },
+      "pet": {
+        "variant": "mist",
+        "vertices": 24458,
+        "transmission": 0,
+        "interior": true,
+        "attachedToBody": true,
+        "bloom": false,
+        "glError": 0
+      },
+      "timerStateRetained": true
+    },
+    {
+      "name": "phone",
+      "passed": true,
+      "initial": {
+        "variant": "mist",
+        "vertices": 24458,
+        "transmission": 0,
+        "interior": true,
+        "attachedToBody": true,
+        "bloom": true,
+        "glError": 0
+      },
+      "fern": {
+        "vertices": 10029,
+        "transmission": 0,
+        "interior": false,
+        "attachedToBody": false,
+        "bloom": false,
+        "glError": 0
+      },
+      "pet": {
+        "variant": "mist",
+        "vertices": 24458,
+        "transmission": 0,
+        "interior": true,
+        "attachedToBody": true,
+        "bloom": false,
+        "glError": 0
+      },
+      "timerStateRetained": true
+    }
+  ]
+}

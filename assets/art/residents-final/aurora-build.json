@@ -1,0 +1,23 @@
+{
+  "id": "aurora",
+  "sourceClaySHA256": "a69498c203b61b1545a59f5186365cde7384f45b1487462f87ca0fc9181799ef",
+  "restBodyVertices": 22707,
+  "restBodyTriangles": 45410,
+  "bones": [
+    "MotionRoot",
+    "BodyControl",
+    "LeftArm",
+    "RightArm",
+    "LeftLeg",
+    "RightLeg"
+  ],
+  "shapeKeys": [
+    "Basis",
+    "Seated"
+  ],
+  "portableClips": [],
+  "color": "#8c83c5",
+  "roughness": 0.2,
+  "transmission": 0.78,
+  "geometryUnchangedFromApprovedClay": true
+}

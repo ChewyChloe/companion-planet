@@ -1,0 +1,220 @@
+{
+  "generatedAt": "2026-11-24T13:58:26.256Z",
+  "errors": [],
+  "cases": [
+    {
+      "platform": "desktop",
+      "selected": [
+        {
+          "id": "nebula",
+          "model": "models/material-preview/nebula.glb",
+          "vertices": 24458,
+          "transmission": 0.72,
+          "faceAlpha": 1,
+          "glError": 0,
+          "bloom": true,
+          "booster": false
+        },
+        {
+          "id": "sprout",
+          "model": "models/residents/sprout.glb",
+          "vertices": 22493,
+          "transmission": 0.52,
+          "faceAlpha": 1,
+          "glError": 0,
+          "bloom": true,
+          "booster": false
+        },
+        {
+          "id": "fern",
+          "model": "models/residents/fern.glb",
+          "vertices": 23815,
+          "transmission": 0.65,
+          "faceAlpha": 1,
+          "glError": 0,
+          "bloom": true,
+          "booster": true
+        },
+        {
+          "id": "mushroom",
+          "model": "models/residents/mushroom.glb",
+          "vertices": 23297,
+          "transmission": 0.48,
+          "faceAlpha": 1,
+          "glError": 0,
+          "bloom": true,
+          "booster": false
+        },
+        {
+          "id": "aurora",
+          "model": "models/residents/aurora.glb",
+          "vertices": 22707,
+          "transmission": 0.78,
+          "faceAlpha": 1,
+          "glError": 0,
+          "bloom": true,
+          "booster": false
+        },
+        {
+          "id": "blossom",
+          "model": "models/residents/blossom.glb",
+          "vertices": 20454,
+          "transmission": 0.6,
+          "faceAlpha": 1,
+          "glError": 0,
+          "bloom": true,
+          "booster": false
+        },
+        {
+          "id": "stardust",
+          "model": "models/residents/stardust.glb",
+          "vertices": 28590,
+          "transmission": 0.58,
+          "faceAlpha": 1,
+          "glError": 0,
+          "bloom": true,
+          "booster": false
+        },
+        {
+          "id": "water",
+          "model": "models/residents/water.glb",
+          "vertices": 21854,
+          "transmission": 0.9,
+          "faceAlpha": 1,
+          "glError": 0,
+          "bloom": true,
+          "booster": false
+        },
+        {
+          "id": "puff",
+          "model": "models/residents/puff.glb",
+          "vertices": 21636,
+          "transmission": 0.24,
+          "faceAlpha": 1,
+          "glError": 0,
+          "bloom": true,
+          "booster": true
+        }
+      ],
+      "pet": {
+        "id": "puff",
+        "model": "models/residents/puff.glb",
+        "vertices": 21636,
+        "transmission": 0,
+        "faceAlpha": 1,
+        "glError": 0,
+        "bloom": false,
+        "booster": false
+      },
+      "passed": true,
+      "selectionAndTimerPersisted": true
+    },
+    {
+      "platform": "phone",
+      "selected": [
+        {
+          "id": "nebula",
+          "model": "models/material-preview/nebula.glb",
+          "vertices": 24458,
+          "transmission": 0,
+          "faceAlpha": 1,
+          "glError": 0,
+          "bloom": true,
+          "booster": false
+        },
+        {
+          "id": "sprout",
+          "model": "models/residents/sprout.glb",
+          "vertices": 22493,
+          "transmission": 0,
+          "faceAlpha": 1,
+          "glError": 0,
+          "bloom": true,
+          "booster": false
+        },
+        {
+          "id": "fern",
+          "model": "models/residents/fern.glb",
+          "vertices": 23815,
+          "transmission": 0,
+          "faceAlpha": 1,
+          "glError": 0,
+          "bloom": true,
+          "booster": true
+        },
+        {
+          "id": "mushroom",
+          "model": "models/residents/mushroom.glb",
+          "vertices": 23297,
+          "transmission": 0,
+          "faceAlpha": 1,
+          "glError": 0,
+          "bloom": true,
+          "booster": false
+        },
+        {
+          "id": "aurora",
+          "model": "models/residents/aurora.glb",
+          "vertices": 22707,
+          "transmission": 0,
+          "faceAlpha": 1,
+          "glError": 0,
+          "bloom": true,
+          "booster": false
+        },
+        {
+          "id": "blossom",
+          "model": "models/residents/blossom.glb",
+          "vertices": 20454,
+          "transmission": 0,
+          "faceAlpha": 1,
+          "glError": 0,
+          "bloom": true,
+          "booster": false
+        },
+        {
+          "id": "stardust",
+          "model": "models/residents/stardust.glb",
+          "vertices": 28590,
+          "transmission": 0,
+          "faceAlpha": 1,
+          "glError": 0,
+          "bloom": true,
+          "booster": false
+        },
+        {
+          "id": "water",
+          "model": "models/residents/water.glb",
+          "vertices": 21854,
+          "transmission": 0,
+          "faceAlpha": 1,
+          "glError": 0,
+          "bloom": true,
+          "booster": false
+        },
+        {
+          "id": "puff",
+          "model": "models/residents/puff.glb",
+          "vertices": 21636,
+          "transmission": 0,
+          "faceAlpha": 1,
+          "glError": 0,
+          "bloom": true,
+          "booster": true
+        }
+      ],
+      "pet": {
+        "id": "puff",
+        "model": "models/residents/puff.glb",
+        "vertices": 21636,
+        "transmission": 0,
+        "faceAlpha": 1,
+        "glError": 0,
+        "bloom": false,
+        "booster": false
+      },
+      "passed": true,
+      "selectionAndTimerPersisted": true
+    }
+  ]
+}

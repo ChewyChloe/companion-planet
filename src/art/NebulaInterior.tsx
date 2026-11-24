@@ -3,7 +3,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import type { NebulaMaterialVariant } from "./nebula-material-test";
 /** A spatial, static density field inside the body, not a surface decal. */
-export function NebulaInterior({ variant }: { variant: NebulaMaterialVariant }) {
+export function NebulaInterior({ variant, center = [0,.63,0], radii = [.33,.40,.265], showStars = true }: { variant: NebulaMaterialVariant; center?: [number,number,number]; radii?: [number,number,number]; showStars?: boolean }) {
   const volume = useRef<THREE.Mesh>(null);
   const { camera } = useThree();
   const strength = variant === "soft" ? .28 : variant === "mist" ? 1.25 : .85;
@@ -29,11 +29,11 @@ export function NebulaInterior({ variant }: { variant: NebulaMaterialVariant }) 
   useFrame(() => {
     if(volume.current) material.uniforms.cameraLocal.value.copy(volume.current.worldToLocal(camera.position.clone()));
   });
-  return <group name="NebulaInterior" userData={{ spatialStars: 18, densityField: "3D raymarch 28 steps" }}>
-    <mesh ref={volume} name="NebulaDensityVolume" position={[0,.63,0]} scale={[.33,.40,.265]} material={material} renderOrder={2} raycast={() => undefined}>
+  return <group name="NebulaInterior" userData={{ spatialStars: showStars ? 18 : 0, densityField: "3D raymarch 28 steps" }}>
+    <mesh ref={volume} name="NebulaDensityVolume" position={center} scale={radii} material={material} renderOrder={2} raycast={() => undefined}>
       <sphereGeometry args={[1,32,24]} />
     </mesh>
-    {stars.map((p,i) => <mesh key={i} name={`InternalStar-${i}`} position={p} raycast={() => undefined}>
+    {showStars && stars.map((p,i) => <mesh key={i} name={`InternalStar-${i}`} position={p} raycast={() => undefined}>
       <sphereGeometry args={[i%4===0?.008:.005,8,6]} />
       <meshBasicMaterial color={new THREE.Color(i%3===0?"#c8dcff":"#f1e6cf").multiplyScalar(3.5)} toneMapped={false} />
     </mesh>)}

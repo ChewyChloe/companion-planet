@@ -1,3 +1,4 @@
+import { residentFocusHeight, residentSeatLift } from "./art/resident-assets";
 import { NebulaBloom } from "./art/NebulaBloom";
 import { getNebulaMaterialVariant } from "./art/nebula-material-test";
 import { JourneyCamera } from "./art/JourneyCamera";
@@ -273,7 +274,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
             root.current.position.y,
             surface +
               (held.current ? 0.28 : 0) +
-              CHAIR.seatedRootOffset * seatBlend.current +
+              (CHAIR.seatedRootOffset + residentSeatLift(state.companionId)) * seatBlend.current +
               (actual === "rest" ? 0.065 : 0),
             5,
             motionDt,
@@ -327,7 +328,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
         .join(",");
       if (root.current) {
         screen.copy(root.current.position);
-        screen.y += 1.05;
+        screen.y += residentFocusHeight(state.companionId);
         screen.project(camera);
         gl.domElement.dataset.screen = [
           (screen.x + 1) / 2,
@@ -384,6 +385,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
     >
       <group name="CharacterFacing" ref={model}>
         <SculptCharacter
+          pet={pet}
           action={visual}
           held={held}
           time={clock}
@@ -498,7 +500,7 @@ export default function Scene({
           );
         }}
       >
-        {getNebulaMaterialVariant() && <NebulaBloom />}
+        {!pet && <NebulaBloom />}
         <CanvasGestures />
         <CameraFraming pet={pet} />
         <RenderQuality />

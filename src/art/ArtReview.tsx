@@ -1,12 +1,11 @@
 import { NebulaBloom } from "./NebulaBloom";
-import { getNebulaMaterialVariant } from "./nebula-material-test";
 import { OrbitControls } from "@react-three/drei";
 import { SoftEnvironment } from "./SoftEnvironment";
 import { Suspense, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import SculptCharacter from "./SculptCharacter";
-import { companionFor, type CompanionId } from "../companions";
+import { companions, companionFor, type CompanionId } from "../companions";
 import type { Action } from "../domain";
 const actions: Action[] = [
   "idle",
@@ -23,10 +22,12 @@ function Figure({
   action,
   angle,
   companionId,
+  still,
 }: {
   action: Action;
   angle: number;
   companionId: CompanionId;
+  still: boolean;
 }) {
   const time = useRef(0);
   const { gl, scene, camera } = useThree();
@@ -50,8 +51,8 @@ function Figure({
     }
   });
   return (
-    <group rotation={[0, angle, 0]}>
-      <SculptCharacter action={action} time={time} companionId={companionId} />
+    <group name="ReviewTurntable" rotation={[0, angle, 0]}>
+      <SculptCharacter still={still} action={action} time={time} companionId={companionId} />
     </group>
   );
 }
@@ -80,7 +81,7 @@ export default function ArtReview() {
         }}
       >
         <OrbitControls makeDefault target={[0,.92,0]} enablePan={false} />
-        {getNebulaMaterialVariant() && <NebulaBloom />}
+        <NebulaBloom />
         <SoftEnvironment />
         <ambientLight intensity={0.55} />
         <hemisphereLight args={["#dce8ef", "#9c9488", 0.7]} />
@@ -89,12 +90,17 @@ export default function ArtReview() {
         <directionalLight position={[0, 3, -4]} intensity={1.4} />
         <Suspense fallback={null}>
           <Figure
+            still={params.has("still")}
             action={action}
             angle={angle}
             companionId={companionFor(params.get("companion")).id}
           />
         </Suspense>
       </Canvas>
+      {!params.has("capture") && <nav aria-label="彩色模型檢視" style={{ position:"absolute",bottom:12,left:12,right:12,padding:12,background:"#f4f1e8",display:"flex",gap:12,flexWrap:"wrap" }}>
+        {companions.map(c=><a key={c.id} href={`?art-review&companion=${c.id}`}>{c.name}</a>)}
+        <a href="/">返回同頻星球</a><span>拖曳旋轉・滾輪／雙指縮放</span>
+      </nav>}
     </div>
   );
 }

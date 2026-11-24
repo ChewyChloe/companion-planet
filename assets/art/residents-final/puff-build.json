@@ -1,0 +1,23 @@
+{
+  "id": "puff",
+  "sourceClaySHA256": "278d3318e8f7f54553a0f030e995ba6b4326baac3d069bd573bce14097f42972",
+  "restBodyVertices": 21636,
+  "restBodyTriangles": 43268,
+  "bones": [
+    "MotionRoot",
+    "BodyControl",
+    "LeftArm",
+    "RightArm",
+    "LeftLeg",
+    "RightLeg"
+  ],
+  "shapeKeys": [
+    "Basis",
+    "Seated"
+  ],
+  "portableClips": [],
+  "color": "#e3b99d",
+  "roughness": 0.7,
+  "transmission": 0.24,
+  "geometryUnchangedFromApprovedClay": true
+}

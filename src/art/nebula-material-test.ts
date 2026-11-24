@@ -9,6 +9,10 @@ export function getNebulaMaterialVariant(search = location.search): NebulaMateri
   const value = new URLSearchParams(search).get("nebula-material");
   return value && Object.hasOwn(nebulaMaterialVariants, value) ? value as NebulaMaterialVariant : undefined;
 }
+export const APPROVED_NEBULA_MATERIAL: NebulaMaterialVariant = "mist";
+export function resolveNebulaMaterial(id: string, search = location.search): NebulaMaterialVariant | undefined {
+  return id === "nebula" ? getNebulaMaterialVariant(search) || APPROVED_NEBULA_MATERIAL : undefined;
+}
 /** Real MeshPhysical transmission in the browser, plus an explicitly approximate
  * mist/rim shader. No Blender render, simulated volume SSS or new animation. */
 export function nebulaTestMaterial(variant: NebulaMaterialVariant, thinShell: boolean) {

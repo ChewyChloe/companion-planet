@@ -1,0 +1,23 @@
+{
+  "id": "blossom",
+  "sourceClaySHA256": "b5fc41715dd7776f790b902410bd815c3697a5d425738be16f158cce8b7d21d6",
+  "restBodyVertices": 20454,
+  "restBodyTriangles": 40904,
+  "bones": [
+    "MotionRoot",
+    "BodyControl",
+    "LeftArm",
+    "RightArm",
+    "LeftLeg",
+    "RightLeg"
+  ],
+  "shapeKeys": [
+    "Basis",
+    "Seated"
+  ],
+  "portableClips": [],
+  "color": "#ddaabd",
+  "roughness": 0.4,
+  "transmission": 0.6,
+  "geometryUnchangedFromApprovedClay": true
+}

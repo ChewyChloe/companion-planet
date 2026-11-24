@@ -1,0 +1,50 @@
+{
+  "views": [
+    {
+      "id": "nebula",
+      "glError": 0,
+      "model": "models/material-preview/nebula.glb"
+    },
+    {
+      "id": "sprout",
+      "glError": 0,
+      "model": "models/residents/sprout.glb"
+    },
+    {
+      "id": "fern",
+      "glError": 0,
+      "model": "models/residents/fern.glb"
+    },
+    {
+      "id": "mushroom",
+      "glError": 0,
+      "model": "models/residents/mushroom.glb"
+    },
+    {
+      "id": "aurora",
+      "glError": 0,
+      "model": "models/residents/aurora.glb"
+    },
+    {
+      "id": "blossom",
+      "glError": 0,
+      "model": "models/residents/blossom.glb"
+    },
+    {
+      "id": "stardust",
+      "glError": 0,
+      "model": "models/residents/stardust.glb"
+    },
+    {
+      "id": "water",
+      "glError": 0,
+      "model": "models/residents/water.glb"
+    },
+    {
+      "id": "puff",
+      "glError": 0,
+      "model": "models/residents/puff.glb"
+    }
+  ],
+  "errors": []
+}

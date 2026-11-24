@@ -35,7 +35,7 @@ export const skinProfiles: Record<
   },
   sprout: {
     roughness: 0.38,
-    transmission: 0.12,
+    transmission: 0.52,
     metalness: 0,
     glow: "#ffe1a6",
     scatter: 0.5,
@@ -44,7 +44,7 @@ export const skinProfiles: Record<
   },
   fern: {
     roughness: 0.3,
-    transmission: 0.22,
+    transmission: 0.65,
     metalness: 0,
     glow: "#bbdc92",
     scatter: 0.36,
@@ -53,7 +53,7 @@ export const skinProfiles: Record<
   },
   mushroom: {
     roughness: 0.46,
-    transmission: 0.15,
+    transmission: 0.48,
     metalness: 0,
     glow: "#ffe2a0",
     scatter: 0.46,
@@ -62,7 +62,7 @@ export const skinProfiles: Record<
   },
   aurora: {
     roughness: 0.2,
-    transmission: 0.32,
+    transmission: 0.78,
     metalness: 0.03,
     glow: "#9cddd5",
     scatter: 0.36,
@@ -71,7 +71,7 @@ export const skinProfiles: Record<
   },
   blossom: {
     roughness: 0.4,
-    transmission: 0.16,
+    transmission: 0.60,
     metalness: 0,
     glow: "#ffd3ca",
     scatter: 0.5,
@@ -80,7 +80,7 @@ export const skinProfiles: Record<
   },
   stardust: {
     roughness: 0.32,
-    transmission: 0.1,
+    transmission: 0.58,
     metalness: 0.02,
     glow: "#9caaf0",
     scatter: 0.28,
@@ -89,7 +89,7 @@ export const skinProfiles: Record<
   },
   water: {
     roughness: 0.1,
-    transmission: 0.45,
+    transmission: 0.90,
     metalness: 0,
     glow: "#a9e3f1",
     scatter: 0.22,
@@ -97,8 +97,8 @@ export const skinProfiles: Record<
     sheen: 0,
   },
   puff: {
-    roughness: 0.62,
-    transmission: 0.1,
+    roughness: 0.70,
+    transmission: 0.24,
     metalness: 0,
     glow: "#ffdfb9",
     scatter: 0.48,
@@ -118,9 +118,10 @@ export function companionSkin(id: CompanionId, lightweight = false) {
     metalness: p.metalness,
     transmission: lightweight ? 0 : p.transmission,
     transparent: lightweight,
+    depthWrite: false,
     opacity:
-      look.materialOpacity * (lightweight ? (id === "water" ? 0.87 : 0.96) : 1),
-    thickness: id === "water" ? 0.45 : 0.8,
+      look.materialOpacity * (lightweight ? (id === "water" ? 0.46 : id === "aurora" ? 0.62 : id === "puff" ? 0.93 : 0.76) : 1),
+    thickness: id === "water" ? 0.45 : id === "stardust" ? 1.1 : 0.8,
     ior: id === "water" ? 1.33 : 1.38,
     attenuationColor: p.glow,
     attenuationDistance: 2.8,
@@ -168,7 +169,7 @@ export function companionSkin(id: CompanionId, lightweight = false) {
    float wrap=pow(max(dot(-normal,normalize(vec3(-.45,.65,.25))),0.0),2.0);
    vec3 glowTint=vec3(${glow.r.toFixed(5)},${glow.g.toFixed(5)},${glow.b.toFixed(5)});
    outgoingLight+=glowTint*(fresnel*.24+wrap*.12+.025)*${((p.scatter * look.subsurfaceAppearance) / 0.35).toFixed(3)};
-   ${["nebula", "stardust", "mushroom"].includes(id) ? `vec3 cell=floor(vCompanionLocal*42.0);float seed=fract(sin(dot(cell,vec3(12.9898,78.233,37.719)))*43758.5453);float sparkle=(1.0-smoothstep(.09,.19,length(fract(vCompanionLocal*42.0)-.5)))*step(.94,seed);outgoingLight+=vec3(${id === "stardust" ? ".85,.66,.34" : ".45,.56,.7"})*sparkle*(.7+.3*sin(uCompanionTime*.8+seed*40.0));` : ""}
+   ${["mushroom"].includes(id) ? `vec3 cell=floor(vCompanionLocal*42.0);float seed=fract(sin(dot(cell,vec3(12.9898,78.233,37.719)))*43758.5453);float sparkle=(1.0-smoothstep(.09,.19,length(fract(vCompanionLocal*42.0)-.5)))*step(.94,seed);outgoingLight+=vec3(${id === "stardust" ? ".85,.66,.34" : ".45,.56,.7"})*sparkle*(.7+.3*sin(uCompanionTime*.8+seed*40.0));` : ""}
    #include <opaque_fragment>`,
     );
   };

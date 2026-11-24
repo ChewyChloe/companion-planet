@@ -1,3 +1,4 @@
+import { residentSeatLift } from "./resident-assets";
 import { useWorld } from "../store";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
@@ -157,6 +158,7 @@ export function Book({
   );
 }
 export function ReadingStation({ wood }: { wood: Maps }) {
+  const selectedResident = useWorld(s => s.companionId);
   const { gl } = useThree();
   const lampOn = useWorld((s) => s.lampOn);
   const light = useRef<THREE.PointLight>(null),
@@ -192,6 +194,9 @@ export function ReadingStation({ wood }: { wood: Maps }) {
   return (
     <group name="ReadingStation" position={[CHAIR.x, floor, CHAIR.z]}>
       <group name="ReadingChair">
+        {residentSeatLift(selectedResident) > 0 && <RoundedBox name="ResidentSeatCushion" args={[.68,residentSeatLift(selectedResident),.70]} radius={.035} smoothness={4} position={[0,.38+residentSeatLift(selectedResident)/2,CHAIR.seatCenterZ]}>
+          <meshStandardMaterial color="#d7cfb9" roughness={.92} />
+        </RoundedBox>}
         <Wood
           name="Seat"
           wood={wood}

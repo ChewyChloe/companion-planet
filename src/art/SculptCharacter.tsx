@@ -1,6 +1,8 @@
+import { residentModelPath } from "./resident-assets";
+import { ResidentInterior } from "./ResidentInterior";
 import { NebulaInterior, NebulaTransmissionProbe } from "./NebulaInterior";
-import { getNebulaMaterialVariant, nebulaTestMaterial } from "./nebula-material-test";
-import { companionSkin, shouldUseThinShell } from "./companion-skin";
+import { getNebulaMaterialVariant, nebulaTestMaterial, resolveNebulaMaterial } from "./nebula-material-test";
+import { companionSkin } from "./companion-skin";
 import { useEffect, useMemo, useRef } from "react";
 import {
   useFrame,
@@ -12,8 +14,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { clone } from "three/addons/utils/SkeletonUtils.js";
 import * as THREE from "three";
 import { useWorld } from "../store";
-import { companionFor, type CompanionId } from "../companions";
-import { CompanionCrown } from "./CompanionCrown";
+import { type CompanionId } from "../companions";
 import type { Action } from "../domain";
 import look from "../../assets/art/character-look.json";
 import { blendPose, neutralPose, poseFor } from "./character-animation";
@@ -48,6 +49,8 @@ export default function SculptCharacter({
   held,
   time,
   seatBlend,
+  pet = false,
+  still = false,
   modelUrl,
 }: {
   action: Action;
@@ -56,12 +59,15 @@ export default function SculptCharacter({
   time: React.RefObject<number>;
   modelUrl?: string;
   seatBlend?: React.RefObject<number>;
+  pet?: boolean;
+  still?: boolean;
 }) {
   const selected = useWorld((s) => s.companionId);
   const id = companionId || selected;
-  const species = companionFor(id);
-  const materialVariant = id === "nebula" ? getNebulaMaterialVariant() : undefined;
-  const previewModel = materialVariant ? "models/material-preview/nebula.glb" : "models/nebula-sculpt.glb";
+  const materialVariant = resolveNebulaMaterial(id);
+  const materialPreview = id === "nebula" && !!getNebulaMaterialVariant();
+  const freezePose = materialPreview || still;
+  const previewModel = residentModelPath(id);
   const gltf = useLoader(GLTFLoader, modelUrl || import.meta.env.BASE_URL + previewModel);
   const { gl } = useThree();
   const pose = useRef({ ...neutralPose });
@@ -72,7 +78,7 @@ export default function SculptCharacter({
     scene.updateMatrixWorld(true);
     const controls: Record<string, Control> = {};
     scene.traverse((node) => {
-      if (CHARACTER_NODES.includes(node.name) || node.name === "BodyControl") {
+      if (CHARACTER_NODES.includes(node.name) || node.name === "BodyControl" || node.name === `Crown-${id}`) {
         const inverse = node
           .getWorldQuaternion(new THREE.Quaternion())
           .invert();
@@ -89,20 +95,10 @@ export default function SculptCharacter({
     });
     for (const name of CHARACTER_NODES)
       if (!controls[name]) throw Error(`Character asset missing ${name}`);
-    const context = gl.getContext(),
-      debug = context.getExtension("WEBGL_debug_renderer_info");
-    const renderer = debug
-      ? String(context.getParameter(debug.UNMASKED_RENDERER_WEBGL))
-      : "";
-    const lightweight = shouldUseThinShell(
-      window.innerWidth,
-      window.matchMedia("(pointer: coarse)").matches,
-      renderer,
-    );
     // Compare actual transmission on desktop including software WebGL; phones
     // use the same explicit thin-shell fallback as the real application.
-    const testThinShell = window.innerWidth < 700 || window.matchMedia("(pointer: coarse)").matches;
-    const skin = materialVariant ? nebulaTestMaterial(materialVariant, testThinShell) : companionSkin(id, lightweight);
+    const testThinShell = pet || window.innerWidth < 700 || window.matchMedia("(pointer: coarse)").matches;
+    const skin = materialVariant ? nebulaTestMaterial(materialVariant, testThinShell) : companionSkin(id, testThinShell);
     const antennaSkin = skin.clone();
     antennaSkin.vertexColors = false;
     antennaSkin.color.set("#96bfd6");
@@ -117,27 +113,7 @@ export default function SculptCharacter({
         if (object.name === "Body") {
           object.material = skin;
           object.geometry = object.geometry.clone();
-          if (id !== "nebula") {
-            const colors = object.geometry.getAttribute("color");
-            const positions = object.geometry.getAttribute("position");
-            const base = new THREE.Color(species.color),
-              accent = new THREE.Color(species.accent),
-              shade = new THREE.Color();
-            for (let i = 0; i < colors.count; i++) {
-              const x = positions.getX(i),
-                y = positions.getY(i),
-                z = positions.getZ(i);
-              const cloud =
-                (Math.sin(x * 13 + y * 9) + Math.sin(z * 17 - y * 11)) * 0.12 +
-                0.24;
-              shade
-                .copy(base)
-                .lerp(accent, id === "stardust" ? cloud * 0.06 : cloud)
-                .multiplyScalar(0.85 + colors.getZ(i) * 0.3);
-              colors.setXYZ(i, shade.r, shade.g, shade.b);
-            }
-          }
-        } else if (materialVariant && (object.name.includes("EyeSurface") || object.name.includes("Cheek") || object.name === "Mouth")) {
+        } else if ((object.name.includes("EyeSurface") || object.name.includes("Cheek") || object.name === "Mouth")) {
           // Alpha stays one. Sorting the face after transmission keeps its own
           // eyes out of the refraction buffer and prevents ghost pupils.
           const face = (object.material as THREE.MeshStandardMaterial).clone();
@@ -147,31 +123,6 @@ export default function SculptCharacter({
           object.renderOrder = 5;
           object.material = face;
           faceMaterials.push(face);
-        } else if (
-          id !== "nebula" &&
-          (object.name.includes("EyeSurface") ||
-            object.name.includes("Cheek") ||
-            object.name === "Mouth")
-        ) {
-          const material = (
-            object.material as THREE.MeshStandardMaterial
-          ).clone();
-          if (object.name.includes("EyeSurface")) {
-            material.color.set(id === "stardust" ? "#f1d493" : "#28353a");
-            if (id === "stardust") {
-              material.emissive.set("#d3ac65");
-              material.emissiveIntensity = 0.15;
-            }
-          } else
-            material.color.set(
-              object.name.includes("Cheek")
-                ? id === "fern"
-                  ? "#99af72"
-                  : "#c99799"
-                : "#946c78",
-            );
-          object.material = material;
-          faceMaterials.push(material);
         } else if (object.name.includes("Antenna")) {
           if (object.name.endsWith("Tip")) {
             const tip = antennaSkin.clone();
@@ -180,6 +131,11 @@ export default function SculptCharacter({
             object.material = tip;
             faceMaterials.push(tip);
           } else object.material = antennaSkin;
+        } else {
+          const m = (object.material as THREE.MeshStandardMaterial).clone();
+          m.userData.baseGlow = m.emissiveIntensity;
+          object.material = m;
+          faceMaterials.push(m);
         }
       }
     });
@@ -191,29 +147,6 @@ export default function SculptCharacter({
     const bodyMesh = scene.getObjectByName("Body") as THREE.SkinnedMesh;
     if (bodyMesh.morphTargetDictionary?.Seated === undefined)
       throw Error("Missing seated corrective");
-    const marks: THREE.Vector3[] = [];
-    if (id === "water") {
-      scene.updateMatrixWorld(true);
-      bodyMesh.skeleton.update();
-      for (const [x, y] of [
-        [-0.19, 0.5],
-        [0.13, 0.57],
-        [-0.08, 0.37],
-        [0.23, 0.39],
-        [0.03, 0.65],
-        [-0.27, 0.68],
-      ]) {
-        const ray = new THREE.Raycaster(
-          new THREE.Vector3(x, y, 2),
-          new THREE.Vector3(0, 0, -1),
-        );
-        const hit = ray.intersectObject(bodyMesh, false)[0];
-        if (hit) {
-          hit.point.z += 0.008;
-          marks.push(controls.BodyControl.node.worldToLocal(hit.point.clone()));
-        }
-      }
-    }
     return {
       scene,
       controls,
@@ -221,13 +154,16 @@ export default function SculptCharacter({
       antennaSkin,
       bodyMesh,
       faceMaterials,
-      marks,
+      interiorMatrix: controls.BodyControl.node.matrixWorld.clone().invert(),
     };
-  }, [gltf.scene, id, species, gl, materialVariant]);
+  }, [gltf.scene, id, gl, materialVariant, pet]);
   useEffect(() => {
     gl.domElement.dataset.modelReady = "sculpt-v1";
     gl.domElement.dataset.companion = id;
-    gl.domElement.dataset.materialTest = materialVariant || "none";
+    gl.domElement.dataset.material = materialVariant || `resident-${id}`;
+    gl.domElement.dataset.modelVersion = "approved-sdf-color-v1";
+    gl.domElement.dataset.modelPath = previewModel;
+    gl.domElement.dataset.materialTest = materialPreview ? materialVariant! : "none";
     gl.domElement.dataset.skinMode = asset.skin.userData.lightweight
       ? "thin-shell"
       : "transmission";
@@ -238,11 +174,11 @@ export default function SculptCharacter({
       asset.skin.dispose();
       asset.antennaSkin.dispose();
     };
-  }, [asset, gl, id, materialVariant]);
+  }, [asset, gl, id, materialVariant, materialPreview, previewModel]);
   useFrame((_state, delta) => {
-    asset.skin.userData.clock.value = materialVariant ? 0 : time.current;
-    const animationTime = materialVariant ? 1 : time.current;
-    const desired = materialVariant ? { ...neutralPose, armRaise: 0, eyeOpen: 1 } : poseFor(action, time.current);
+    asset.skin.userData.clock.value = materialVariant || freezePose ? 0 : time.current;
+    const animationTime = freezePose ? 1 : time.current;
+    const desired = freezePose ? { ...neutralPose, armRaise: 0, eyeOpen: 1 } : poseFor(action, time.current);
     if (id === "water") {
       desired.scaleY = 1 + (desired.scaleY - 1) * 1.6;
       desired.roll *= 1.25;
@@ -262,7 +198,7 @@ export default function SculptCharacter({
         rightLeg: -0.12,
         lift: 0,
       });
-    const p = materialVariant ? Object.assign(pose.current, desired) : blendPose(pose.current, desired, delta);
+    const p = freezePose ? Object.assign(pose.current, desired) : blendPose(pose.current, desired, delta);
     const c = asset.controls;
     const rotate = (control: Control, x = 0, y = 0, z = 0) => {
       control.node.quaternion.copy(control.rotation);
@@ -307,6 +243,11 @@ export default function SculptCharacter({
       antenna.node.scale.copy(antenna.scale);
       antenna.node.scale.y *= look.antennaLength;
     }
+    if (c[`Crown-${id}`]) rotate(c[`Crown-${id}`], 0, 0, Math.sin(animationTime * .8) * .025);
+    for (const m of asset.faceMaterials) {
+      if (m instanceof THREE.MeshStandardMaterial && m.userData.baseGlow)
+        m.emissiveIntensity = m.userData.baseGlow * (.9 + .1 * Math.sin(animationTime * 1.6));
+    }
     gl.domElement.dataset.pose = Object.values(p)
       .map((n) => n.toFixed(4))
       .join(",");
@@ -314,33 +255,18 @@ export default function SculptCharacter({
   return (
     <group ref={root} scale={[look.bodyWidth, look.bodyHeight, 1]}>
       <primitive object={asset.scene} />
-      {materialVariant && <NebulaInterior variant={materialVariant} />}
+      {materialVariant && createPortal(
+        <group matrixAutoUpdate={false} matrix={asset.interiorMatrix}>
+          <NebulaInterior variant={materialVariant} />
+        </group>, asset.controls.BodyControl.node,
+      )}
       {materialVariant && new URLSearchParams(location.search).has("material-probe") && <NebulaTransmissionProbe />}
-      {id === "water" &&
-        createPortal(
-          <group name="WaterBubbleMarks">
-            {asset.marks.map((p, i) => (
-              <mesh key={i} position={p}>
-                <ringGeometry args={[0.025, 0.031, 20]} />
-                <meshStandardMaterial
-                  color="#bce5eb"
-                  roughness={0.4}
-                  side={THREE.DoubleSide}
-                />
-              </mesh>
-            ))}
-          </group>,
-          asset.controls.BodyControl.node,
-        )}
-      {id !== "nebula" &&
-        createPortal(
-          <CompanionCrown id={id} />,
-          asset.controls.BodyControl.node,
-        )}
+      {id !== "nebula" && createPortal(
+        <group matrixAutoUpdate={false} matrix={asset.interiorMatrix}>
+          <ResidentInterior id={id} />
+        </group>, asset.controls.BodyControl.node,
+      )}
+
     </group>
   );
 }
-useLoader.preload(
-  GLTFLoader,
-  import.meta.env.BASE_URL + "models/nebula-sculpt.glb",
-);
