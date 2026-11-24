@@ -20,8 +20,7 @@ it("accepts explicit deployment origins, rejects credentials and non-origin URLs
 it("serves chat through a configured HTTPS origin without trusting arbitrary hosts", async () => {
   const server = await startServer({
     port: 0,
-    allowedHosts: ["127.0.0.1", "planet.example"],
-    allowedOrigins: ["https://planet.example"],
+    ...webAccess(8080, "", "https://planet.example"),
   });
   const port = (server.address() as { port: number }).port;
   const send = (
@@ -53,6 +52,7 @@ it("serves chat through a configured HTTPS origin without trusting arbitrary hos
       req.end(body ? JSON.stringify(body) : undefined);
     });
   try {
+    expect((await send("/api/health", "planet.example")).status).toBe(200);
     const chat = await send(
       "/api/chat",
       "planet.example",
@@ -74,4 +74,13 @@ it("serves chat through a configured HTTPS origin without trusting arbitrary hos
   } finally {
     await new Promise<void>((resolve) => server.close(() => resolve()));
   }
+});
+
+it("adds only the Render-assigned origin alongside explicit custom domains", () => {
+ const access = webAccess(10000, "https://custom.example", "https://companion-planet.onrender.com");
+ expect(access.allowedOrigins).toContain("https://companion-planet.onrender.com");
+ expect(access.allowedHosts).toContain("companion-planet.onrender.com");
+ expect(access.allowedHosts).toContain("custom.example");
+ expect(access.allowedHosts).not.toContain("other.onrender.com");
+ expect(() => webAccess(10000,"","https://user:secret@planet.example")).toThrow();
 });

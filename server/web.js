@@ -3,7 +3,7 @@ import { webAccess } from "./access.js";
 const port = Number(process.env.PORT) || 8080;
 if (!Number.isInteger(port) || port < 1 || port > 65535)
   throw new Error("Invalid PORT");
-const access = webAccess(port, process.env.WEB_ORIGINS || "");
+const access = webAccess(port, process.env.WEB_ORIGINS || "", process.env.RENDER_EXTERNAL_URL || "");
 startServer({ port, host: "0.0.0.0", staticFiles: true, ...access })
   .then(() => {
     console.log(`Companion Planet web server listening on port ${port}`);

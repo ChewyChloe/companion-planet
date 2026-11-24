@@ -19,3 +19,12 @@
 嘗試從雲端查詢正式 `/api/health`，出站代理回覆 CONNECT 403，無法驗證遠端 API 狀態；未讀取或要求使用者金鑰。
 
 最終 `npm run check` 通過：44 項測試、型別、lint、正式建置及依賴檢查；桌機與手機 UI 狀態測試均通過。
+
+
+## Render Host rejected 修正
+
+Render 正式網址過去未自動納入 Host 允許清單，會在 Groq 呼叫之前拒絕 `/api/health` 和 `/api/chat`。正式啟動現在將可信任部署環境變數 `RENDER_EXTERNAL_URL` 經相同 origin 驗證後加入清單；不信任 Host／Forwarded 標頭推導網址，也不開放其他 onrender.com 子網域。
+
+自訂網域仍透過 `WEB_ORIGINS` 設定。如果需要手動修正現有部署，可設定 `WEB_ORIGINS=https://companion-planet.onrender.com` 後重新部署。這只解決主機檢查，不代表 Groq 金鑰已驗證。
+
+驗證：access.test.ts 用 Render origin 組態實際啟動伺服器，確認同站健康檢查及聊天為 200、陌生 Host 與跨站 Origin 仍為 403，另檢查自訂網域合併及不合法設定拒絕。正式 Render 更新後仍須在網站重新確認 API。

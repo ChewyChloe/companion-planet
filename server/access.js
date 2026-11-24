@@ -33,8 +33,13 @@ export function localOrigins(port, interfaces = networkInterfaces()) {
     ),
   ].map((host) => `http://${host}:${port}`);
 }
-export function webAccess(port, configured = "") {
-  const origins = [...localOrigins(port), ...parseOrigins(configured)];
+export function webAccess(port, configured = "", renderExternalUrl = "") {
+  // Deployment metadata is trusted configuration, never inferred from request headers.
+  const origins = [...new Set([
+    ...localOrigins(port),
+    ...parseOrigins(configured),
+    ...parseOrigins(renderExternalUrl),
+  ])];
   return {
     allowedOrigins: origins,
     allowedHosts: [
