@@ -22,7 +22,7 @@ it("drops stay on dry land with body clearance around furniture", () => {
   for (let x = -5; x <= 5; x += 0.2)
     for (let z = -5; z <= 5; z += 0.2) {
       const [a, b] = safeDrop(x, z);
-      expect(Math.hypot(a, b)).toBeLessThanOrEqual(1.850001);
+      expect(Math.hypot(a, b)).toBeLessThanOrEqual(4.150001);
       expect(inDeskObstacle(a, b, 0.5)).toBe(false);
       expect(
         Math.abs(a - CHAIR.x) < 0.95 &&

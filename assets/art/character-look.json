@@ -9,7 +9,7 @@
   "armLength": 0.2,
   "legLength": 0.18,
   "materialOpacity": 1.0,
-  "surfaceRoughness": 0.42,
+  "surfaceRoughness": 0.5,
   "subsurfaceAppearance": 0.35,
   "bodyDepth": 1.25
 }

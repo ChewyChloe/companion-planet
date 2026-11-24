@@ -1,7 +1,23 @@
+import { planetFor, type PlanetId } from "./planets";
 import { create } from "zustand";
 import { initialTimer, restoreTimer, type Timer, type Action } from "./domain";
 import { companionFor, type CompanionId } from "./companions";
+type WorldMemory = Partial<
+  Record<PlanetId, { lampOn: boolean; flowersBloom: boolean }>
+>;
 interface State {
+  worldStates: WorldMemory;
+  journey: { target: PlanetId; started: number } | null;
+  hoveredPlanet: PlanetId | null;
+  hoverPlanet: (id: PlanetId | null) => void;
+  destination: { x: number; z: number; serial: number } | null;
+  goTo: (x: number, z: number) => void;
+  planetId: PlanetId;
+  lampOn: boolean;
+  flowersBloom: boolean;
+  visit: (id: PlanetId) => void;
+  toggleLamp: () => void;
+  toggleFlowers: () => void;
   companionId: CompanionId;
   setCompanion: (id: CompanionId) => void;
   timer: Timer;
@@ -33,6 +49,48 @@ function read() {
 const saved = read();
 export const useWorld = create<State>((set) => ({
   timer: restoreTimer(saved.timer, Date.now()),
+  planetId: planetFor(saved.planetId).id,
+  worldStates: {
+    [planetFor(saved.planetId).id]: {
+      lampOn: saved.lampOn !== false,
+      flowersBloom: false,
+    },
+  },
+  journey: null,
+  hoveredPlanet: null,
+  hoverPlanet: (hoveredPlanet) => set({ hoveredPlanet }),
+  destination: null,
+  goTo: (x, z) => {
+    if (Number.isFinite(x) && Number.isFinite(z))
+      set({ destination: { x, z, serial: Date.now() } });
+  },
+  lampOn: saved.lampOn !== false,
+  flowersBloom: false,
+  visit: (id) =>
+    set((s) =>
+      s.journey || planetFor(id).id === s.planetId
+        ? {}
+        : {
+            journey: { target: planetFor(id).id, started: Date.now() },
+            hoveredPlanet: null,
+          },
+    ),
+  toggleLamp: () =>
+    set((s) => ({
+      lampOn: !s.lampOn,
+      worldStates: {
+        ...s.worldStates,
+        [s.planetId]: { lampOn: !s.lampOn, flowersBloom: s.flowersBloom },
+      },
+    })),
+  toggleFlowers: () =>
+    set((s) => ({
+      flowersBloom: !s.flowersBloom,
+      worldStates: {
+        ...s.worldStates,
+        [s.planetId]: { lampOn: s.lampOn, flowersBloom: !s.flowersBloom },
+      },
+    })),
   companionId: companionFor(saved.companionId).id,
   setCompanion: (id) => set({ companionId: companionFor(id).id }),
   silent: saved.silent === true,
@@ -58,6 +116,13 @@ export const useWorld = create<State>((set) => ({
     set({
       timer: { ...initialTimer },
       companionId: "nebula",
+      destination: null,
+      worldStates: {},
+      journey: null,
+      hoveredPlanet: null,
+      planetId: "b612",
+      lampOn: true,
+      flowersBloom: false,
       silent: false,
       reduced: false,
       notifications: true,
@@ -71,6 +136,8 @@ export const useWorld = create<State>((set) => ({
 let lastPersist = 0;
 useWorld.subscribe((s, previous) => {
   const preferenceChanged =
+    s.planetId !== previous.planetId ||
+    s.lampOn !== previous.lampOn ||
     s.companionId !== previous.companionId ||
     s.silent !== previous.silent ||
     s.reduced !== previous.reduced ||
@@ -93,6 +160,8 @@ useWorld.subscribe((s, previous) => {
       JSON.stringify({
         timer: s.timer,
         companionId: s.companionId,
+        planetId: s.planetId,
+        lampOn: s.lampOn,
         silent: s.silent,
         reduced: s.reduced,
         notifications: s.notifications,

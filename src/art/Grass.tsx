@@ -5,28 +5,25 @@ import { groundHeight, mossAllowed, noise3 } from "./terrain";
 export function Grass() {
   const ref = useRef<THREE.InstancedMesh>(null);
   const geometry = useMemo(() => {
-    const g = new THREE.BufferGeometry();
-    g.setAttribute(
-      "position",
-      new THREE.Float32BufferAttribute(
-        [
-          -0.012, 0, 0, 0.012, 0, 0, -0.008, 0.055, 0.008, 0.008, 0.055, 0.008,
-          0, 0.11, 0.028,
-        ],
-        3,
-      ),
-    );
-    g.setIndex([0, 1, 3, 0, 3, 2, 2, 3, 4]);
-    g.computeVertexNormals();
+    const g = new THREE.CapsuleGeometry(0.035, 0.055, 2, 6);
+    g.translate(0, 0.055, 0);
     return g;
   }, []);
   const blades = useMemo(() => {
     const list: { x: number; z: number; s: number }[] = [];
-    for (let i = 0; list.length < 1100 && i < 16000; i++) {
+    for (let i = 0; list.length < 350 && i < 22000; i++) {
+      const centers = [
+        [-2.7, -1.8],
+        [2.1, -2.5],
+        [-2.5, 0.8],
+        [1.4, 1.9],
+        [0.1, 3.2],
+      ];
+      const [cx, cz] = centers[i % centers.length];
       const angle = i * 2.399963,
-        r = 1.2 + noise3(i * 0.37, 8, 0) * 1.2,
-        x = Math.cos(angle) * r,
-        z = Math.sin(angle) * r;
+        r = 0.7 * Math.sqrt(noise3(i * 0.37, 8, 0)),
+        x = cx + Math.cos(angle) * r,
+        z = cz + Math.sin(angle) * r;
       if (mossAllowed(x, z))
         list.push({ x, z, s: 0.55 + noise3(i, 9, 3) * 0.75 });
     }

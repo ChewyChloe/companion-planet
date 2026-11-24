@@ -4,7 +4,10 @@
       "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
       "/workspace/companion-planet/node_modules/.bin/playwright",
       "test",
-      "--config=playwright.mobile.config.ts"
+      "--config=playwright.mobile.config.ts",
+      "--project=phone-standard",
+      "-g",
+      "touch rotation"
     ],
     "configFile": "/workspace/companion-planet/playwright.mobile.config.ts",
     "rootDir": "/workspace/companion-planet/tests",
@@ -81,47 +84,6 @@
         "metadata": {
           "actualWorkers": 1
         },
-        "name": "phone-small",
-        "testDir": "/workspace/companion-planet/tests",
-        "snapshotDir": "/workspace/companion-planet/tests",
-        "testIgnore": [],
-        "testMatch": "mobile.spec.ts",
-        "timeout": 60000,
-        "use": {
-          "baseURL": "http://127.0.0.1:8080",
-          "screenshot": "only-on-failure",
-          "trace": "retain-on-failure",
-          "launchOptions": {
-            "executablePath": "/usr/bin/chromium",
-            "args": [
-              "--no-sandbox",
-              "--use-gl=angle",
-              "--use-angle=swiftshader",
-              "--enable-webgl",
-              "--ignore-gpu-blocklist"
-            ]
-          },
-          "viewport": {
-            "width": 360,
-            "height": 640
-          },
-          "isMobile": true,
-          "hasTouch": true,
-          "deviceScaleFactor": 1
-        },
-        "dependencies": [],
-        "ignoreSnapshots": false,
-        "__projectId": "phone-small"
-      },
-      {
-        "grep": {},
-        "grepInvert": null,
-        "outputDir": "/workspace/companion-planet/test-results-mobile",
-        "repeatEach": 1,
-        "retries": 0,
-        "metadata": {
-          "actualWorkers": 1
-        },
         "name": "phone-standard",
         "testDir": "/workspace/companion-planet/tests",
         "snapshotDir": "/workspace/companion-planet/tests",
@@ -153,47 +115,6 @@
         "dependencies": [],
         "ignoreSnapshots": false,
         "__projectId": "phone-standard"
-      },
-      {
-        "grep": {},
-        "grepInvert": null,
-        "outputDir": "/workspace/companion-planet/test-results-mobile",
-        "repeatEach": 1,
-        "retries": 0,
-        "metadata": {
-          "actualWorkers": 1
-        },
-        "name": "phone-landscape",
-        "testDir": "/workspace/companion-planet/tests",
-        "snapshotDir": "/workspace/companion-planet/tests",
-        "testIgnore": [],
-        "testMatch": "mobile.spec.ts",
-        "timeout": 60000,
-        "use": {
-          "baseURL": "http://127.0.0.1:8080",
-          "screenshot": "only-on-failure",
-          "trace": "retain-on-failure",
-          "launchOptions": {
-            "executablePath": "/usr/bin/chromium",
-            "args": [
-              "--no-sandbox",
-              "--use-gl=angle",
-              "--use-angle=swiftshader",
-              "--enable-webgl",
-              "--ignore-gpu-blocklist"
-            ]
-          },
-          "viewport": {
-            "width": 844,
-            "height": 390
-          },
-          "isMobile": true,
-          "hasTouch": true,
-          "deviceScaleFactor": 1
-        },
-        "dependencies": [],
-        "ignoreSnapshots": false,
-        "__projectId": "phone-landscape"
       }
     ],
     "quiet": false,
@@ -239,68 +160,22 @@
           "tags": [],
           "tests": [
             {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "phone-small",
-              "projectName": "phone-small",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 21932,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-11-24T05:50:49.623Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            },
-            {
-              "timeout": 60000,
+              "timeout": 120000,
               "annotations": [],
               "expectedStatus": "passed",
               "projectId": "phone-standard",
               "projectName": "phone-standard",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 22679,
+                  "duration": 54748,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-11-24T05:51:22.039Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            },
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "phone-landscape",
-              "projectName": "phone-landscape",
-              "results": [
-                {
-                  "workerIndex": 2,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 24022,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-11-24T05:51:54.591Z",
+                  "startTime": "2026-11-24T09:40:29.143Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -308,89 +183,9 @@
               "status": "expected"
             }
           ],
-          "id": "e79c838550b25e92508e-2ec75d4f5953cf72ead5",
+          "id": "e79c838550b25e92508e-bf3f44456a1830abb616",
           "file": "mobile.spec.ts",
-          "line": 3,
-          "column": 1
-        },
-        {
-          "title": "touch grabs and drops the resident without moving the camera",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "phone-small",
-              "projectName": "phone-small",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 9254,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-11-24T05:51:12.085Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            },
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "phone-standard",
-              "projectName": "phone-standard",
-              "results": [
-                {
-                  "workerIndex": 1,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 8702,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-11-24T05:51:45.277Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            },
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "phone-landscape",
-              "projectName": "phone-landscape",
-              "results": [
-                {
-                  "workerIndex": 2,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 8767,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-11-24T05:52:19.113Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "e79c838550b25e92508e-d9ce77d067fa9a01a1ec",
-          "file": "mobile.spec.ts",
-          "line": 106,
+          "line": 4,
           "column": 1
         }
       ]
@@ -398,9 +193,9 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-11-24T05:50:48.217Z",
-    "duration": 99862.917,
-    "expected": 6,
+    "startTime": "2026-11-24T09:40:27.399Z",
+    "duration": 57307.132999999994,
+    "expected": 1,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0

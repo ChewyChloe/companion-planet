@@ -1,0 +1,68 @@
+{
+  "source": "mobile-results-initial.log",
+  "cases": [
+    {
+      "file": "mobile.spec.ts",
+      "title": "touch rotation, character tap, timer and mobile keyboard chat work",
+      "project": "phone-small",
+      "passed": true,
+      "duration": "57.6s"
+    },
+    {
+      "file": "mobile.spec.ts",
+      "title": "touch grabs and drops the resident without moving the camera",
+      "project": "phone-small",
+      "passed": true,
+      "duration": "12.6s"
+    },
+    {
+      "file": "mobile.spec.ts",
+      "title": "touch distant planets and the physical lamp while keeping the timer",
+      "project": "phone-small",
+      "passed": true,
+      "duration": "14.9s"
+    },
+    {
+      "file": "mobile.spec.ts",
+      "title": "touch rotation, character tap, timer and mobile keyboard chat work",
+      "project": "phone-standard",
+      "passed": false,
+      "duration": "42.3s"
+    },
+    {
+      "file": "mobile.spec.ts",
+      "title": "touch grabs and drops the resident without moving the camera",
+      "project": "phone-standard",
+      "passed": true,
+      "duration": "14.0s"
+    },
+    {
+      "file": "mobile.spec.ts",
+      "title": "touch distant planets and the physical lamp while keeping the timer",
+      "project": "phone-standard",
+      "passed": true,
+      "duration": "16.5s"
+    },
+    {
+      "file": "mobile.spec.ts",
+      "title": "touch rotation, character tap, timer and mobile keyboard chat work",
+      "project": "phone-landscape",
+      "passed": true,
+      "duration": "51.6s"
+    },
+    {
+      "file": "mobile.spec.ts",
+      "title": "touch grabs and drops the resident without moving the camera",
+      "project": "phone-landscape",
+      "passed": true,
+      "duration": "12.9s"
+    },
+    {
+      "file": "mobile.spec.ts",
+      "title": "touch distant planets and the physical lamp while keeping the timer",
+      "project": "phone-landscape",
+      "passed": true,
+      "duration": "13.5s"
+    }
+  ]
+}

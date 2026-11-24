@@ -879,3 +879,189 @@ select {
 .pet .companion-grid button > svg:not(.icon) {
   height: 52px;
 }
+
+.distant-planet {
+  position: relative;
+  height: 76px;
+  min-width: 58px;
+  border: 0;
+  background: transparent;
+  color: #fff8ed;
+  border-radius: 50%;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.distant-planet span {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-shadow: 0 1px 2px #6b648440;
+}
+.distant-planet:hover {
+  outline: 1px solid #fff8e69c;
+}
+.distant-planet:focus-visible {
+  outline: 2px solid #fff8e6;
+  outline-offset: 6px;
+}
+.explore-dock {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  bottom: 25px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 10px;
+  border: 1px solid #fff8ed45;
+  border-radius: 22px;
+  background: #e8dfed55;
+  color: #fffaf0;
+}
+.explore-dock button {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  padding: 8px;
+  min-height: 38px;
+  border-radius: 12px;
+}
+.explore-dock button:hover,
+.explore-dock button[aria-pressed="true"] {
+  background: #fff8ed28;
+}
+.explore-dock .icon {
+  width: 17px;
+  height: 17px;
+}
+.planet-address {
+  font-size: 12px;
+  letter-spacing: 1px;
+  border-right: 1px solid #fff8ed55;
+  padding: 0 12px 0 6px;
+  white-space: nowrap;
+}
+.planet-arrival {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  background: #eee4ef;
+  animation: planet-arrival 1.15s ease-out forwards;
+  display: grid;
+  place-items: center;
+  color: #706b89;
+}
+.planet-arrival span {
+  letter-spacing: 5px;
+  font-size: 26px;
+}
+.planet-arrival.still {
+  animation-duration: 0.15s;
+}
+@keyframes planet-arrival {
+  0%,
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+@media (max-width: 700px) {
+  .explore-dock {
+    bottom: 83px;
+    width: max-content;
+    max-width: calc(100% - 32px);
+    padding: 4px 8px;
+  }
+  .explore-dock button {
+    font-size: 11px;
+    padding: 7px;
+  }
+  .planet-address {
+    font-size: 11px;
+    padding-right: 8px;
+  }
+  .distant-planet span {
+    font-size: 11px;
+  }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .explore-dock {
+    bottom: 16px;
+  }
+  .planet-address {
+    display: none;
+  }
+  .explore-dock button {
+    padding: 6px;
+  }
+}
+.planet-destinations {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+.planet-destinations .distant-planet {
+  position: absolute;
+  width: 78px;
+  height: 78px;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+}
+.scene-speech {
+  position: absolute;
+  z-index: 6;
+  pointer-events: none;
+  width: 190px;
+  left: var(--speech-x, 50%);
+  top: var(--speech-y, 50%);
+  transform: translate(-50%, -50%);
+}
+.planet-destinations .distant-planet {
+  pointer-events: none;
+}
+.distant-planet span {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.distant-planet:hover span,
+.distant-planet:focus-visible span {
+  opacity: 1;
+}
+@media (hover: none) {
+  .distant-planet span {
+    opacity: 0.85;
+  }
+}
+.journey-fog {
+  position: absolute;
+  inset: 0;
+  background: #eee4ef;
+  opacity: var(--journey-opacity, 0);
+  pointer-events: none;
+  z-index: 7;
+}
+.distant-planet.hovered span {
+  opacity: 1;
+}
+.explore-dock {
+  color: #625e78;
+  background: #f3ecf3bf;
+  border-color: #fff9f5aa;
+}
+.scene-caption {
+  color: #777189;
+}

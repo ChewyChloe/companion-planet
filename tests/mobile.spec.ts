@@ -1,5 +1,6 @@
 import { openTimerSettings } from "./ui";
 import { test, expect } from "@playwright/test";
+test.describe.configure({ timeout: 120000 });
 test("touch rotation, character tap, timer and mobile keyboard chat work", async ({
   page,
   context,
@@ -16,9 +17,24 @@ test("touch rotation, character tap, timer and mobile keyboard chat work", async
   ).toBe(true);
   await canvas.scrollIntoViewIfNeeded();
   const box = (await canvas.boundingBox())!;
+  // Tap the visible actor before rotating: old screen coordinates must not be
+  // reused to chase an autonomously walking actor through a moving camera.
+  const point = (await canvas.getAttribute("data-screen"))!
+    .split(",")
+    .map(Number);
+  await page.touchscreen.tap(
+    box.x + point[0] * box.width,
+    box.y + point[1] * box.height,
+  );
+  await expect(canvas).toHaveAttribute(
+    "data-reaction",
+    /happy|stretch|listen|idle/,
+  );
+  const tapReaction = await canvas.getAttribute("data-reaction");
+
   const before = await canvas.getAttribute("data-camera");
   const x = box.x + box.width * 0.5,
-    y = box.y + box.height * 0.45;
+    y = box.y + box.height * 0.3;
   const session = await context.newCDPSession(page);
   await session.send("Input.dispatchTouchEvent", {
     type: "touchStart",
@@ -63,17 +79,8 @@ test("touch rotation, character tap, timer and mobile keyboard chat work", async
   await expect
     .poll(async () => Math.abs((await distance()) - beforeZoom))
     .toBeGreaterThan(0.1);
-  const point = (await canvas.getAttribute("data-screen"))!
-    .split(",")
-    .map(Number);
-  await page.touchscreen.tap(
-    box.x + point[0] * box.width,
-    box.y + point[1] * box.height,
-  );
-  await expect(canvas).toHaveAttribute(
-    "data-reaction",
-    /happy|stretch|listen|idle/,
-  );
+  // A pinch must not synthesize a furniture/character click.
+  await expect(canvas).toHaveAttribute("data-reaction", tapReaction!);
   await page.screenshot({
     path: `artifacts/${info.project.name}-touch.png`,
     fullPage: true,
@@ -138,4 +145,32 @@ test("touch grabs and drops the resident without moving the camera", async ({
   await expect(canvas).not.toHaveAttribute("data-position", before!);
   expect(await canvas.getAttribute("data-camera")).toBe(camera);
   await expect(canvas).toHaveAttribute("data-reaction", "none");
+});
+
+test("touch distant planets and the physical lamp while keeping the timer", async ({
+  page,
+}, info) => {
+  await page.goto("/");
+  const canvas = page.locator("canvas");
+  await expect(canvas).toHaveAttribute("data-frames", /\d+/);
+  const timer = await page.getByRole("timer").innerText(),
+    box = (await canvas.boundingBox())!;
+  await page.touchscreen.tap(box.width * 0.18, box.height * 0.41);
+  await expect(page.locator("main")).toHaveAttribute("data-planet", "rose");
+  await expect(canvas).toHaveAttribute("data-journey", "idle");
+  const lamp = (await canvas.getAttribute("data-lamp-screen"))!
+    .split(",")
+    .map(Number);
+  await page.touchscreen.tap(box.width * lamp[0], box.height * lamp[1]);
+  await expect(
+    page.getByRole("button", { name: "開啟桌燈", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "照顧花朵", exact: true }).tap();
+  await expect(
+    page.getByRole("button", { name: "照顧花朵", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("timer")).toHaveText(timer);
+  await page.screenshot({
+    path: `artifacts/universe/${info.project.name}-touch-world.png`,
+  });
 });

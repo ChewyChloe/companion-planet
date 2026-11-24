@@ -38,7 +38,7 @@ it("uses bounded random positions and changes to stretch on break", () => {
   );
   expect(walk.action).toBe("walk");
   expect(walk.target[0]).toBeLessThan(1.1);
-  expect(walk.target[1]).toBeGreaterThan(-0.36);
+  expect(Math.hypot(...walk.target)).toBeLessThanOrEqual(4.15);
   expect(inDeskObstacle(...walk.target, 0.4)).toBe(false);
   const rest = advanceBehavior(walk, "break", null, 0, 1000, 1);
   expect(rest.action).toBe("stretch");

@@ -1,3 +1,4 @@
+import { SoftEnvironment } from "./SoftEnvironment";
 import { Suspense, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
@@ -74,6 +75,7 @@ export default function ArtReview() {
           gl.setClearColor("#f4f1e8", 1);
         }}
       >
+        <SoftEnvironment />
         <ambientLight intensity={0.55} />
         <hemisphereLight args={["#dce8ef", "#9c9488", 0.7]} />
         <directionalLight position={[-3, 4, 5]} intensity={2.2} />

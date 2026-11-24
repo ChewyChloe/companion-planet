@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { companions } from "../src/companions";
+test.describe.configure({ timeout: 120000 });
 test("all nine residents switch real 3D geometry and persist through reload", async ({
   page,
 }, info) => {

@@ -1,3 +1,4 @@
+import { companionSkin, shouldUseThinShell } from "./companion-skin";
 import { useEffect, useMemo, useRef } from "react";
 import {
   useFrame,
@@ -84,48 +85,17 @@ export default function SculptCharacter({
     });
     for (const name of CHARACTER_NODES)
       if (!controls[name]) throw Error(`Character asset missing ${name}`);
-    const skin = new THREE.MeshPhysicalMaterial({
-      color: "#ffffff",
-      vertexColors: true,
-      roughness: look.surfaceRoughness,
-      metalness: 0,
-      ior: 1.2,
-      specularIntensity: 0.38,
-      clearcoat: 0.08,
-      clearcoatRoughness: 0.55,
-      opacity: look.materialOpacity,
-      transparent: look.materialOpacity < 0.99,
-    });
-    skin.onBeforeCompile = (shader) => {
-      if (id === "stardust") {
-        shader.vertexShader =
-          "varying vec3 vCompanionPosition;\n" + shader.vertexShader;
-        shader.vertexShader = shader.vertexShader.replace(
-          "#include <begin_vertex>",
-          "#include <begin_vertex>\nvCompanionPosition=position;",
-        );
-        shader.fragmentShader =
-          "varying vec3 vCompanionPosition;\n" + shader.fragmentShader;
-        shader.fragmentShader = shader.fragmentShader.replace(
-          "#include <opaque_fragment>",
-          `
-          vec3 starCell=floor(vCompanionPosition*42.0);
-          float starSeed=fract(sin(dot(starCell,vec3(12.9898,78.233,37.719)))*43758.5453);
-          float starDot=(1.0-smoothstep(0.09,0.19,length(fract(vCompanionPosition*42.0)-0.5)))*step(0.92,starSeed);
-          outgoingLight+=vec3(0.85,0.66,0.34)*starDot;
-          #include <opaque_fragment>`,
-        );
-      }
-      shader.uniforms.uSoftness = { value: look.subsurfaceAppearance };
-      shader.fragmentShader =
-        "uniform float uSoftness;\n" + shader.fragmentShader;
-      shader.fragmentShader = shader.fragmentShader.replace(
-        "#include <opaque_fragment>",
-        `float softRim=pow(1.0-clamp(dot(normal,normalize(vViewPosition)),0.0,1.0),3.0);\noutgoingLight+=vec3(0.12,0.19,0.23)*softRim*uSoftness;\n#include <opaque_fragment>`,
-      );
-    };
-    skin.customProgramCacheKey = () =>
-      `companion-soft-skin-${id}-${look.subsurfaceAppearance}`;
+    const context = gl.getContext(),
+      debug = context.getExtension("WEBGL_debug_renderer_info");
+    const renderer = debug
+      ? String(context.getParameter(debug.UNMASKED_RENDERER_WEBGL))
+      : "";
+    const lightweight = shouldUseThinShell(
+      window.innerWidth,
+      window.matchMedia("(pointer: coarse)").matches,
+      renderer,
+    );
+    const skin = companionSkin(id, lightweight);
     const antennaSkin = skin.clone();
     antennaSkin.vertexColors = false;
     antennaSkin.color.set("#96bfd6");
@@ -185,8 +155,15 @@ export default function SculptCharacter({
             );
           object.material = material;
           faceMaterials.push(material);
-        } else if (object.name.includes("Antenna"))
-          object.material = antennaSkin;
+        } else if (object.name.includes("Antenna")) {
+          if (object.name.endsWith("Tip")) {
+            const tip = antennaSkin.clone();
+            tip.emissive.set("#b5ddff");
+            tip.emissiveIntensity = 0.4;
+            object.material = tip;
+            faceMaterials.push(tip);
+          } else object.material = antennaSkin;
+        }
       }
     });
     for (const side of ["Left", "Right"]) {
@@ -229,10 +206,13 @@ export default function SculptCharacter({
       faceMaterials,
       marks,
     };
-  }, [gltf.scene, id, species]);
+  }, [gltf.scene, id, species, gl]);
   useEffect(() => {
     gl.domElement.dataset.modelReady = "sculpt-v1";
     gl.domElement.dataset.companion = id;
+    gl.domElement.dataset.skinMode = asset.skin.userData.lightweight
+      ? "thin-shell"
+      : "transmission";
     gl.domElement.dataset.characterNodes = CHARACTER_NODES.join(",");
     return () => {
       asset.bodyMesh.geometry.dispose();
@@ -242,7 +222,16 @@ export default function SculptCharacter({
     };
   }, [asset, gl, id]);
   useFrame((_state, delta) => {
+    asset.skin.userData.clock.value = time.current;
     const desired = poseFor(action, time.current);
+    if (id === "water") {
+      desired.scaleY = 1 + (desired.scaleY - 1) * 1.6;
+      desired.roll *= 1.25;
+    }
+    if (id === "blossom" && action === "idle") {
+      desired.armForward = 0.12;
+      desired.armRaise = 0.17;
+    }
     if (held?.current)
       Object.assign(desired, {
         seated: 0,

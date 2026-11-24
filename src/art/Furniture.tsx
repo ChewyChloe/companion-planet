@@ -1,4 +1,6 @@
-import { useMemo } from "react";
+import { useWorld } from "../store";
+import { useFrame, useThree } from "@react-three/fiber";
+import { useMemo, useRef } from "react";
 import { RoundedBox, Line } from "@react-three/drei";
 import * as THREE from "three";
 import { CHAIR, groundHeight } from "./terrain";
@@ -114,7 +116,7 @@ function BookInk() {
     return g;
   }, []);
   return (
-    <lineSegments geometry={geometry}>
+    <lineSegments geometry={geometry} raycast={() => undefined}>
       <lineBasicMaterial color="#bdb49f" />
     </lineSegments>
   );
@@ -130,6 +132,10 @@ export function Book({
 }) {
   return (
     <group
+      onClick={(e) => {
+        e.stopPropagation();
+        if (e.delta < 6) useWorld.getState().react("read");
+      }}
       name="OpenBook"
       position={position}
       rotation={rotation}
@@ -151,6 +157,26 @@ export function Book({
   );
 }
 export function ReadingStation({ wood }: { wood: Maps }) {
+  const { gl } = useThree();
+  const lampOn = useWorld((s) => s.lampOn);
+  const light = useRef<THREE.PointLight>(null),
+    bulb = useRef<THREE.MeshStandardMaterial>(null);
+  const brightness = useRef(lampOn ? 1 : 0);
+  useFrame((_s, delta) => {
+    brightness.current = THREE.MathUtils.damp(
+      brightness.current,
+      lampOn ? 1 : 0,
+      5,
+      Math.min(delta, 0.1),
+    );
+    if (light.current) light.current.intensity = brightness.current * 1.3;
+    if (bulb.current) {
+      bulb.current.emissiveIntensity = brightness.current * 0.9;
+      bulb.current.color
+        .set("#b0a28d")
+        .lerp(new THREE.Color("#fff1c8"), brightness.current);
+    }
+  });
   const floor = groundHeight(CHAIR.x, CHAIR.z);
   const stem = useMemo(
     () =>
@@ -212,7 +238,24 @@ export function ReadingStation({ wood }: { wood: Maps }) {
           )),
         )}
         <Book position={[0.08, 0.87, -0.13]} />
-        <group name="DeskLamp">
+        <group
+          name="DeskLamp"
+          onPointerOver={(e) => {
+            e.stopPropagation();
+            gl.domElement.style.cursor = "pointer";
+          }}
+          onPointerOut={() => {
+            gl.domElement.style.cursor = "auto";
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (e.delta < 6) useWorld.getState().toggleLamp();
+          }}
+        >
+          <mesh name="LampTouchTarget" position={[-0.1, 1.46, 0.08]}>
+            <sphereGeometry args={[0.23, 12, 8]} />
+            <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+          </mesh>
           <mesh position={[-0.48, 0.89, 0.08]} castShadow>
             <cylinderGeometry args={[0.14, 0.15, 0.045, 32]} />
             <meshStandardMaterial color="#b9aa94" roughness={0.55} />
@@ -233,17 +276,20 @@ export function ReadingStation({ wood }: { wood: Maps }) {
             <mesh position={[0, -0.085, 0]} rotation={[Math.PI / 2, 0, 0]}>
               <circleGeometry args={[0.166, 32]} />
               <meshStandardMaterial
-                color="#fff1c8"
+                ref={bulb}
+                color={lampOn ? "#fff1c8" : "#b0a28d"}
                 emissive="#efd29b"
-                emissiveIntensity={0.45}
+                emissiveIntensity={lampOn ? 0.8 : 0}
                 side={THREE.DoubleSide}
               />
             </mesh>
             <pointLight
               position={[0, -0.12, 0]}
               color="#ffdfae"
-              intensity={0.16}
-              distance={1.5}
+              ref={light}
+              name="DeskLampLight"
+              intensity={lampOn ? 0.9 : 0}
+              distance={3}
               decay={2}
             />
           </group>
@@ -272,6 +318,10 @@ export function ReadingStation({ wood }: { wood: Maps }) {
 export function RestArea({ cloth }: { cloth: Maps }) {
   return (
     <group
+      onClick={(e) => {
+        e.stopPropagation();
+        if (e.delta < 6) useWorld.getState().react("rest");
+      }}
       name="RestArea"
       position={[-1.1, groundHeight(-1.1, 0.65), 0.65]}
       rotation={[0, -0.2, 0]}

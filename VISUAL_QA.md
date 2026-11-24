@@ -70,3 +70,7 @@ node scripts/report-art-tests.mjs
 ## 後續九位居民驗證
 
 新互動、九種冠飾、角色切換、拖放、短句與靜音的本輪記錄獨立收於 [INTERACTION_QA.md](INTERACTION_QA.md)。原有照片屬先前美術／版面版本，不作為九位居民已驗證的證明。每一位的最新真實前視渲染與三乘三比較圖位於 artifacts/interaction；風格與參考圖一致程度仍須人工確認。
+
+## 最新同頻星球宇宙版本
+
+本輪丘面、Shader 天空、雲霧、遠方星球、檯燈與九材質的證據以 [UNIVERSE_QA.md](UNIVERSE_QA.md) 及 artifacts/universe 為準。先前湖畔與九角色比較圖是當輪歷史；新的比較圖以本輪實際擷取檔案為準。只有實際執行的功能／渲染檢查標為 Passed；目標插畫的風格相似度、雲水交界與實機效能仍須人工確認。

@@ -1,15 +1,21 @@
 {
-  "generatedAt": "2026-11-24T07:19:49.944Z",
+  "generatedAt": "2026-11-24T10:00:13.199Z",
   "errors": [],
   "residents": [
     {
       "id": "nebula",
+      "skinMode": "thin-shell",
+      "roughness": 0.5,
+      "iridescence": 0.08,
       "crowns": [],
       "triangles": 26326,
       "calls": 12
     },
     {
       "id": "sprout",
+      "skinMode": "thin-shell",
+      "roughness": 0.38,
+      "iridescence": 0.22,
       "crowns": [
         "Crown-sprout"
       ],
@@ -18,14 +24,20 @@
     },
     {
       "id": "fern",
+      "skinMode": "thin-shell",
+      "roughness": 0.3,
+      "iridescence": 0.05,
       "crowns": [
         "Crown-fern"
       ],
       "triangles": 30070,
-      "calls": 47
+      "calls": 48
     },
     {
       "id": "mushroom",
+      "skinMode": "thin-shell",
+      "roughness": 0.46,
+      "iridescence": 0.08,
       "crowns": [
         "Crown-mushroom"
       ],
@@ -34,43 +46,74 @@
     },
     {
       "id": "aurora",
+      "skinMode": "thin-shell",
+      "roughness": 0.2,
+      "iridescence": 0.8,
       "crowns": [
         "Crown-aurora"
       ],
       "triangles": 24278,
-      "calls": 11
+      "calls": 11,
+      "isolatedPhysical": {
+        "transmission": 0.32,
+        "iridescence": 0.8,
+        "glError": 0
+      }
     },
     {
       "id": "blossom",
+      "skinMode": "thin-shell",
+      "roughness": 0.4,
+      "iridescence": 0.12,
       "crowns": [
         "Crown-blossom"
       ],
-      "triangles": 26034,
-      "calls": 15
+      "triangles": 26386,
+      "calls": 16
     },
     {
       "id": "stardust",
+      "skinMode": "thin-shell",
+      "roughness": 0.32,
+      "iridescence": 0.2,
       "crowns": [
         "Crown-stardust"
       ],
-      "triangles": 23798,
-      "calls": 10
+      "triangles": 24566,
+      "calls": 12
     },
     {
       "id": "water",
+      "skinMode": "thin-shell",
+      "roughness": 0.1,
+      "iridescence": 0.12,
       "crowns": [
         "Crown-water"
       ],
       "triangles": 24166,
-      "calls": 16
+      "calls": 16,
+      "isolatedPhysical": {
+        "transmission": 0.45,
+        "iridescence": 0.12,
+        "glError": 0
+      }
     },
     {
       "id": "puff",
+      "skinMode": "thin-shell",
+      "roughness": 0.62,
+      "iridescence": 0.05,
       "crowns": [
         "Crown-puff"
       ],
       "triangles": 23926,
-      "calls": 11
+      "calls": 12
     }
+  ],
+  "nebulaAngles": [
+    "front",
+    "side",
+    "back",
+    "quarter"
   ]
 }

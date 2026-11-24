@@ -1,3 +1,4 @@
+import { planetFor } from "./planets";
 import { CompanionPicker } from "./CompanionPicker";
 import { companionFor, randomGreeting } from "./companions";
 import { Icon } from "./Icon";
@@ -133,6 +134,8 @@ function App() {
     if (state.silent) setSpeech("");
   }, [state.silent]);
   const selected = companionFor(state.companionId);
+  const planet = planetFor(state.planetId);
+  useEffect(() => setSpeech(""), [state.planetId]);
   useEffect(() => {
     if (!speech) return;
     const timer = setTimeout(() => setSpeech(""), 5500);
@@ -318,6 +321,7 @@ function App() {
   return (
     <main
       className={pet ? "app pet" : "app"}
+      data-planet={state.planetId}
       data-phase={state.timer.phase}
       data-activity={activity}
     >
@@ -458,6 +462,50 @@ function App() {
               )}
             </section>
           )}
+          <div
+            key={state.planetId}
+            className={`planet-arrival ${state.reduced ? "still" : ""}`}
+            aria-live="polite"
+          >
+            <span>{planet.short}</span>
+          </div>
+          <div className="explore-dock" role="group" aria-label="星球互動">
+            <span className="planet-address">{planet.short}</span>
+            <button
+              aria-label={state.lampOn ? "關閉桌燈" : "開啟桌燈"}
+              aria-pressed={state.lampOn}
+              onClick={state.toggleLamp}
+            >
+              <Icon name="settings" />
+              <span>桌燈</span>
+            </button>
+            <button
+              onClick={() => {
+                useWorld.setState({ destination: null });
+                state.react("read");
+              }}
+            >
+              <Icon name="leaf" />
+              <span>讀書</span>
+            </button>
+            <button
+              onClick={() => {
+                useWorld.setState({ destination: null });
+                state.react("rest");
+              }}
+            >
+              <Icon name="moon" />
+              <span>休息</span>
+            </button>
+            <button
+              aria-label="照顧花朵"
+              aria-pressed={state.flowersBloom}
+              onClick={state.toggleFlowers}
+            >
+              <Icon name="leaf" />
+              <span>{state.flowersBloom ? "花開了" : "澆花"}</span>
+            </button>
+          </div>
           <div className="scene-caption">
             <h1>同頻星球</h1>
             <button

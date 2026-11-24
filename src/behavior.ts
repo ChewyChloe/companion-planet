@@ -1,3 +1,4 @@
+import { safeDrop } from "./art/placement";
 import { HOME, APPROACH, CHAIR } from "./art/terrain";
 import { allowedAction, chooseAction, type Action, type Phase } from "./domain";
 export interface Behavior {
@@ -81,12 +82,9 @@ export function advanceBehavior(
   if (phase === "focus") target = desk;
   else if (action === "rest") target = [-1.1, 0.65];
   else if (action === "walk") {
-    const angle = 0.15 + random() * (Math.PI - 0.3);
-    const radius = 0.55 + random() * 0.5;
-    target = [
-      -0.7 - Math.abs(Math.cos(angle)) * radius * 0.45,
-      -0.35 + Math.sin(angle) * radius * 0.65,
-    ];
+    const angle = random() * Math.PI * 2;
+    const radius = 1.3 + random() * 2.5;
+    target = safeDrop(Math.cos(angle) * radius, Math.sin(angle) * radius);
   }
   return { ...current, action, target, until: elapsed + 5 + random() * 7 };
 }

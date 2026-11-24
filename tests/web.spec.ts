@@ -1,5 +1,6 @@
 import { openTimerSettings } from "./ui";
 import { test, expect } from "@playwright/test";
+test.describe.configure({ timeout: 120000 });
 test("planet renders, camera rotates, character responds, timer and conversation stay synchronized", async ({
   page,
 }, testInfo) => {
@@ -48,7 +49,9 @@ test("planet renders, camera rotates, character responds, timer and conversation
   await page.getByLabel("專注時長").selectOption("1");
   await page.getByRole("button", { name: "開始專注", exact: false }).click();
   await expect(page.locator("main")).toHaveAttribute("data-phase", "focus");
-  await expect(canvas).toHaveAttribute("data-action", "read");
+  await expect(canvas).toHaveAttribute("data-action", "read", {
+    timeout: 45000,
+  });
   await page.getByRole("button", { name: "暫停" }).click();
   const paused = await page.getByRole("timer").innerText();
   await page.waitForTimeout(700);

@@ -1,3 +1,6 @@
+import { useWorld } from "../store";
+import { planetFor } from "../planets";
+import { PlanetGarden } from "./PlanetGarden";
 import { Grass } from "./Grass";
 import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
@@ -156,11 +159,25 @@ function Rocks() {
   );
 }
 export function World({ shoreline = false }: { shoreline?: boolean }) {
+  const id = useWorld((s) => s.planetId);
+  const theme = planetFor(id);
   const rockGeometry = useMemo(
       () => (shoreline ? createShoreGeometry() : createRockGeometry()),
       [shoreline],
     ),
-    soilGeometry = useMemo(createSoilGeometry, []);
+    soilGeometry = useMemo(
+      () =>
+        createSoilGeometry(
+          id === "rose"
+            ? { base: "#c9b2b4", moss: "#b5bda1" }
+            : id === "moon"
+              ? { base: "#c5c4d6", moss: "#aeb9c3" }
+              : id === "forest"
+                ? { base: "#a9b7a5", moss: "#7d9c8a" }
+                : undefined,
+        ),
+      [id],
+    );
   const maps = useMemo(
     () => ({
       rock: surfaceMaps("rock"),
@@ -187,15 +204,24 @@ export function World({ shoreline = false }: { shoreline?: boolean }) {
         <meshStandardMaterial
           vertexColors
           normalMap={maps.rock.normalMap}
-          normalScale={
-            new THREE.Vector2(shoreline ? 0.18 : 0.65, shoreline ? 0.18 : 0.65)
-          }
+          normalScale={new THREE.Vector2(0.12, 0.12)}
           roughness={0.94}
         />
       </mesh>
-      <mesh name="Soil" geometry={soilGeometry} receiveShadow>
+      <mesh
+        name="Soil"
+        geometry={soilGeometry}
+        receiveShadow
+        onClick={(e) => {
+          if (e.delta < 6) {
+            e.stopPropagation();
+            useWorld.getState().goTo(e.point.x, e.point.z);
+          }
+        }}
+      >
         <meshStandardMaterial
           vertexColors
+          color={theme.tint}
           normalMap={maps.soil.normalMap}
           normalScale={new THREE.Vector2(0.35, 0.35)}
           roughness={1}
@@ -204,6 +230,7 @@ export function World({ shoreline = false }: { shoreline?: boolean }) {
       <Grass />
       <Rocks />
       <SmallPlants />
+      <PlanetGarden />
       <ReadingStation wood={maps.wood} />
       <RestArea cloth={maps.cloth} />
     </group>
@@ -212,31 +239,50 @@ export function World({ shoreline = false }: { shoreline?: boolean }) {
 export function ArtLights({ pet = false }: { pet?: boolean }) {
   const { gl } = useThree();
   const last = useRef(-1);
+  const ambient = useRef<THREE.AmbientLight>(null),
+    hemisphere = useRef<THREE.HemisphereLight>(null);
+  useFrame((_s, delta) => {
+    const on = useWorld.getState().lampOn;
+    if (ambient.current)
+      ambient.current.intensity = THREE.MathUtils.damp(
+        ambient.current.intensity,
+        on ? 0.32 : 0.44,
+        3,
+        Math.min(delta, 0.1),
+      );
+    if (hemisphere.current)
+      hemisphere.current.intensity = THREE.MathUtils.damp(
+        hemisphere.current.intensity,
+        on ? 0.55 : 0.68,
+        3,
+        Math.min(delta, 0.1),
+      );
+  });
   useFrame((state) => {
     gl.shadowMap.autoUpdate = false;
-    if (state.clock.elapsedTime - last.current > 0.2) {
+    if (state.clock.elapsedTime - last.current > 0.4) {
       gl.shadowMap.needsUpdate = true;
       last.current = state.clock.elapsedTime;
     }
   });
   return (
     <>
-      <ambientLight intensity={0.4} />
-      <hemisphereLight args={["#dfebf2", "#8f8d7c", 0.55]} />
+      <ambientLight ref={ambient} intensity={0.4} />
+      <hemisphereLight ref={hemisphere} args={["#e6dfe9", "#b3b19a", 0.6]} />
       <directionalLight
         name="KeyLight"
         position={[-3.5, 6, 4.5]}
-        intensity={2.2}
+        intensity={1.6}
         castShadow={!pet}
         shadow-mapSize={[512, 512]}
-        shadow-camera-left={-4}
-        shadow-camera-right={4}
-        shadow-camera-top={4}
-        shadow-camera-bottom={-4}
+        shadow-camera-left={-6}
+        shadow-camera-right={6}
+        shadow-camera-top={6}
+        shadow-camera-bottom={-6}
         shadow-camera-far={16}
         shadow-normalBias={0.025}
         shadow-bias={-0.00015}
-        shadow-radius={3}
+        shadow-radius={5}
       />
       <directionalLight
         name="FillLight"
@@ -247,8 +293,8 @@ export function ArtLights({ pet = false }: { pet?: boolean }) {
       <directionalLight
         name="RimLight"
         position={[-1, 4, -4]}
-        intensity={1.2}
-        color="#dce8f3"
+        intensity={0.9}
+        color="#ffe2bb"
       />
     </>
   );

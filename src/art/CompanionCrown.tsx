@@ -1,4 +1,7 @@
-import { useEffect, useMemo } from "react";
+import { useFrame } from "@react-three/fiber";
+import { useWorld } from "../store";
+import { CompanionMotes } from "./CompanionMotes";
+import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { companionFor, type CompanionId } from "../companions";
 function Stem({
@@ -54,6 +57,57 @@ function Leaf({
 }
 export function CompanionCrown({ id }: { id: CompanionId }) {
   const c = companionFor(id);
+  const root = useRef<THREE.Group>(null),
+    emissives = useRef<THREE.MeshStandardMaterial[]>([]);
+  useEffect(() => {
+    emissives.current = [];
+    root.current?.traverse((n) => {
+      if (
+        n instanceof THREE.Mesh &&
+        n.material instanceof THREE.MeshStandardMaterial
+      ) {
+        const m = n.material;
+        const glow =
+          id === "sprout"
+            ? m.emissive.getHex() !== 0
+            : [
+                "mushroom",
+                "aurora",
+                "blossom",
+                "stardust",
+                "water",
+                "puff",
+              ].includes(id);
+        if (glow) {
+          m.emissive.set(
+            id === "stardust"
+              ? "#e7c17d"
+              : id === "aurora"
+                ? "#78cfc4"
+                : id === "water"
+                  ? "#8bdbe8"
+                  : id === "blossom"
+                    ? "#e9b1bd"
+                    : "#efd6a3",
+          );
+          m.userData.baseGlow =
+            id === "sprout" ? 1.1 : id === "puff" ? 0.6 : 0.22;
+          emissives.current.push(m);
+        }
+      }
+    });
+  }, [id]);
+  useFrame((s) => {
+    const t = useWorld.getState().reduced ? 0 : s.clock.elapsedTime;
+    for (const m of emissives.current)
+      m.emissiveIntensity =
+        m.userData.baseGlow * (0.85 + 0.15 * Math.sin(t * 1.6));
+    if (root.current) {
+      root.current.rotation.z = Math.sin(t * 0.8) * 0.025;
+      const star = root.current.getObjectByName("StarGlow");
+      if (star) star.position.y = 0.48 + Math.sin(t * 1.6) * 0.012;
+    }
+  });
   const star = useMemo(() => {
     const s = new THREE.Shape();
     for (let i = 0; i < 10; i++) {
@@ -85,7 +139,7 @@ export function CompanionCrown({ id }: { id: CompanionId }) {
     return new Float32Array(a);
   }, []);
   return (
-    <group name={`Crown-${id}`} position={[0, 0.94, 0]}>
+    <group ref={root} name={`Crown-${id}`} position={[0, 0.94, 0]}>
       {c.head === "star" && (
         <>
           <Stem
@@ -98,7 +152,7 @@ export function CompanionCrown({ id }: { id: CompanionId }) {
           />
           <Leaf x={-0.07} y={0.13} angle={0.9} color="#91a669" />
           <Leaf x={0.08} y={0.16} angle={-0.9} color="#91a669" />
-          <mesh position={[0.08, 0.4, 0]}>
+          <mesh name="StarGlow" position={[0.08, 0.48, 0]}>
             <extrudeGeometry
               args={[
                 star,
@@ -199,6 +253,29 @@ export function CompanionCrown({ id }: { id: CompanionId }) {
           )}
         </>
       )}
+      {id === "fern" && <CompanionMotes />}
+      {id === "puff" && <CompanionMotes puff />}
+      {id === "blossom" && (
+        <mesh position={[0, 0.19, 0]}>
+          <sphereGeometry args={[0.075, 16, 12]} />
+          <meshStandardMaterial
+            color="#ffe7b8"
+            emissive="#ffe0aa"
+            emissiveIntensity={1}
+          />
+        </mesh>
+      )}
+      {id === "stardust" &&
+        [-1, 1].map((side) => (
+          <mesh
+            key={side}
+            position={[side * 0.18, 0.18, 0]}
+            rotation={[0.5, 0, side * 0.3]}
+          >
+            <torusGeometry args={[0.066, 0.006, 6, 32]} />
+            <meshBasicMaterial color="#efd494" transparent opacity={0.65} />
+          </mesh>
+        ))}
       {c.head === "flower" && (
         <>
           <group position={[0, 0.07, 0]}>
@@ -255,7 +332,7 @@ export function CompanionCrown({ id }: { id: CompanionId }) {
             ]}
             radius={0.012}
           />
-          <lineSegments>
+          <lineSegments raycast={() => undefined}>
             <bufferGeometry>
               <bufferAttribute attach="attributes-position" args={[rays, 3]} />
             </bufferGeometry>
