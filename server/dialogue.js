@@ -50,7 +50,10 @@ export async function getReply(
         }),
       },
     );
-    if (!response.ok) throw new Error("Provider unavailable");
+    if (!response.ok) {
+      console.warn(`[LLM] provider_http_${response.status}`);
+      return { ...backup, provider: "fallback" };
+    }
     const data = await response.json();
     const result = validateReply(
       JSON.parse(data.choices?.[0]?.message?.content),
@@ -59,8 +62,12 @@ export async function getReply(
       result.suggested_action = "listen";
       result.reply_text = result.reply_text.split(/(?<=[。！？])/)[0];
     }
+    console.info("[LLM] reply_ok");
     return { ...result, provider: "llm" };
-  } catch {
+  } catch (error) {
+    const reason = error?.name === "TimeoutError" || error?.name === "AbortError"
+      ? "timeout" : error instanceof SyntaxError ? "invalid_json" : "request_or_response_failed";
+    console.warn(`[LLM] ${reason}`);
     return { ...backup, provider: "fallback" };
   }
 }

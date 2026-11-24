@@ -44,10 +44,6 @@ export function CompanionPicker({
           </button>
         ))}
       </div>
-      <a href={`?art-review&companion=${selected}`}>旋轉檢視角色模型</a>
-      <p className="companion-hint">
-        按一下打招呼 · 抓住後拖動，放到小島上的空地
-      </p>
     </section>
   );
 }

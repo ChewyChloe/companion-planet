@@ -94,3 +94,7 @@ The latest user explicitly requests heading-correct travel, articulated limbs, e
 ### Day/night control (latest)
 
 The user replaces the upper-right sun/settings popover with a direct day/night toggle and removes its old contents. Do not restore the settings panel. `night` is a persisted preference; sky/fog/water, scene lighting and environment intensity respond without remounting the character or changing timer/planet/lamp state. Keep the independent lamp toggle. `scripts/check-daynight.mjs` validates desktop and touch-phone switching, actual light changes and reload persistence.
+
+### Simplified picker and hidden mini entry
+
+The user removes the picker model-review link and drag instruction and temporarily hides the mini/pet entry button. Keep the underlying desktop mode implementation for future restoration. Health provider=llm means configured only; show AI connected only after a validated provider reply. Provider logs must contain bounded reason/status codes only, never keys, user text or provider response bodies. See API_CONNECTION_QA.md.

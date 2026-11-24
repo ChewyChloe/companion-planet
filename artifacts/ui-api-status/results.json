@@ -1,0 +1,20 @@
+{
+  "cases": [
+    {
+      "mobile": false,
+      "removedHint": true,
+      "hiddenMini": true,
+      "configuredNotConnected": true,
+      "fallbackAndSuccessLabels": true
+    },
+    {
+      "mobile": true,
+      "removedHint": true,
+      "hiddenMini": true,
+      "configuredNotConnected": true,
+      "fallbackAndSuccessLabels": true
+    }
+  ],
+  "errors": [],
+  "providerResponses": "Simulated HTTP responses; not a live Groq credential test"
+}

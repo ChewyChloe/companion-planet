@@ -101,7 +101,7 @@ test("silent mode suppresses completion notices and AI proposals require confirm
   await page.getByRole("button", { name: "確認開始專注" }).click();
   await expect(page.locator("main")).toHaveAttribute("data-phase", "focus");
 });
-test("offline fallback and mini companion remain operable", async ({
+test("offline fallback remains operable while mini companion entry is hidden", async ({
   page,
 }) => {
   await page.route("**/api/chat", (route) => route.abort());
@@ -111,9 +111,6 @@ test("offline fallback and mini companion remain operable", async ({
   await page.getByRole("button", { name: "送出訊息" }).click();
   await expect(page.locator(".message.assistant")).toContainText("辛苦");
   await page.getByRole("button", { name: "收合聊天" }).click();
-  await page.getByRole("button", { name: "體驗迷你陪伴" }).click();
-  await expect(page.locator("main")).toHaveClass("app pet");
-  await expect(page.locator("canvas")).toHaveAttribute("data-frames", /\d+/);
-  await page.getByRole("button", { name: "返回星球" }).click();
+  await expect(page.getByRole("button", { name: "體驗迷你陪伴" })).toHaveCount(0);
   await expect(page.getByRole("heading")).toBeVisible();
 });

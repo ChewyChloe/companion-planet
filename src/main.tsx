@@ -192,7 +192,7 @@ function App() {
     fetch("/api/health", { signal: controller.signal })
       .then((r) => r.json())
       .then((r) =>
-        setProvider(r.provider === "llm" ? "AI 已連線" : "本機陪伴模式"),
+        setProvider(r.provider === "llm" ? "AI 已設定，待測試" : "本機陪伴模式"),
       )
       .catch(() => setProvider("離線陪伴模式"));
     return () => controller.abort();
@@ -542,14 +542,6 @@ function App() {
             >
               <Icon name="orbit" />
             </button>
-            <button
-              className="round-control"
-              onClick={() => void mode()}
-              aria-label={window.desktop ? "切換桌寵模式" : "體驗迷你陪伴"}
-              title="迷你陪伴"
-            >
-              <Icon name="expand" />
-            </button>
           </div>
         </>
       )}
@@ -631,7 +623,9 @@ function App() {
             AI 陪伴角色，非真人。
             {provider === "AI 已連線"
               ? "文字將傳送至 AI 服務。"
-              : "目前由本機陪伴模式回應。"}
+              : provider === "AI 已設定，待測試"
+                ? "已讀取 API 設定，傳送訊息後確認連線。"
+                : "目前由本機陪伴模式回應。"}
             對話只暫存在這個視窗。
           </p>
           <div className="messages" aria-live="polite">
