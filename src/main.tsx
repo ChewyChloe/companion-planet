@@ -3,7 +3,7 @@ import { getNebulaMaterialVariant, nebulaMaterialVariants } from "./art/nebula-m
 import { planetFor } from "./planets";
 import { CompanionPicker } from "./CompanionPicker";
 import { companionFor } from "./companions";
-import { focusCompleteLine, tapDialogue } from "./tap-dialogue";
+import { dialogueActions, dialogueMood, focusCompleteLine, tapDialogue } from "./tap-dialogue";
 import { Icon } from "./Icon";
 import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
@@ -222,9 +222,11 @@ function App() {
     const count = now - taps.current.at < 950 ? taps.current.count + 1 : 1;
     taps.current = { at: now, count };
     const focusing = state.timer.phase === "focus" && state.timer.running;
-    const greeting = tapDialogue(lastGreeting.current, count, focusing, new Date(now).getHours());
+    const hour = new Date(now).getHours();
+    const greeting = tapDialogue(lastGreeting.current, count, focusing, hour);
     lastGreeting.current = greeting.index;
-    state.react(focusing ? "listen" : count === 3 ? "stretch" : "happy");
+    const mood = dialogueMood(greeting.index, count, focusing, hour);
+    state.react(dialogueActions[mood], mood);
     if (!state.silent) showSpeech(greeting.text);
   };
   const send = async (e: React.FormEvent) => {
@@ -394,26 +396,19 @@ function App() {
                 </button>
               </div>
               <div className="duration">
-                <label htmlFor="duration">專注時長</label>
-                <select
-                  id="duration"
-                  value={minutes}
-                  disabled={state.timer.running}
-                  onChange={(e) => {
-                    setMinutes(Number(e.target.value));
-                    if (state.timer.phase === "idle")
-                      state.setTimer({
-                        ...state.timer,
-                        remaining: Number(e.target.value) * 60000,
-                      });
-                  }}
-                >
-                  <option value={25}>25 分鐘</option>
-                  <option value={45}>45 分鐘</option>
-                  <option value={5}>5 分鐘</option>
-                  <option value={1}>1 分鐘展示</option>
-                  <option value={1 / 6}>10 秒展示</option>
-                </select>
+                <fieldset className="duration-options" disabled={state.timer.running}>
+                  <legend>專注時長</legend>
+                  {[[25, "25 分鐘"], [45, "45 分鐘"], [5, "5 分鐘"], [1, "1 分鐘展示"], [1 / 6, "10 秒展示"]].map(([value, label]) => (
+                    <label key={value}>
+                      <input name="duration" type="radio" checked={minutes === value} onChange={() => {
+                        const duration = Number(value);
+                        setMinutes(duration);
+                        if (state.timer.phase === "idle") state.setTimer({ ...state.timer, remaining: duration * 60000 });
+                      }} />
+                      <span>{label}</span>
+                    </label>
+                  ))}
+                </fieldset>
               </div>
               <div className="popover-actions">
                 <span>{state.timer.completed} 段完成</span>

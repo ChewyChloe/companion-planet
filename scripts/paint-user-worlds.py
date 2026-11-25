@@ -10,7 +10,7 @@ ROOT=Path(__file__).resolve().parents[1];SIZE=2048
 SEEDS=json.loads((ROOT/'assets/art/world-color/seeds.json').read_text())
 TRANS=json.loads((ROOT/'assets/art/user-models/RUNTIME_TRANSFORMS.json').read_text())
 PALETTES={
-'b612':dict(rock='#a5a098',grass='#94a381',leaf='#91a17c',bark='#967559',stone='#d7cbb5',roof='#839da4',wood='#b7956e',paper='#eddfbd',cover='#768fa5',metal='#ad9363',water='#79aab2',rose='#dfbf9d',cloth='#b7b3a1',moon='#e9d3a0',light='#f2cc88',crystal='#a2bfc7'),
+'b612':dict(rock='#9b7858',grass='#94a381',leaf='#91a17c',bark='#967559',stone='#ccb191',roof='#839da4',wood='#ac7854',paper='#eddfbd',cover='#768fa5',metal='#ad9363',water='#79aab2',rose='#dfbf9d',cloth='#b7b3a1',moon='#e9d3a0',light='#f2cc88',crystal='#76a9bb'),
 'moon':dict(rock='#8f91a5',grass='#a3b3ad',leaf='#86a5a7',bark='#998b8c',stone='#d4cfde',roof='#7d92af',wood='#ae9488',paper='#ede0c8',cover='#8880a3',metal='#b2a17f',water='#8cb8c5',rose='#d1b2cc',cloth='#aaa4bc',moon='#e4ce9c',light='#f2d49d',crystal='#b2bfdb'),
 'rose':dict(rock='#987784',grass='#99aa79',leaf='#547954',bark='#9c8069',stone='#d2aa99',roof='#a86577',wood='#a4765d',paper='#f1e2cd',cover='#b37f8a',metal='#ad946b',water='#88b7b8',rose='#bf5479',cloth='#c4abb0',moon='#dfc59b',light='#f2cb8e',crystal='#c4b3c9'),
 'forest':dict(rock='#999f94',grass='#849874',leaf='#749373',bark='#927459',stone='#c8c6b2',roof='#819b8a',wood='#b19471',paper='#e7dbbd',cover='#7b8e82',metal='#aa946d',water='#79aba8',rose='#c9b1b0',cloth='#c9bb9b',moon='#d8c99f',light='#f0cf91',crystal='#a6c1b6')}
@@ -47,6 +47,13 @@ def raster(g,b,key):
 def paint(key,xyz,norm,shape):
  x,y,z=xyz.T;ny=norm[:,1];n=len(y);names=list(ROUGH);palette=PALETTES[key]
  color=np.tile(rgb(palette['rock']),(n,1));rough=np.full(n,.94,np.float32);metal=np.zeros(n,np.float32);emission=np.zeros(n,np.float32);labels=np.full(n,names.index('rock'),np.uint8)
+ # Exposed bedrock has local strata, distinct from paving and planted soil.
+ strata={'b612':('#8a6851','#c4a07c'),'moon':('#605776','#a493ae'),
+         'rose':('#8b536b','#c392a1'),'forest':('#596953','#9b9274')}
+ vein=.5+.5*np.sin(y*46+np.sin(x*19+z*13)*1.55+np.sin(z*41)*.26)
+ mineral=np.clip(.32+.28*vein+.22*ease(.15,.44,y)+.14*ease(-.15,.85,ny),0,1)
+ low,high=map(rgb,strata[key])
+ color[:]=low*(1-mineral[:,None])+high*mineral[:,None]
  # Non-repeating gentle mineral/leaf variation; no global horizontal bands.
  variation=(np.sin(x*57+np.sin(z*31))*np.sin(z*43-y*23)+.4*np.sin(x*151+y*83)*np.sin(z*129))*.025
  def apply(name,w):
@@ -185,6 +192,15 @@ def paint(key,xyz,norm,shape):
  if key=='moon':
   # Hanging star / visible reading window.
   apply('light',ell([.18,.80,-.17],[.026,.035,.028]));apply('light',ell([-.11,.52,-.085],[.018,.024,.012]))
+ if key=='b612':
+  # Localize cliff ornaments by their sampled sculpt positions.
+  for center,radii in [
+   ((-.279,.229,.324),(.026,.023,.037)),
+   ((-.264,.227,.352),(.023,.023,.023)),
+   ((-.219,.174,.369),(.018,.017,.025)),
+  ]: apply('wood',ell(center,radii))
+  apply('crystal',ell([.11,.131,.334],[.062,.062,.037])*ease(.091,.115,y))
+  apply('stone',ell([.024,.059,.447],[.086,.017,.047]))
  if key=='moon':
   # This lamp is part of the uploaded island mesh, in front of the live light.
   stem=[[-.104,.380,.074],[-.104,.507,.075],[-.085,.533,.083],

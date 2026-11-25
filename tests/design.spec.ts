@@ -55,7 +55,7 @@ test("immersive lakeside keeps corner controls, open center and local Huninn", a
     page.getByRole("button", { name: "開啟環境音" }),
   ).toHaveAttribute("aria-pressed", "false");
   await openTimerSettings(page);
-  await page.getByLabel("專注時長", { exact: true }).selectOption("5");
+  await page.getByRole("radio", {name:"5 分鐘", exact:true}).check();
   await expect(page.getByRole("timer")).toHaveText("05:00");
   await page.getByRole("button", { name: "收合計時設定" }).click();
   await page.getByRole("button", { name: "和星雲仔說說話" }).click();

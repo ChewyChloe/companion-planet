@@ -1,3 +1,4 @@
+import type { Action } from "./domain";
 const lines = [
   "嗯？你剛剛叫我嗎？ (｡･ω･｡)",
   "我剛剛在數星星，數到第七顆就忘記了 (´･ω･`)",
@@ -39,3 +40,23 @@ export function tapDialogue(previous: number, count: number, focusing: boolean, 
   const index = (previous + 1 + Math.floor(random() * (previous < 0 ? lines.length : lines.length - 1))) % lines.length;
   return { index, text: lines[index] };
 }
+
+
+export type TapMood = "joy" | "annoyed" | "sad" | "surprise" | "curious" | "sleepy";
+
+export function dialogueMood(index: number, streak: number, focusing: boolean, hour: number): TapMood {
+  if (streak === 3) return "surprise";
+  if (streak === 5) return "joy";
+  if (focusing) return "curious";
+  if (hour >= 23 || hour < 5) return "sleepy";
+  if (index === 18) return "annoyed";
+  if ([16, 22, 25, 26].includes(index)) return "sad";
+  if ([2, 9, 19].includes(index)) return "surprise";
+  if ([1, 3, 5, 13, 14, 20, 21, 23].includes(index)) return "curious";
+  return "joy";
+}
+
+export const dialogueActions: Record<TapMood, Action> = {
+  joy: "happy", annoyed: "stretch", sad: "idle", surprise: "stretch",
+  curious: "listen", sleepy: "idle",
+};

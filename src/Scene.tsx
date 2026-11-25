@@ -417,6 +417,10 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
         if (!drag.current) gl.domElement.style.cursor = "auto";
       }}
     >
+      <mesh name="ResidentTapTarget" position={[0, .86, 0]} scale={[.62, .70, .52]}>
+        <sphereGeometry args={[1, 16, 12]} />
+        <meshBasicMaterial visible={false} />
+      </mesh>
       <group name="CharacterFacing" ref={model} scale={pet ? 1 : RESIDENT_SCALE}>
         <SculptCharacter
           pet={pet}

@@ -1073,3 +1073,28 @@ select {
 .scene-caption {
   color: #777189;
 }
+
+.duration-options {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.duration-options legend { margin-block-end: 10px; }
+.duration-options label { position: relative; cursor: pointer; }
+.duration-options input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.duration-options span {
+  display: grid;
+  place-items: center;
+  padding: 9px 7px;
+  min-height: 42px;
+  border: 1px solid #d8cfdf;
+  background: #fffaf6;
+  text-align: center;
+}
+.duration-options input:checked + span { background: #ded6e9; border-color: #827097; }
+.duration-options input:focus-visible + span { outline: 2px solid #72658c; outline-offset: 2px; }
+.duration-options:disabled { opacity: .65; }
+.companion-grid button:disabled { cursor: default; }

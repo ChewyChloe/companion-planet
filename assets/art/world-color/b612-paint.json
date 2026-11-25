@@ -6,13 +6,13 @@
   "paintedPixels": 3245856,
   "semanticPixelCounts": {
     "creamRose": 0,
-    "rock": 1732296,
+    "rock": 1714238,
     "grass": 323375,
-    "leaf": 600312,
+    "leaf": 599546,
     "bark": 244768,
-    "stone": 107998,
+    "stone": 112878,
     "roof": 81456,
-    "wood": 48974,
+    "wood": 54325,
     "paper": 16110,
     "cover": 2383,
     "metal": 38254,
@@ -21,13 +21,13 @@
     "cloth": 0,
     "moon": 0,
     "light": 908,
-    "crystal": 3208
+    "crystal": 11801
   },
   "geometryUnchanged": true,
   "ambientOcclusion": "Cycles CPU 24 samples, 1024 atlas",
   "baseColorSize": 2048,
   "packedOrmSize": 1024,
   "emissionSize": 512,
-  "runtimeBytes": 4169096,
-  "sha256": "2374dd5b67735052d49d1e3d68ddbb1fd5f613c6a4f212eaa65cc3c7fd50c5cd"
+  "runtimeBytes": 4218924,
+  "sha256": "29be4291e1de9a8c05417c870cfccd29d45dbefc1504ff1ea2cc3f31296a1d65"
 }

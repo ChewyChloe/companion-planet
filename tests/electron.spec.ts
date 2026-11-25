@@ -77,10 +77,11 @@ test("desktop shares state, transparent topmost pet switches back and quits", as
       delete (globalThis as any).originalCursor;
     });
     await page.getByRole("button", { name: "更換角色", exact: true }).click();
-    await page.getByRole("button", { name: "小星草", exact: true }).click();
+    await expect(page.getByRole("button", { name: /小星草/ })).toBeDisabled();
+    await page.getByRole("button", { name: "關閉角色選擇" }).click();
     await expect(page.locator("canvas")).toHaveAttribute(
       "data-companion",
-      "sprout",
+      "nebula",
     );
     const frames = await page.locator("canvas").getAttribute("data-frames");
     await expect(page.locator("canvas")).not.toHaveAttribute(

@@ -1,7 +1,8 @@
+import type { TapMood } from "./tap-dialogue";
 import { planetFor, type PlanetId } from "./planets";
 import { create } from "zustand";
 import { initialTimer, restoreTimer, type Timer, type Action } from "./domain";
-import { companionFor, type CompanionId } from "./companions";
+import { type CompanionId } from "./companions";
 type WorldMemory = Partial<
   Record<PlanetId, { lampOn: boolean; flowersBloom: boolean }>
 >;
@@ -34,7 +35,8 @@ interface State {
   setSilent: (b: boolean) => void;
   setReduced: (b: boolean) => void;
   setNotifications: (b: boolean) => void;
-  react: (a: Action) => void;
+  tapMood: TapMood | null;
+  react: (a: Action, mood?: TapMood) => void;
   clear: () => void;
 }
 const key = "companion-planet-v1";
@@ -93,8 +95,8 @@ export const useWorld = create<State>((set) => ({
         [s.planetId]: { lampOn: s.lampOn, flowersBloom: !s.flowersBloom },
       },
     })),
-  companionId: companionFor(saved.companionId).id,
-  setCompanion: (id) => set({ companionId: companionFor(id).id }),
+  companionId: "nebula",
+  setCompanion: (id) => { if (id === "nebula") set({ companionId: id }); },
   night: saved.night === true,
   toggleNight: () => set(s => ({ night: !s.night })),
   silent: saved.silent === true,
@@ -115,7 +117,8 @@ export const useWorld = create<State>((set) => ({
   setSilent: (silent) => set({ silent }),
   setReduced: (reduced) => set({ reduced }),
   setNotifications: (notifications) => set({ notifications }),
-  react: (reaction) => set({ reaction, reactionUntil: Date.now() + 3200 }),
+  tapMood: null,
+  react: (reaction, mood) => set({ reaction, reactionUntil: Date.now() + 3200, tapMood: mood ?? null }),
   clear: () => {
     set({
       timer: { ...initialTimer },

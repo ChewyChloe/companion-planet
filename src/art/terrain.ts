@@ -57,17 +57,20 @@ export function riverBedDepth(x: number, z: number, planet: string) {
   return .14 * Math.exp(-(((x-center)/width)**4)) * smoothstep(start,start+.4,z);
 }
 // Surveyed tread centers. The generated terrain mask erodes narrow stairways
-// because it treats adjacent risers like walls.
-const stairs: Record<string, readonly (readonly [number, number, number])[]> = {
+// because it treats adjacent risers like walls. Rose samples follow the paved
+// outer walkway where adjacent flowers were inflating the collision mask.
+const surveyedPaths: Record<string, readonly (readonly [number, number, number])[]> = {
   b612: [[-.60,.70,2.45],[-.84,.72,2.82],[-.93,.57,3.16],
     [-.73,.47,3.81],[-.74,.24,4.04],[-.71,.15,4.48],[-.61,-.05,4.77],[-.40,-.03,5.12]],
+  rose: [[.72,.14,.27],[.20,.14,.27],[-.24,.18,.27],[-.75,.24,.25],[-1.25,.22,.65],[-1.48,.21,1.65],
+    [-.95,.12,2.08],[-.76,.10,2.24],[-.86,.07,2.68],[-.80,.02,3.36]],
   forest: [[.40,.31,.80],[.15,.35,.80],[-.24,.34,.80],[-.60,.38,.85],[-.60,.40,1.30],[-.60,.46,1.85],[-.60,.52,2.50],
     [-.59,.52,2.90],[-.30,.48,3.20],[.10,.49,3.34],[.42,.71,3.48],[.38,.73,4.00],
     [.40,.94,4.54],[.68,.78,4.53],[.90,.48,4.40],
     [1.10,.15,4.15],[1.33,-.07,3.84],[1.60,-.24,3.32]],
 };
 function stairHeight(planet: string, x: number, z: number) {
-  const path = stairs[planet];
+  const path = surveyedPaths[planet];
   if (!path) return null;
   let best = .34 ** 2;
   let height: number | null = null;
@@ -139,8 +142,8 @@ export function groundNormal(x: number, z: number, out = new THREE.Vector3()) {
 }
 export function inDeskObstacle(x: number, z: number, margin = 0) {
   return (
-    x > -0.03 - margin &&
-    x < 1.47 + margin &&
+    x > (navigationPlanet === "rose" ? .12 : -.03) - margin &&
+    x < (navigationPlanet === "rose" ? 1.30 : 1.47) + margin &&
     z > CHAIR.z + CHAIR.deskZ - 0.4 - margin &&
     z < CHAIR.z + CHAIR.deskZ + 0.4 + margin
   );
@@ -164,7 +167,7 @@ export function inNavigationObstacle(x:number,z:number,margin=0) {
  const station = Math.abs(x-CHAIR.x)<.26 && z>CHAIR.z-.12 && z<CHAIR.z+.85;
  const chairBack = Math.abs(x-CHAIR.x)<.80+margin*.25 && z>CHAIR.z-.95-margin*.25 && z<CHAIR.z-.23+margin*.25;
  if (!chairBack && !inDeskObstacle(x,z,margin) && stairHeight(navigationPlanet,x,z)!==null) return false;
- return chairBack || (!station && !(boarding && Math.hypot(x-CHAIR.x,z-CHAIR.z)<1.8) && solidBodyBlocked(navigationPlanet,x,groundHeight(x,z),z)) || inDeskObstacle(x,z,margin) || (!station && !userWalkable(navigationPlanet,x,z,Math.max(0,margin-.30)));
+ return chairBack || (!station && !(boarding && Math.hypot(x-CHAIR.x,z-CHAIR.z)<1.8) && solidBodyBlocked(navigationPlanet,x,groundHeight(x,z),z)) || inDeskObstacle(x,z,margin) || (!station && !userWalkable(navigationPlanet,x,z,Math.max(0,margin-(navigationPlanet === "rose" ? .39 : .30))));
 
 }
 const NAV_STEP=.20,NAV_MARGIN=.42;

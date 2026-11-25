@@ -5,7 +5,7 @@ import { expect, it } from "vitest";
 import { Vector3 } from "three";
 import { configureLandmarkNavigation, HOME, navigationLanding, waypoint } from "../src/art/terrain";
 
-it.each([["b612",-.71,4.48],["forest",.68,4.53]] as const)("connects %s steps to the walking terrace", (id, stairX, stairZ) => {
+it.each([["b612",-.71,4.48],["forest",.68,4.53],["rose",-.80,3.36]] as const)("connects %s paths to the walking terrace", (id, stairX, stairZ) => {
   const scene=load(id);
   const transform=transforms[id];
   scene.scale.setScalar(transform.scale);

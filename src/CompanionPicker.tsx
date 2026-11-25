@@ -35,6 +35,7 @@ export function CompanionPicker({
         {companions.map((c) => (
           <button
             key={c.id}
+            disabled={c.id !== "nebula"}
             aria-pressed={selected === c.id}
             onClick={() => onSelect(c.id)}
           >

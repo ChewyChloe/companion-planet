@@ -35,6 +35,7 @@ export function solidBodyBlocked(id:string,x:number,y:number,z:number) {
   if(!worlds.has(id))return false;
   const key=`${id}:${Math.round(x*10)},${Math.round(y*10)},${Math.round(z*10)}`;
   const cached=blockedCache.get(key);if(cached!==undefined)return cached;
+  probe.radius=id === "rose" ? .27 : .36;
   probe.start.set(x,y+.48,z);probe.end.set(x,y+1.18,z);
   const hit=worlds.get(id)!.capsuleIntersect(probe);
   const blocked=!!hit && hit.depth>.025 && (hit.normal.y<.75 || hit.depth>.22);
@@ -44,6 +45,7 @@ export function solidBodyBlocked(id:string,x:number,y:number,z:number) {
 export function resolveBodyContact(id:string, point:Vector3) {
   const tree=worlds.get(id);if(!tree)return;
   const c=body(point.x,point.y,point.z);
+  c.radius=id === "rose" ? .52 : .64;
   for(let i=0;i<5;i++){
     const hit=tree.capsuleIntersect(c);if(!hit || hit.depth<.001)break;
     const correction=hit.normal.multiplyScalar(hit.depth+.003);
