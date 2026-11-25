@@ -87,7 +87,7 @@ export function advanceBehavior(
       const target = safeDrop(x + Math.cos(angle) * radius, z + Math.sin(angle) * radius);
       const distance = Math.hypot(target[0] - x, target[1] - z);
       if (distance >= 0.55 && distance <= 2.8)
-        return { ...current, action: "walk", target, until: elapsed + 14 };
+        return { ...current, action: "walk", target, until: Infinity };
     }
     return { ...current, action: "idle", until: elapsed + idlePause(random) };
   }
