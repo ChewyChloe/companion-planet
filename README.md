@@ -1,109 +1,37 @@
-# 同頻星球 · Companion Planet
+# 同頻星球
 
-「你專心的時候，牠也在做自己的事。」
+同頻星球是一個可以探索的 3D 專注空間。設定番茄鐘，讓星雲仔在書桌旁陪你讀書。休息時可以切換星球、聽音樂，或和星雲仔聊幾句。
 
-真正即時渲染的微型星球宇宙、九位陪伴生物、番茄鐘、繁體中文對話，以及 Electron 桌寵。無 API Key 時可使用本機規則回覆；**Mock 不是生成式 AI**，但使用相同的角色控制器與計時系統。
+**[開啟同頻星球](https://companion-planet.onrender.com)**
 
-## 四座星球使用上傳的 GLB
+![同頻星球夜景，中央是浮島，周圍有三顆可前往的星球](artifacts/night-sky.jpg)
 
-正式場景使用 `assets/art/user-models/` 中的同頻星球、月光書原、玫瑰花園與微風森林。原檔不變；`public/models/user-worlds/` 是已完成分區上色、PBR 材質與 AO 的執行副本，完整保留原模型面數與輪廓。此批模型為使用者提供，未聲明額外的再散布授權。
+## 體驗方式
 
-- [原始模型與匯入紀錄](assets/art/user-models/RUNTIME_TRANSFORMS.json)
-- [上色與實際渲染預覽](docs/archive/WORLD_COLOR_QA.md)
-- [整合與驗收說明](docs/archive/USER_WORLD_INTEGRATION.md)
-- `npm run dev` 後開啟 `/?world-model-review`，可旋轉檢視未經配置的原始模型。
-- `python scripts/prepare-user-worlds.py` 可重新產生工作副本和地形資料，需 Python、NumPy、Pillow。
+| 功能 | 操作 |
+| --- | --- |
+| 探索四座星球 | 拖曳旋轉視角，以滾輪或雙指縮放。點選外圍星球，前往同頻星球、月光書原、玫瑰花園或微風森林。 |
+| 專注計時 | 在左上角輸入分鐘和秒鐘，再按播放。計時期間可暫停、繼續或重新開始。 |
+| 與星雲仔互動 | 點星雲仔看短句和表情，或用右下角的聊天按鈕開啟對話。下方也能請他讀書或休息。 |
+| 切換氣氛 | 右上角可切換日夜與環境音。各星球有自己的背景音樂，桌燈可獨立開關。 |
 
-## 開始使用
+## 作品展示
 
-建議 Node.js 24 LTS、npm 11。Windows 10/11 x64 為桌面目標。
+- [四座星球場景總覽](artifacts/user-worlds/integration/four-worlds.jpg)
+- [手機畫面](artifacts/user-worlds/integration/phone-worlds.jpg)
+- [星雲仔的 12 種表情](artifacts/nebula-expressions/12-expressions.png)
+
+網站使用 React、TypeScript、Three.js 與 React Three Fiber 即時渲染，並以 Express 提供聊天 API。四座浮島以 GLB 載入，具備各自的材質、地形和配樂。星球旅行與場景互動可在桌面和手機瀏覽器操作。
+
+## 本機執行
+
+需 Node.js 24 與 npm。
 
 ```sh
 npm ci
 npm run dev
 ```
 
-Vite 開發服務使用 5173，後端使用 3001。由終端顯示的網址開啟全螢幕湖畔場景。拖曳場景旋轉、滾輪或雙指縮放，按住角色可抓起並拖放到小島空地；直接點一下會隨機做動作或出現短句。右下星球圖示可切換九位居民，選擇會記住。左上播放／暫停專注，點時間數字開啟時長與重設；右上切換白天／夜晚、環境音，右下開啟聊天；迷你陪伴的網頁入口暫時隱藏。桌機、平板與手機使用同一響應式版面。計時以截止時間計算，暫停／重新整理不會重新起算。版面驗證見 [LAYOUT_QA.md](docs/archive/LAYOUT_QA.md)，九位居民與拖放操作見 [INTERACTION_QA.md](docs/archive/INTERACTION_QA.md)。
+開啟 `http://localhost:5173`。正式建置可執行 `npm run build`，再用 `npm start` 啟動。
 
-點空地可以讓角色走過去；點遠方星球可前往玫瑰花園、微風森林或月光書原。點燈罩開關桌燈，點書本讀書；下方可選讀書、休息及照顧花朵；下方互動列也提供較好按的手機控制。早期互動規格見 [UNIVERSE_QA.md](docs/archive/UNIVERSE_QA.md)；本輪場景驗證見 [整合紀錄](docs/archive/USER_WORLD_INTEGRATION.md)。
-
-「安靜陪我」停止主動提示，仍可主動聊天。專注期間不主動發話，結束最多提醒一次。右上角日夜按鈕直接切換場景光線，不會變動計時狀態。環境音為本機合成的低音量和弦，需手動開啟，不使用外部音訊素材。
-
-## 桌寵
-
-```sh
-npm run desktop
-```
-
-此指令先建置，再啟動 Electron；不需另開 API。桌面內嵌服務使用固定的 loopback 3002，讓重開程式後仍使用同一個本機儲存來源；連接埠被占用時啟動將失敗，不會接管其他服務。
-
-- 星球頁右下角「切換桌寵模式」。透明、無框、320×420、置頂。
-- 抓住桌寵角色本體，或拖曳桌寵上方名稱區域移動。星球頁可拖曳頁首空白區域。
-- ↗ 返回星球；☏ 開啟對話；− 隱藏至系統匣，有系統匣時從選單重新開啟，否則最小化至工作列；× 完全退出。
-- 系統匣選單提供星球、桌寵及退出。關閉視窗或退出會結束 API，不留桌寵背景程序。
-- 未啟用滑鼠穿透，因此角色始終可操作；小型視窗的透明區域仍可能攔截滑鼠。可拖走或最小化，避免擋住其他應用程式。
-- 瀏覽器「體驗迷你陪伴」只切換網頁版面；真正的系統置頂／透明視窗需要 Electron。
-
-Linux 虛擬顯示器測試已驗證 Electron 主要操作；Windows 原生合成、拖曳、系統匣及安裝須依下方實機驗收，未宣稱通過。
-
-## 可選 LLM
-
-複製 `.env.example` 為 `.env`，將 `LLM_API_KEY`、`LLM_BASE_URL`、`LLM_MODEL` 設於後端環境。採用 OpenAI-compatible chat completions JSON 格式。開發 API 與未打包 Electron 都會讀取專案 `.env`。已打包版本請透過作業系統環境變數提供，不將 `.env` 放進套件。
-
-API Key 不進入前端／儲存庫；避免使用 `VITE_` 前綴。設定完成後重啟程式。雲端須允許該供應商網域；本次未設定或測試付費 API。網路代理使用繼承的 HTTP(S)_PROXY 與 CA；不關閉 TLS 驗證。
-
-文字最多 600 字元，API 每來源每分鐘最多 20 次，模型請求 8 秒逾時。格式無效、供應商出錯或前端 10 秒未取得回應時會採備援；介面會標示回覆模式。AI 建議開始專注／休息／安靜時必須另按確認。模型無法呼叫作業系統或讀取個人檔案。開發／桌面 API 預設僅在 loopback 監聽；`npm start` 的正式網站監聽網路介面，並以本機介面、明確的 `WEB_ORIGINS` 與 Render 注入的 `RENDER_EXTERNAL_URL` 校驗 Host／Origin，不開放萬用 CORS。
-
-對話僅存本次視窗記憶體；最近 6 則訊息會隨請求送往設定的供應商。計時與偏好存在 localStorage，可清除。緊急自傷詞句採明確求助回覆，不送模型；目前是保守的關鍵字備援，並非完整危機辨識或醫療服務。
-
-## 指令與驗證
-
-```sh
-npm run check          # TypeScript、ESLint、Vitest、production build、依賴相容性
-npm run test:e2e       # Chromium：1366×768 與 390×844
-npm run test:electron  # 先 npm run build；需要桌面顯示器
-npm run package:win    # Windows 上製作 NSIS 安裝檔；Linux 需要 Wine
-npm run package:win:portable # Windows x64 可攜 ZIP
-```
-
-E2E 預設使用 `/usr/bin/chromium`；其他系統請設定 `CHROMIUM_PATH` 為 Chromium／Chrome 執行檔路徑。例如 PowerShell：`$env:CHROMIUM_PATH='C:\Program Files\Google\Chrome\Application\chrome.exe'`。Electron 測試以自己的 BrowserWindow 執行，不依賴 Chrome 路徑。測試中的 `--no-sandbox` 僅用於受限制的 Linux 測試容器，正常桌面啟動維持沙箱。
-
-本機測試報告位於 `playwright-report/`、`playwright-report-electron/`；交付摘要、截圖和測量在 `artifacts/`，詳見 `DEVELOPMENT_REPORT.md`。`?stats` 在開發模式顯示 FPS 工具。
-
-## 素材與架構
-
-星雲仔已重製為原創 Blender 連續皮膚骨架模型 `public/models/nebula-sculpt.glb`，可編輯來源、真實外觀參數與重建指令見 [assets/art/README.md](assets/art/README.md)。場景包含自訂月岩地形、坑洞、苔蘚、木桌／靠背椅／曲面書頁／彎頸桌燈與休息區。模型替換需提供相同命名骨架與控制節點，不能直接換任意 GLB。美術診斷見 [ART_AUDIT.md](docs/archive/ART_AUDIT.md)，四視角、參考對照與驗收狀態見 [VISUAL_QA.md](docs/archive/VISUAL_QA.md)。
-
-- `src/domain.ts`：純計時與行為規則。
-- `src/behavior.ts`：動作優先權、冷卻、活動目標與返回路徑。
-- `src/store.ts`：共用狀態與本機保存。
-- `src/Scene.tsx`：星球、角色呈現、動畫和鏡頭。
-- `src/main.tsx`：計時、聊天與設定介面。
-- `shared/dialogue.js`：格式驗證、本機回覆。
-- `server/`：LLM provider、限流、loopback API。
-- `electron/`：安全 preload、模式與視窗生命週期。
-
-## Windows 實機驗收（尚待執行）
-
-1. 解壓可攜 ZIP 至可寫入目錄，執行「同頻星球.exe」；或在原始碼執行 `npm ci`、`npm run desktop`。
-2. 確認星球完整可見、旋轉／縮放、角色散步與眨眼。啟動計時，確認走到書桌閱讀。
-3. 切換桌寵，確認桌面透出、無邊框、置頂；拖曳上方把手，確認不影響其他應用程式。
-4. 開啟聊天並送出「好累」；確認回覆與角色反應，計時未被更動。
-5. − 隱藏後從工作列或系統匣恢復，↗ 返回星球。重開應用程式確認計時／偏好保存。
-6. 10 秒展示結束只提醒一次；開啟安靜模式再試，無主動提醒。
-7. × 或 Alt+F4 退出後，確認工作管理員沒有殘留本程式程序，3002 連接埠可釋放。
-8. 若製作安裝檔，在 Windows 執行 `npm run package:win`，安裝／啟動／解除安裝。版本尚未程式碼簽章，需依實際 Windows 安全政策檢查。
-
-## 手機版與公開網址
-
-手機使用 Safari／Chrome 開啟網頁版，支援觸控旋轉、計時、聊天、安靜與音效；Windows ZIP 不適用手機。推薦部署公開 HTTPS 網站，設定已提供於 `render.yaml`。也可 `npm run build && npm start` 後，在同 Wi-Fi 手機開啟電腦網路地址。詳細連線、部署與實機限制見 [MOBILE.md](docs/MOBILE.md)。使用者已透過 Render 試用初版；實際網址與部署狀態請以你的 Render 服務頁面為準。
-
-## 響應式美術與字型
-
-桌機、平板與手機共用淺色手帖風格、方正卡片及 SVG 圖示；3D 角色與場景採霧面材質、紙葉植栽、步道與小水池。Huninn 來自 Google Fonts，並提供本機 WOFF2 與 `Noto Sans TC, sans-serif` 後備；外部字型載入採非阻塞方式，字型下載失敗仍顯示文字。授權與來源記錄在 `public/fonts/`。`npx playwright test --config=playwright.design.config.ts` 驗證桌機／平板／手機與字型失敗情境，截圖位於 `artifacts/redesign/`。
-
-## 維護文件
-
-- [API 設定與連線排查](docs/API_CONNECTION_QA.md)
-- [手機版說明](docs/MOBILE.md)
-- [歷史開發與驗收紀錄](docs/archive/)
+聊天支援相容 OpenAI Chat Completions 的服務。在本機專案的 `.env` 或 Render 的 **Environment** 設定 `LLM_API_KEY`、`LLM_BASE_URL` 和 `LLM_MODEL`。金鑰只由後端讀取。未設定金鑰或模型服務失敗時，聊天會使用本機備援台詞。

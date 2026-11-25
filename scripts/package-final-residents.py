@@ -11,7 +11,6 @@ with ZipFile(out/'companion-planet-nine-colored-residents.zip','w',ZIP_DEFLATED)
   if p.is_file():z.write(p,Path('comparisons')/p.name)
  for p in (root/'dist').rglob('*'):
   if p.is_file():z.write(p,Path('web')/p.relative_to(root/'dist'))
- z.write(root/'docs/archive/RESIDENT_MATERIALS.md','docs/archive/RESIDENT_MATERIALS.md')
  for f in ['finish-resident-materials.py','review-final-residents.mjs','compose-final-residents.py','check-final-residents.mjs','check-final-touch.mjs','report-final-residents.mjs']:
   z.write(root/'scripts'/f,Path('scripts')/f)
  for p in (root/'src/art').glob('*.ts*'):z.write(p,p.relative_to(root))

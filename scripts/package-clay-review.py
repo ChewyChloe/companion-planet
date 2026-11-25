@@ -5,7 +5,7 @@ root=Path(__file__).resolve().parents[1];out=Path('/workspace/exports');out.mkdi
 with ZipFile(out/'companion-planet-nine-clay-review.zip','w',ZIP_DEFLATED) as z:
  for pattern in ['assets/art/clay-stage/*','artifacts/clay-review/*.png','artifacts/clay-review/*.json']:
   for p in root.glob(pattern):z.write(p,p.relative_to(root))
- for file in ['docs/archive/NINE_CLAY_REVIEW.md','docs/archive/CLAY_SHAPE_REVIEW.md','scripts/sculpt-clay-sdf.py','scripts/build-clay-review.py','scripts/capture-clay-review.mjs','scripts/compose-clay-review.py','scripts/verify-clay-stage.py','scripts/verify-nine-clay.py','scripts/compose-nine-clay.py']:
+ for file in ['scripts/sculpt-clay-sdf.py','scripts/build-clay-review.py','scripts/capture-clay-review.mjs','scripts/compose-clay-review.py','scripts/verify-clay-stage.py','scripts/verify-nine-clay.py','scripts/compose-nine-clay.py']:
   z.write(root/file,file)
  viewer=(root/'artifacts/clay-review/viewer.html').read_text()
  viewer=viewer.replace('<script type="module">','<script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/":"./vendor/addons/"}}</script><script type="module">')
