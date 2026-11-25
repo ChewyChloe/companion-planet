@@ -32,11 +32,12 @@ const lines = [
   "下次來的時候，也要記得找我喔 (｡•̀ᴗ-)✧",
 ];
 export const focusCompleteLine = "叮！是休息時間！我先去伸個懶腰。";
-export function tapDialogue(previous: number, count: number, focusing: boolean, hour: number, random = Math.random) {
+export const lateNightLine = "這個時間，連星星都快睡著了。";
+export function tapDialogue(previous: number, count: number, focusing: boolean, hour: number, random = Math.random, allowNight = true) {
   if (count === 3) return { index: previous, text: "等、等一下！我的腦袋轉不過來啦！" };
   if (count === 5) return { index: previous, text: "你是不是很喜歡我呀……？" };
   if (focusing) return { index: previous, text: "我會小聲一點，你繼續忙。" };
-  if (hour >= 23 || hour < 5) return { index: previous, text: "這個時間，連星星都快睡著了。" };
+  if (allowNight && (hour >= 23 || hour < 5) && random() < .12) return { index: previous, text: lateNightLine };
   const index = (previous + 1 + Math.floor(random() * (previous < 0 ? lines.length : lines.length - 1))) % lines.length;
   return { index, text: lines[index] };
 }
@@ -44,11 +45,11 @@ export function tapDialogue(previous: number, count: number, focusing: boolean, 
 
 export type TapMood = "joy" | "annoyed" | "sad" | "surprise" | "curious" | "sleepy";
 
-export function dialogueMood(index: number, streak: number, focusing: boolean, hour: number): TapMood {
+export function dialogueMood(index: number, streak: number, focusing: boolean, lateNight: boolean): TapMood {
   if (streak === 3) return "surprise";
   if (streak === 5) return "joy";
   if (focusing) return "curious";
-  if (hour >= 23 || hour < 5) return "sleepy";
+  if (lateNight) return "sleepy";
   if (index === 18) return "annoyed";
   if ([16, 22, 25, 26].includes(index)) return "sad";
   if ([2, 9, 19].includes(index)) return "surprise";

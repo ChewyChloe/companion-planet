@@ -1,9 +1,10 @@
+import { DurationSelect } from "./DurationSelect";
 import { usePlanetMusic } from "./usePlanetMusic";
 import { getNebulaMaterialVariant, nebulaMaterialVariants } from "./art/nebula-material-test";
 import { planetFor } from "./planets";
 import { CompanionPicker } from "./CompanionPicker";
 import { companionFor } from "./companions";
-import { dialogueActions, dialogueMood, focusCompleteLine, tapDialogue } from "./tap-dialogue";
+import { dialogueActions, dialogueMood, focusCompleteLine, lateNightLine, tapDialogue } from "./tap-dialogue";
 import { Icon } from "./Icon";
 import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
@@ -104,6 +105,7 @@ function App() {
   const [picker, setPicker] = useState(false);
   const [speech, setSpeech] = useState("");
   const lastGreeting = useRef(-1);
+  const nightLineUntil = useRef(0);
   const taps = useRef({ count: 0, at: 0 });
   const [speechVersion, setSpeechVersion] = useState(0);
   const showSpeech = (text: string) => {
@@ -223,9 +225,11 @@ function App() {
     taps.current = { at: now, count };
     const focusing = state.timer.phase === "focus" && state.timer.running;
     const hour = new Date(now).getHours();
-    const greeting = tapDialogue(lastGreeting.current, count, focusing, hour);
+    const greeting = tapDialogue(lastGreeting.current, count, focusing, hour, Math.random, now >= nightLineUntil.current);
+    const lateNight = greeting.text === lateNightLine;
+    if (lateNight && !state.silent) nightLineUntil.current = now + 5 * 60_000;
     lastGreeting.current = greeting.index;
-    const mood = dialogueMood(greeting.index, count, focusing, hour);
+    const mood = dialogueMood(greeting.index, count, focusing, lateNight);
     state.react(dialogueActions[mood], mood);
     if (!state.silent) showSpeech(greeting.text);
   };
@@ -396,19 +400,10 @@ function App() {
                 </button>
               </div>
               <div className="duration">
-                <fieldset className="duration-options" disabled={state.timer.running}>
-                  <legend>專注時長</legend>
-                  {[[25, "25 分鐘"], [45, "45 分鐘"], [5, "5 分鐘"], [1, "1 分鐘展示"], [1 / 6, "10 秒展示"]].map(([value, label]) => (
-                    <label key={value}>
-                      <input name="duration" type="radio" checked={minutes === value} onChange={() => {
-                        const duration = Number(value);
-                        setMinutes(duration);
-                        if (state.timer.phase === "idle") state.setTimer({ ...state.timer, remaining: duration * 60000 });
-                      }} />
-                      <span>{label}</span>
-                    </label>
-                  ))}
-                </fieldset>
+                <DurationSelect value={minutes} disabled={state.timer.running} onChange={duration => {
+                  setMinutes(duration);
+                  if (state.timer.phase === "idle") state.setTimer({ ...state.timer, remaining: duration * 60000 });
+                }} />
               </div>
               <div className="popover-actions">
                 <span>{state.timer.completed} 段完成</span>
@@ -568,15 +563,6 @@ function App() {
               <Icon name="close" />
             </button>
           </div>
-          <p className="privacy">
-            AI 陪伴角色，非真人。
-            {provider === "AI 已連線"
-              ? "文字將傳送至 AI 服務。"
-              : provider === "AI 已設定，待測試"
-                ? "已讀取 API 設定，傳送訊息後確認連線。"
-                : "目前由本機陪伴模式回應。"}
-            對話只暫存在這個視窗。
-          </p>
           <div className="messages" aria-live="polite">
             {messages.length === 0 && (
               <p className="welcome">

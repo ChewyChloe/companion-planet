@@ -99,7 +99,7 @@ export const useWorld = create<State>((set) => ({
   setCompanion: (id) => { if (id === "nebula") set({ companionId: id }); },
   night: saved.night === true,
   toggleNight: () => set(s => ({ night: !s.night })),
-  silent: saved.silent === true,
+  silent: saved.quietPreferenceVersion === 1 && saved.silent === true,
   reduced:
     saved.reduced === true ||
     (saved.reduced === undefined &&
@@ -172,6 +172,7 @@ useWorld.subscribe((s, previous) => {
         lampOn: s.lampOn,
         night: s.night,
         silent: s.silent,
+        quietPreferenceVersion: 1,
         reduced: s.reduced,
         notifications: s.notifications,
         focusMinutes: s.focusMinutes,

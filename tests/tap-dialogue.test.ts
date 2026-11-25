@@ -13,5 +13,7 @@ it("gives tap streaks priority over focus and late-night dialogue", () => {
   expect(tapDialogue(2,3,true,1).text).toContain("腦袋");
   expect(tapDialogue(2,5,true,1).text).toContain("喜歡");
   expect(tapDialogue(2,1,true,1).text).toContain("小聲");
-  expect(tapDialogue(2,1,false,1).text).toContain("睡著");
+  expect(tapDialogue(2,1,false,1, () => .05).text).toContain("睡著");
+  expect(tapDialogue(2,1,false,1, () => .05, false).index).not.toBe(2);
+  expect(tapDialogue(2,1,false,1, () => .5).index).not.toBe(2);
 });

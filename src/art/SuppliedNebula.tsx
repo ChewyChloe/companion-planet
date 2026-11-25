@@ -20,6 +20,7 @@ export function SuppliedNebula({ action, still, held, seatBlend, pet = false }: 
   const seat = useRef(0);
   const brows = useRef<THREE.Group>(null);
   const vertex = useMemo(()=>new THREE.Vector3(),[]);
+  const browVertex = useMemo(() => new THREE.Vector3(), []);
   const asset = useMemo(() => {
     const scene = clone(gltf.scene);
     const materials: THREE.Material[] = [];
@@ -67,7 +68,12 @@ export function SuppliedNebula({ action, still, held, seatBlend, pet = false }: 
       const y = bounds.min.y + bounds.getSize(new THREE.Vector3()).y * .584;
       const ray = new THREE.Raycaster(new THREE.Vector3(x,y,bounds.max.z+.5), new THREE.Vector3(0,0,-1));
       const hit = ray.intersectObjects(meshes, false)[0];
-      return [x,y,(hit?.point.z ?? bounds.max.z)+.015] as [number,number,number];
+      if (!hit?.face || !(hit.object instanceof THREE.SkinnedMesh)) return null;
+      const mesh = hit.object;
+      const indices = [hit.face.a, hit.face.b, hit.face.c];
+      const points = indices.map(index => mesh.localToWorld(mesh.getVertexPosition(index, new THREE.Vector3())));
+      const weights = THREE.Triangle.getBarycoord(hit.point, points[0], points[1], points[2], new THREE.Vector3());
+      return weights ? { mesh, indices, weights } : null;
     });
     const mixer = new THREE.AnimationMixer(scene);
     const clips = Object.fromEntries(gltf.animations.map(clip => [clip.name, mixer.clipAction(clip)]));
@@ -98,14 +104,14 @@ export function SuppliedNebula({ action, still, held, seatBlend, pet = false }: 
       // swing foot, and blend both into the seated position.
       const cycle = walking ? Math.sin(asset.mixer.time * 8 + index * Math.PI) : 0;
       bone.position.copy(base);
-      bone.position.x += .105 * seat.current + cycle * .068 * (1-seat.current);
-      bone.position.y += .085 * seat.current + Math.max(0, cycle) * .045 * (1-seat.current);
+      bone.position.x += cycle * .068 * (1-seat.current);
+      bone.position.y += Math.max(0, cycle) * .045 * (1-seat.current);
       bone.quaternion.copy(rotation);
     });
     if(root.current && !pet){
       root.current.scale.set(asset.scale*(1+.075*seat.current),asset.scale*(1-.16*seat.current),asset.scale);
       gl.domElement.dataset.seatedPose = seat.current.toFixed(3);
-      const seatedOffset = asset.offset[1] - .14 * seat.current;
+      const seatedOffset = asset.offset[1] - .06 * seat.current;
       root.current.position.y=seatedOffset;
       root.current.updateWorldMatrix(true,true);
       // SkinnedMesh updates its attached bind inverse in updateMatrixWorld.
@@ -139,9 +145,23 @@ export function SuppliedNebula({ action, still, held, seatBlend, pet = false }: 
     }
     if (brows.current) {
       brows.current.visible = expression !== "neutral";
+      root.current?.updateWorldMatrix(true, true);
+      root.current?.updateMatrixWorld(true);
+      asset.meshes.forEach(mesh => mesh.skeleton.update());
       brows.current.children.forEach((brow, i) => {
+        const anchor = asset.browPoints[i];
+        brow.visible = !!anchor;
+        if (!anchor) return;
+        brow.position.set(0, 0, 0);
+        anchor.indices.forEach((index, corner) => {
+          anchor.mesh.getVertexPosition(index, browVertex);
+          anchor.mesh.localToWorld(browVertex);
+          root.current?.worldToLocal(browVertex);
+          brow.position.addScaledVector(browVertex, anchor.weights.getComponent(corner));
+        });
+        brow.position.z += .012;
         const side = i === 0 ? -1 : 1;
-        brow.position.y = asset.browPoints[i][1] + (expression === "surprise" ? .038 : expression === "joy" ? .012 : 0);
+        brow.scale.y = expression === "surprise" ? .013 : .009;
         brow.rotation.z = side * (expression === "sad" ? -.36 : expression === "annoyed" ? .52 : expression === "curious" ? .24 : expression === "joy" ? .14 : 0);
       });
     }
@@ -154,8 +174,8 @@ export function SuppliedNebula({ action, still, held, seatBlend, pet = false }: 
   return <group ref={root} name="SuppliedNebula" position={asset.offset} scale={asset.scale}>
     <primitive object={asset.scene} />
     <group ref={brows} visible={false}>
-      {asset.browPoints.map((point,i) => (
-        <mesh key={i} position={point} scale={[.046,.009,.010]} raycast={() => null}>
+      {asset.browPoints.map((_,i) => (
+        <mesh key={i} scale={[.046,.009,.010]} raycast={() => null}>
           <sphereGeometry args={[1,12,8]} />
           <meshStandardMaterial color="#284051" roughness={.82} />
         </mesh>

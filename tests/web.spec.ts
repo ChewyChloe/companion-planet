@@ -47,7 +47,8 @@ test("planet renders, camera rotates, character responds, timer and conversation
     path: `artifacts/planet-${testInfo.project.name}.png`,
   });
   await openTimerSettings(page);
-  await page.getByRole("radio", {name:"1 分鐘展示"}).check();
+  await page.getByLabel("專注時長", { exact: true }).click();
+  await page.getByRole("button", { name: "1 分鐘展示", exact: true }).last().click();
   await page.getByRole("button", { name: "開始專注", exact: false }).click();
   await expect(page.locator("main")).toHaveAttribute("data-phase", "focus");
   await expect(canvas).toHaveAttribute("data-action", "read", {
@@ -59,7 +60,7 @@ test("planet renders, camera rotates, character responds, timer and conversation
   await expect(page.getByRole("timer")).toHaveText(paused);
   await page.reload();
   await openTimerSettings(page);
-  await expect(page.getByLabel("專注時長")).toHaveValue("1");
+  await expect(page.getByLabel("專注時長")).toHaveText("1 分鐘展示");
   await expect(page.getByRole("timer")).toHaveText(paused);
   await page.getByRole("button", { name: "繼續專注" }).click();
   await page.getByRole("button", { name: "和星雲仔說說話" }).click();
@@ -85,7 +86,8 @@ test("silent mode suppresses completion notices and AI proposals require confirm
   await page.goto("/");
   await page.getByRole("button", { name: "安靜陪我" }).click();
   await openTimerSettings(page);
-  await page.getByRole("radio", {name:"10 秒展示"}).check();
+  await page.getByLabel("專注時長", { exact: true }).click();
+  await page.getByRole("button", { name: "10 秒展示", exact: true }).last().click();
   await page.getByRole("button", { name: "開始專注", exact: false }).click();
   await expect(page.locator("main")).toHaveAttribute("data-phase", "break", {
     timeout: 18000,
