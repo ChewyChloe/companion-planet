@@ -377,10 +377,10 @@ function App() {
           </section>
           <nav className="scene-tools" aria-label="陪伴設定">
             <button
-              className="round-control"
+              className="round-control control-tooltip"
               aria-label={state.night ? "切換為白天" : "切換為夜晚"}
               aria-pressed={state.night}
-              title={state.night ? "切換為白天" : "切換為夜晚"}
+              data-tooltip={state.night ? "切換為白天" : "切換為夜晚"}
               onClick={() => state.toggleNight()}
             >
               <Icon name={state.night ? "moon" : "settings"} />

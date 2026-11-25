@@ -2,13 +2,14 @@ import { useWorld } from "../store";
 import { useEffect, useMemo } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
+import { skyFragmentShader, skyVertexShader } from "./sky-shaders";
 export function Atmosphere({ reduced }: { reduced: boolean }) {
-  const { scene, gl } = useThree();
+  const { scene, gl, size } = useThree();
   const night = useWorld(s => s.night);
   const palette = useMemo(() => ({
-    upper: new THREE.Color(night ? "#242d58" : "#9daed2"),
-    middle: new THREE.Color(night ? "#4c4d77" : "#d0c1db"),
-    horizon: new THREE.Color(night ? "#81748f" : "#f1d1b8"),
+    upper: new THREE.Color(night ? "#122442" : "#9daed2"),
+    middle: new THREE.Color(night ? "#1a315a" : "#d0c1db"),
+    horizon: new THREE.Color(night ? "#3e578b" : "#f1d1b8"),
     water: new THREE.Color(night ? "#535876" : "#c3bdd7"),
     fog: new THREE.Color(night ? "#5f5e7c" : "#ddcbd5"),
   }), [night]);
@@ -23,14 +24,11 @@ export function Atmosphere({ reduced }: { reduced: boolean }) {
           upper: { value: new THREE.Color("#888fb8") },
           middle: { value: new THREE.Color("#c2afc9") },
           horizon: { value: new THREE.Color("#f1d1b8") },
+          aspect: { value: 1 },
+          night: { value: 0 },
         },
-        vertexShader:
-          "varying vec3 vWorld;void main(){vWorld=(modelMatrix*vec4(position,1.)).xyz;gl_Position=projectionMatrix*viewMatrix*vec4(vWorld,1.);}",
-        fragmentShader:
-          "uniform vec3 upper;uniform vec3 middle;uniform vec3 horizon;varying vec3 vWorld;void main(){float h=smoothstep(-.65,.28,normalize(vWorld-cameraPosition).y);vec3 c=mix(horizon,middle,smoothstep(0.,.55,h));c=mix(c,upper,smoothstep(.35,1.,h));gl_FragColor=vec4(c,1.);#include <colorspace_fragment>\n}".replace(
-            ";#include",
-            ";\n#include",
-          ),
+        vertexShader: skyVertexShader,
+        fragmentShader: skyFragmentShader,
       }),
     [],
   );
@@ -76,6 +74,8 @@ export function Atmosphere({ reduced }: { reduced: boolean }) {
   useFrame((s, delta) => {
     const blend = 1 - Math.exp(-Math.min(delta,.1)*3);
     for (const key of ["upper", "middle", "horizon"] as const) sky.uniforms[key].value.lerp(palette[key], blend);
+    sky.uniforms.aspect.value = size.width / Math.max(1, size.height);
+    sky.uniforms.night.value = THREE.MathUtils.lerp(sky.uniforms.night.value, Number(night), blend);
     water.uniforms.color.value.lerp(palette.water,blend);
     if (scene.fog) scene.fog.color.lerp(palette.fog,blend);
     gl.domElement.dataset.timeOfDay = night ? "night" : "day";
@@ -87,6 +87,7 @@ export function Atmosphere({ reduced }: { reduced: boolean }) {
         <sphereGeometry args={[95, 32, 20]} />
       </mesh>
       <mesh
+        visible={!night}
         position={[0, -4.1, 0]}
         rotation={[-Math.PI / 2, 0, 0]}
         material={water}
@@ -107,7 +108,7 @@ export function Atmosphere({ reduced }: { reduced: boolean }) {
               map={cloud}
               color={night ? "#74708f" : i % 2 ? "#e5d9e3" : "#d8d2e3"}
               transparent
-              opacity={0.22}
+              opacity={night ? 0.12 : 0.22}
               depthWrite={false}
               depthTest={true}
             />

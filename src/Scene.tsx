@@ -10,7 +10,7 @@ import { Atmosphere } from "./art/Atmosphere";
 import { SoftEnvironment } from "./art/SoftEnvironment";
 import { planets } from "./planets";
 import { safeDrop } from "./art/placement";
-import { Cosmos } from "./art/Cosmos";
+import { Cosmos, destinationPositions } from "./art/Cosmos";
 import {
   Component,
   Suspense,
@@ -594,8 +594,8 @@ export default function Scene({
                 key={p.id}
                 className={`distant-planet ${hoveredPlanet === p.id ? "hovered" : ""}`}
                 style={{
-                  left: `${[11, 67.5, 89][i]}%`,
-                  top: `${[27, 7.5, 25][i]}%`,
+                  left: `${destinationPositions[i][0]}%`,
+                  top: `${destinationPositions[i][1]}%`,
                 }}
                 onMouseEnter={() => useWorld.getState().hoverPlanet(p.id)}
                 onMouseLeave={() => useWorld.getState().hoverPlanet(null)}

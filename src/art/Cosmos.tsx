@@ -49,31 +49,35 @@ function paintPlanet(id: PlanetId) {
   shape.setAttribute("color", new THREE.BufferAttribute(colors, 3));
   return shape;
 }
+export const destinationPositions = [
+  [12, 37],
+  [68, 9],
+  [88, 37],
+] as const;
+
 function Destination({ id, index }: { id: PlanetId; index: number }) {
   const root = useRef<THREE.Group>(null);
   const halo = useRef<THREE.ShaderMaterial>(null);
   const { camera, gl } = useThree();
   const geometry = useMemo(() => paintPlanet(id), [id]);
   const other = useMemo(() => new THREE.Vector3(), []);
-  const positions = [
-    [-0.78, 0.46],
-    [0.35, 0.85],
-    [0.78, 0.50],
-  ];
   useFrame((_state, delta) => {
     if (!root.current) return;
-    const [x, y] = positions[index];
+    const [left, top] = destinationPositions[index];
+    const x = left / 50 - 1, y = 1 - top / 50;
     root.current.position.set(x, y, 0.98).unproject(camera);
-    other.set(x, y + [0.045, 0.032, 0.055][index], 0.98).unproject(camera);
+    const aspect = (camera as THREE.PerspectiveCamera).aspect;
+    const radius = Math.min([.096, .075, .113][index], .18 * aspect);
+    other.set(x, y + radius, 0.98).unproject(camera);
     const hovered = useWorld.getState().hoveredPlanet === id;
     const scale =
       other.distanceTo(root.current.position) * (hovered ? 1.15 : 1);
-    root.current.scale.lerp(new THREE.Vector3(scale, scale, scale), 1-Math.exp(-Math.min(delta,.1)*16));
+    root.current.scale.setScalar(THREE.MathUtils.damp(root.current.scale.x, scale, 16, Math.min(delta, .1)));
     if (halo.current)
       halo.current.uniforms.strength.value = hovered ? 0.35 : 0.16;
     root.current.quaternion.copy(camera.quaternion);
     gl.domElement.dataset[`planet${index}`] =
-      `${id},${(x + 1) / 2},${(1 - y) / 2}`;
+      `${id},${left / 100},${top / 100}`;
   });
   return (
     <group
@@ -115,9 +119,9 @@ export function Cosmos() {
   const id = useWorld((s) => s.planetId);
   const stars = useMemo(() => {
     const a = [];
-    for (let i = 0; i < 360; i++) {
+    for (let i = 0; i < 1600; i++) {
       const t = i * 2.399963,
-        y = 1 - (2 * (i + 0.5)) / 360,
+        y = 1 - (2 * (i + 0.5)) / 1600,
         r = Math.sqrt(1 - y * y);
       a.push(Math.cos(t) * r * 65, y * 65, Math.sin(t) * r * 65);
     }
@@ -129,13 +133,28 @@ export function Cosmos() {
         <bufferGeometry>
           <bufferAttribute attach="attributes-position" args={[stars, 3]} />
         </bufferGeometry>
-        <pointsMaterial
-          color="#f5e8cf"
-          size={0.075}
+        <shaderMaterial
           transparent
-          opacity={0.65}
-          sizeAttenuation
           depthWrite={false}
+          vertexShader={`
+            varying float sizeSeed;
+            void main() {
+              sizeSeed = fract(sin(dot(position, vec3(1.7, 3.1, 5.3))) * 43758.5);
+              gl_PointSize = sizeSeed > .91 ? 9. + 8. * sizeSeed : 2. + 2. * sizeSeed;
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.);
+            }
+          `}
+          fragmentShader={`
+            varying float sizeSeed;
+            void main() {
+              vec2 p = abs(2. * gl_PointCoord - 1.);
+              float core = exp(-23. * dot(p,p));
+              float rays = exp(-42. * min(p.x,p.y)) * pow(max(0., 1. - max(p.x,p.y)), 2.4);
+              float light = sizeSeed > .91 ? max(core, rays * .75) : core * (.4 + .55 * sizeSeed);
+              gl_FragColor = vec4(mix(vec3(.60,.74,1.),vec3(1.,.76,.45),sizeSeed),light);
+              #include <colorspace_fragment>
+            }
+          `}
         />
       </points>
       {planets
