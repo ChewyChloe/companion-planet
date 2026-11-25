@@ -93,7 +93,7 @@ float mouthShape(vec2 p,float kind) {
 }
 float ink(float d) { return 1.0-smoothstep(-.0018,.0024,d); }
 vec3 nebulaFace(vec3 skin) {
-  if (nebulaRest.z<.24 || abs(nebulaRest.x)>.24 || nebulaRest.y<.46 || nebulaRest.y>.71) return skin;
+  if (nebulaRest.z<.215 || abs(nebulaRest.x)>.31 || nebulaRest.y<.38 || nebulaRest.y>.73) return skin;
   vec2 p=nebulaRest.xy;
   vec2 le=p-vec2(-.146,.544), re=p-vec2(.138,.541);
   vec2 lb=p-vec2(-.146,.619), rb=p-vec2(.138,.616);
@@ -103,11 +103,15 @@ vec3 nebulaFace(vec3 skin) {
   float brows=max(ink(mix(browShape(lb,faceA[2],-1.0),browShape(lb,faceB[2],-1.0),faceMix)),
                   ink(mix(browShape(rb,faceA[3],1.0),browShape(rb,faceB[3],1.0),faceMix)));
   float mouth=ink(mix(mouthShape(m,faceA[4]),mouthShape(m,faceB[4]),faceMix));
-  float socket = min(length(le/vec2(.059,.061)),length(re/vec2(.059,.061)));
-  float lip = length(m/vec2(.044,.028));
-  float repairedSkin = 1.0-smoothstep(.79,1.23,min(socket,lip));
-  vec3 smoothSkin = vec3(.24,.64,.79) + vec3(.032,.045,.050)*clamp((p.y-.5)*7.0,-1.0,1.0);
-  vec3 result=mix(mix(skin,smoothSkin,repairedSkin),vec3(.012,.026,.041),eyes);
+  // Match the UV atlas samples from the forehead and cheeks in linear RGB.
+  // A single feathered skin region avoids rings around individual components.
+  float horizontal = 1.0-smoothstep(.205,.295,abs(p.x));
+  float vertical = smoothstep(.400,.465,p.y)*(1.0-smoothstep(.620,.706,p.y));
+  float front = smoothstep(.215,.260,nebulaRest.z);
+  float cheek = smoothstep(0.0,.25,abs(p.x));
+  vec3 matchedSkin = mix(vec3(.270,.755,.980),vec3(.243,.694,.951),cheek);
+  float repairedSkin = horizontal*vertical*front;
+  vec3 result=mix(mix(skin,matchedSkin,repairedSkin),vec3(.012,.026,.041),eyes);
   result=mix(result,vec3(.035,.073,.098),brows);
   return mix(result,vec3(.018,.032,.049),mouth);
 }
@@ -131,5 +135,5 @@ export function attachNebulaFace(material:MeshPhysicalMaterial, uniforms:FaceUni
     shader.fragmentShader = facialShader+shader.fragmentShader.replace(
       "#include <map_fragment>", "#include <map_fragment>\ndiffuseColor.rgb=nebulaFace(diffuseColor.rgb);");
   };
-  material.customProgramCacheKey=()=> "nebula-modular-face-v3";
+  material.customProgramCacheKey=()=> "nebula-modular-face-v4";
 }
