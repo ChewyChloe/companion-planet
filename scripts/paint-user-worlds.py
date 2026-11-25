@@ -137,12 +137,33 @@ def paint(key,xyz,norm,shape):
   apply('water',ell(c,[.058,.13,.035]))
   if key=='b612':
    apply('water',ell([.06,.089,.37],[.12,.012,.095]))
-   # Follow the shallow upstream channel into the top lip of the falls.
-   center=-.044+.075*(z-.23)
-   channel=(1-ease(.029,.043,abs(x-center)))*ease(.214,.239,z)*(1-ease(.35,.379,z))
-   bed=.366-.364*z
-   apply('water',channel*(1-ease(.013,.030,abs(y-bed)))*ease(.06,.47,ny))
- if key=='moon':apply('water',ell([-.11,.20,.22],[.05,.17,.045]))
+   # Surveyed centerline in source coordinates, from the upper spring to the lip.
+   river=[(-.139,.311,.163,.019),(-.149,.291,.188,.029),
+          (-.149,.280,.214,.033),(-.109,.267,.252,.035),
+          (-.087,.254,.299,.039),(-.072,.246,.329,.045),
+          (-.044,.235,.353,.046)]
+   channel=np.zeros_like(x)
+   for start,end in zip(river,river[1:]):
+    ax,ay,az,aw=start;bx,by,bz,bw=end
+    dx,dz=bx-ax,bz-az
+    t=np.clip(((x-ax)*dx+(z-az)*dz)/(dx*dx+dz*dz),0,1)
+    distance=np.hypot(x-ax-t*dx,z-az-t*dz)
+    width=aw+t*(bw-aw)
+    bed=ay+t*(by-ay)
+    mask=(1-ease(.82,1.05,distance/width))*(1-ease(.012,.026,abs(y-bed)))
+    channel=np.maximum(channel,mask)
+   apply('water',channel*ease(.12,.54,ny))
+ if key=='moon':
+  # Measured upstream bed bends toward the actual lip at source z=.31.
+  center=-.08-.04*ease(.21,.27,z)+.013*ease(.28,.31,z)
+  channel=(1-ease(.028,.047,abs(x-center)))*ease(.185,.216,z)*(1-ease(.307,.329,z))
+  apply('water',channel*(1-ease(.009,.025,abs(y-(.375-.12*z))))*ease(.12,.55,ny))
+  # Follow the slightly slanted curtain and the splash area below.
+  curtain_x=-.105-.045*(1-ease(.17,.33,y))
+  curtain_z=.287+.024*ease(.17,.33,y)
+  curtain=(1-ease(.038,.062,abs(x-curtain_x)))*(1-ease(.013,.036,abs(z-curtain_z)))
+  apply('water',curtain*ease(.14,.17,y)*(1-ease(.337,.358,y))*(1-ease(.64,.91,ny)))
+  apply('water',ell([-.155,.158,.302],[.063,.025,.049]))
  if key=='rose':
   # Only the inner fountain bowls are water; their rim and pedestal stay limestone.
   apply('water',ell([.38,.368,.21],[.050,.008,.050]));apply('water',ell([.335,.37,.18],[.040,.008,.040]))
@@ -153,6 +174,16 @@ def paint(key,xyz,norm,shape):
  if key=='moon':
   # Hanging star / visible reading window.
   apply('light',ell([.18,.80,-.17],[.026,.035,.028]));apply('light',ell([-.11,.52,-.085],[.018,.024,.012]))
+ if key=='moon':
+  # This lamp is part of the uploaded island mesh, in front of the live light.
+  stem=[[-.104,.380,.074],[-.104,.507,.075],[-.085,.533,.083],
+        [-.072,.547,.099],[-.061,.549,.116]]
+  for a,b in zip(stem,stem[1:]):
+   a=np.array(a);v=np.array(b)-a
+   t=np.clip(((xyz-a)*v).sum(1)/(v@v),0,1)
+   apply('metal',1-ease(.011,.018,np.linalg.norm(xyz-a-t[:,None]*v,axis=1)))
+  apply('metal',ell([-.104,.378,.075],[.027,.013,.029]))
+  apply('paper',ell([-.058,.533,.127],[.030,.029,.030]))
  color*=np.clip(1+variation[:,None],.93,1.07);rough[:]=np.clip(rough+variation*.6,.12,.98)
  return color,rough,metal,emission,labels,names
 

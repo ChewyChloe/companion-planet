@@ -6,9 +6,9 @@
   "paintedPixels": 3245856,
   "semanticPixelCounts": {
     "creamRose": 0,
-    "rock": 1732274,
-    "grass": 330766,
-    "leaf": 600657,
+    "rock": 1732296,
+    "grass": 323375,
+    "leaf": 600312,
     "bark": 244768,
     "stone": 107998,
     "roof": 81456,
@@ -16,7 +16,7 @@
     "paper": 16110,
     "cover": 2383,
     "metal": 38254,
-    "water": 38100,
+    "water": 45814,
     "rose": 0,
     "cloth": 0,
     "moon": 0,
@@ -28,6 +28,6 @@
   "baseColorSize": 2048,
   "packedOrmSize": 1024,
   "emissionSize": 512,
-  "runtimeBytes": 4169892,
-  "sha256": "1e8e5a96244f2833bb2e37b55eb7e520db3abea3477a23d3d7b2663842576447"
+  "runtimeBytes": 4169096,
+  "sha256": "2374dd5b67735052d49d1e3d68ddbb1fd5f613c6a4f212eaa65cc3c7fd50c5cd"
 }
