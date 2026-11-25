@@ -1,0 +1,362 @@
+{
+  "name": "observatory",
+  "dimensions_blender_xyz": [
+    2.880000114440918,
+    3.890000104904175,
+    2.6855244636535645
+  ],
+  "triangles": 69268,
+  "parts": [
+    {
+      "name": "observatory_Root",
+      "type": "EMPTY",
+      "parent": null
+    },
+    {
+      "name": "Terraced_foundation_and_stair",
+      "type": "EMPTY",
+      "parent": "observatory_Root"
+    },
+    {
+      "name": "Lower_plinth",
+      "type": "MESH",
+      "parent": "Terraced_foundation_and_stair"
+    },
+    {
+      "name": "Upper_plinth",
+      "type": "MESH",
+      "parent": "Terraced_foundation_and_stair"
+    },
+    {
+      "name": "Dome_sill",
+      "type": "MESH",
+      "parent": "Terraced_foundation_and_stair"
+    },
+    {
+      "name": "Approach_step_1",
+      "type": "MESH",
+      "parent": "Terraced_foundation_and_stair"
+    },
+    {
+      "name": "Approach_step_2",
+      "type": "MESH",
+      "parent": "Terraced_foundation_and_stair"
+    },
+    {
+      "name": "Approach_step_3",
+      "type": "MESH",
+      "parent": "Terraced_foundation_and_stair"
+    },
+    {
+      "name": "Approach_step_4",
+      "type": "MESH",
+      "parent": "Terraced_foundation_and_stair"
+    },
+    {
+      "name": "Approach_step_5",
+      "type": "MESH",
+      "parent": "Terraced_foundation_and_stair"
+    },
+    {
+      "name": "Complete_dome_frame",
+      "type": "EMPTY",
+      "parent": "observatory_Root"
+    },
+    {
+      "name": "Arch_column_foot_0",
+      "type": "MESH",
+      "parent": "Complete_dome_frame"
+    },
+    {
+      "name": "Meridian_dome_rib_0",
+      "type": "CURVE",
+      "parent": "Complete_dome_frame"
+    },
+    {
+      "name": "Between_column_arch_0",
+      "type": "CURVE",
+      "parent": "Complete_dome_frame"
+    },
+    {
+      "name": "Arch_column_foot_1",
+      "type": "MESH",
+      "parent": "Complete_dome_frame"
+    },
+    {
+      "name": "Meridian_dome_rib_1",
+      "type": "CURVE",
+      "parent": "Complete_dome_frame"
+    },
+    {
+      "name": "Between_column_arch_1",
+      "type": "CURVE",
+      "parent": "Complete_dome_frame"
+    },
+    {
+      "name": "Arch_column_foot_2",
+      "type": "MESH",
+      "parent": "Complete_dome_frame"
+    },
+    {
+      "name": "Meridian_dome_rib_2",
+      "type": "CURVE",
+      "parent": "Complete_dome_frame"
+    },
+    {
+      "name": "Between_column_arch_2",
+      "type": "CURVE",
+      "parent": "Complete_dome_frame"
+    },
+    {
+      "name": "Arch_column_foot_3",
+      "type": "MESH",
+      "parent": "Complete_dome_frame"
+    },
+    {
+      "name": "Meridian_dome_rib_3",
+      "type": "CURVE",
+      "parent": "Complete_dome_frame"
+    },
+    {
+      "name": "Between_column_arch_3",
+      "type": "CURVE",
+      "parent": "Complete_dome_frame"
+    },
+    {
+      "name": "Arch_column_foot_4",
+      "type": "MESH",
+      "parent": "Complete_dome_frame"
+    },
+    {
+      "name": "Meridian_dome_rib_4",
+      "type": "CURVE",
+      "parent": "Complete_dome_frame"
+    },
+    {
+      "name": "Between_column_arch_4",
+      "type": "CURVE",
+      "parent": "Complete_dome_frame"
+    },
+    {
+      "name": "Arch_column_foot_5",
+      "type": "MESH",
+      "parent": "Complete_dome_frame"
+    },
+    {
+      "name": "Meridian_dome_rib_5",
+      "type": "CURVE",
+      "parent": "Complete_dome_frame"
+    },
+    {
+      "name": "Between_column_arch_5",
+      "type": "CURVE",
+      "parent": "Complete_dome_frame"
+    },
+    {
+      "name": "Arch_column_foot_6",
+      "type": "MESH",
+      "parent": "Complete_dome_frame"
+    },
+    {
+      "name": "Meridian_dome_rib_6",
+      "type": "CURVE",
+      "parent": "Complete_dome_frame"
+    },
+    {
+      "name": "Between_column_arch_6",
+      "type": "CURVE",
+      "parent": "Complete_dome_frame"
+    },
+    {
+      "name": "Arch_column_foot_7",
+      "type": "MESH",
+      "parent": "Complete_dome_frame"
+    },
+    {
+      "name": "Meridian_dome_rib_7",
+      "type": "CURVE",
+      "parent": "Complete_dome_frame"
+    },
+    {
+      "name": "Between_column_arch_7",
+      "type": "CURVE",
+      "parent": "Complete_dome_frame"
+    },
+    {
+      "name": "Apex_collar",
+      "type": "MESH",
+      "parent": "Complete_dome_frame"
+    },
+    {
+      "name": "Five_point_roof_finial",
+      "type": "MESH",
+      "parent": "Complete_dome_frame"
+    },
+    {
+      "name": "Separate_dome_panels",
+      "type": "EMPTY",
+      "parent": "observatory_Root"
+    },
+    {
+      "name": "Dome_panel_0",
+      "type": "MESH",
+      "parent": "Separate_dome_panels"
+    },
+    {
+      "name": "Dome_panel_1",
+      "type": "MESH",
+      "parent": "Separate_dome_panels"
+    },
+    {
+      "name": "Dome_panel_2",
+      "type": "MESH",
+      "parent": "Separate_dome_panels"
+    },
+    {
+      "name": "Dome_panel_3",
+      "type": "MESH",
+      "parent": "Separate_dome_panels"
+    },
+    {
+      "name": "Dome_panel_4",
+      "type": "MESH",
+      "parent": "Separate_dome_panels"
+    },
+    {
+      "name": "Dome_panel_5",
+      "type": "MESH",
+      "parent": "Separate_dome_panels"
+    },
+    {
+      "name": "Dome_panel_6",
+      "type": "MESH",
+      "parent": "Separate_dome_panels"
+    },
+    {
+      "name": "Dome_panel_7",
+      "type": "MESH",
+      "parent": "Separate_dome_panels"
+    },
+    {
+      "name": "Telescope_assembly",
+      "type": "EMPTY",
+      "parent": "observatory_Root"
+    },
+    {
+      "name": "Tripod_leg_0",
+      "type": "CURVE",
+      "parent": "Telescope_assembly"
+    },
+    {
+      "name": "Tripod_pad_0",
+      "type": "MESH",
+      "parent": "Telescope_assembly"
+    },
+    {
+      "name": "Tripod_cross_brace_0",
+      "type": "CURVE",
+      "parent": "Telescope_assembly"
+    },
+    {
+      "name": "Tripod_leg_1",
+      "type": "CURVE",
+      "parent": "Telescope_assembly"
+    },
+    {
+      "name": "Tripod_pad_1",
+      "type": "MESH",
+      "parent": "Telescope_assembly"
+    },
+    {
+      "name": "Tripod_cross_brace_1",
+      "type": "CURVE",
+      "parent": "Telescope_assembly"
+    },
+    {
+      "name": "Tripod_leg_2",
+      "type": "CURVE",
+      "parent": "Telescope_assembly"
+    },
+    {
+      "name": "Tripod_pad_2",
+      "type": "MESH",
+      "parent": "Telescope_assembly"
+    },
+    {
+      "name": "Tripod_cross_brace_2",
+      "type": "CURVE",
+      "parent": "Telescope_assembly"
+    },
+    {
+      "name": "Tilt_pedestal",
+      "type": "MESH",
+      "parent": "Telescope_assembly"
+    },
+    {
+      "name": "Hollow_optical_barrel",
+      "type": "MESH",
+      "parent": "Telescope_assembly"
+    },
+    {
+      "name": "Recessed_objective",
+      "type": "CURVE",
+      "parent": "Telescope_assembly"
+    },
+    {
+      "name": "Rear_eyepiece",
+      "type": "CURVE",
+      "parent": "Telescope_assembly"
+    },
+    {
+      "name": "U_shaped_tilt_cradle",
+      "type": "CURVE",
+      "parent": "Telescope_assembly"
+    },
+    {
+      "name": "Focus_knob_axle",
+      "type": "CURVE",
+      "parent": "Telescope_assembly"
+    },
+    {
+      "name": "Focus_knob",
+      "type": "MESH",
+      "parent": "Telescope_assembly"
+    }
+  ],
+  "methods_and_limits": {
+    "method": "Custom revolved molding profiles and hollow optical tube; individually modeled hemisphere meridians, bay arches, pane surfaces, tripod and focusing assembly.",
+    "limits": [
+      "Dome panes use a neutral low-alpha inspection material only; this is not a finished glass/PBR look.",
+      "Bay arches are added in response to the requested trial brief; the reference primarily shows dome meridians.",
+      "Rear details and mounting hardware are inferred where hidden in the supplied design."
+    ]
+  },
+  "source": "references/companion-planet/同頻星球.png",
+  "status": "Needs Human Review",
+  "gray_only": true,
+  "website_integrated": false,
+  "source_image_packed_in_blend": true,
+  "views": {
+    "quarter": {
+      "azimuth": 45,
+      "elevation": 23.672943392302233
+    },
+    "front": {
+      "azimuth": 0,
+      "elevation": 0
+    },
+    "side": {
+      "azimuth": 90,
+      "elevation": 0
+    },
+    "back": {
+      "azimuth": 180,
+      "elevation": 0
+    }
+  },
+  "reference_fidelity_self_assessment": "Needs Human Review",
+  "user_approval": "Pending",
+  "blend_sha256": "79ddfbd9ea826a7a1ee552ec838535a3e187fb589525d75e833ecaed0f2a13eb",
+  "glb_sha256": "37dd5efec8a52c87d9684ca8f994150e4815a659bc3dbc34d4871337b96d1152",
+  "runtime_performance": "Not Tested; authoring studies without LOD or website integration"
+}

@@ -1,0 +1,47 @@
+{
+  "source": "assets/art/planet-rebuild/references/companion-planet/同頻星球.png",
+  "size": [
+    1536,
+    1024
+  ],
+  "sha256": "2acdabb6c2b7bf0de43b90aa508d3568e54bdd56ef990bee1787130ff7b2c2b6",
+  "crops": {
+    "treehouse-hero": [
+      128,
+      76,
+      593,
+      454
+    ],
+    "treehouse-detail": [
+      24,
+      830,
+      201,
+      975
+    ],
+    "island-hero": [
+      64,
+      357,
+      977,
+      786
+    ],
+    "island-layers": [
+      1012,
+      518,
+      1266,
+      781
+    ],
+    "observatory-hero": [
+      619,
+      72,
+      830,
+      293
+    ],
+    "observatory-detail": [
+      204,
+      832,
+      373,
+      975
+    ]
+  },
+  "sourceViews": "The supplied sheet has small alternate views; obscured geometry must be documented as inferred."
+}

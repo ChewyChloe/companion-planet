@@ -1,0 +1,94 @@
+[
+  {
+    "name": "treehouse",
+    "finite_source_vertices": true,
+    "finite_imported_vertices": true,
+    "source_reference_packed": true,
+    "glb_embedded_buffers": true,
+    "glb_animation_count": 0,
+    "roundtrip_bbox_max_error_m": 0.0,
+    "source_bbox": [
+      -3.15794038772583,
+      -2.504999876022339,
+      0.0,
+      2.640857458114624,
+      1.3380266427993774,
+      4.974490165710449
+    ],
+    "import_bbox": [
+      -3.15794038772583,
+      -2.504999876022339,
+      0.0,
+      2.640857458114624,
+      1.3380266427993774,
+      4.974490165710449
+    ],
+    "source_trunk_topology": {
+      "Continuous_sculpted_root_trunk_branches": {
+        "components": 1,
+        "non_manifold_edges": 0
+      }
+    },
+    "source_sha256": "8ec0d0f1e25d67f753d4239e5e4fdf81184832f8eca1bfc37999010412fe7848",
+    "glb_sha256": "f12cea57490e2302ffc75ab5e92980d7b1e1589ce071006c43418510a478222a",
+    "technical_pass": true
+  },
+  {
+    "name": "island",
+    "finite_source_vertices": true,
+    "finite_imported_vertices": true,
+    "source_reference_packed": true,
+    "glb_embedded_buffers": true,
+    "glb_animation_count": 0,
+    "roundtrip_bbox_max_error_m": 0.0,
+    "source_bbox": [
+      -5.184000492095947,
+      -4.387452125549316,
+      -2.9443039894104004,
+      5.059372425079346,
+      3.578199863433838,
+      1.2129136323928833
+    ],
+    "import_bbox": [
+      -5.184000492095947,
+      -4.387452125549316,
+      -2.9443039894104004,
+      5.059372425079346,
+      3.578199863433838,
+      1.2129136323928833
+    ],
+    "source_trunk_topology": {},
+    "source_sha256": "fa8abbe7868fc070ddbce849832cc2fd8a5f08ce78853d4989945c5436181039",
+    "glb_sha256": "43c4e9abad041a8cc8eea02e34a528548aaf71aad2fdc4334797c5c675940f91",
+    "technical_pass": true
+  },
+  {
+    "name": "observatory",
+    "finite_source_vertices": true,
+    "finite_imported_vertices": true,
+    "source_reference_packed": true,
+    "glb_embedded_buffers": true,
+    "glb_animation_count": 0,
+    "roundtrip_bbox_max_error_m": 0.0,
+    "source_bbox": [
+      -1.440000057220459,
+      -2.450000047683716,
+      0.0,
+      1.440000057220459,
+      1.440000057220459,
+      2.6855244636535645
+    ],
+    "import_bbox": [
+      -1.440000057220459,
+      -2.450000047683716,
+      0.0,
+      1.440000057220459,
+      1.440000057220459,
+      2.6855244636535645
+    ],
+    "source_trunk_topology": {},
+    "source_sha256": "79ddfbd9ea826a7a1ee552ec838535a3e187fb589525d75e833ecaed0f2a13eb",
+    "glb_sha256": "37dd5efec8a52c87d9684ca8f994150e4815a659bc3dbc34d4871337b96d1152",
+    "technical_pass": true
+  }
+]
