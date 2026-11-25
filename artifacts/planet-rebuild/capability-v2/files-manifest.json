@@ -1,0 +1,142 @@
+[
+  {
+    "path": "artifacts/planet-rebuild/capability-v2/REVIEW.md",
+    "bytes": 4881,
+    "sha256": "20c6275e8146e692465a8d2dfb83f5797174106142617ad203462e4075ddd040"
+  },
+  {
+    "path": "artifacts/planet-rebuild/capability-v2/protected-files-before.json",
+    "bytes": 6406,
+    "sha256": "e206f5ab4451ba7a7fe91fa298805786a2b6096feab4d3c06be1333c8925fb79"
+  },
+  {
+    "path": "artifacts/planet-rebuild/capability-v2/scope-verification.json",
+    "bytes": 81,
+    "sha256": "4230e1d82a68e2bd2a432bf12cc3bbc994599ced48e67b80521b5286623b59d0"
+  },
+  {
+    "path": "artifacts/planet-rebuild/capability-v2/technical-validation.json",
+    "bytes": 940,
+    "sha256": "6d166be3471bba783b345757bda6a13c6dc054922d4ea0c72e0c2541bd5394b2"
+  },
+  {
+    "path": "artifacts/planet-rebuild/capability-v2/treehouse/back.png",
+    "bytes": 984533,
+    "sha256": "bccc28553017c38de382b2e238a603b9b3e69d1b509b8284d5366d73d16f9902"
+  },
+  {
+    "path": "artifacts/planet-rebuild/capability-v2/treehouse/four-views.jpg",
+    "bytes": 103505,
+    "sha256": "fdf48c1f86fe8b325c79edfb4bd1015cc4962900e79a358bb89c2a706b8a7372"
+  },
+  {
+    "path": "artifacts/planet-rebuild/capability-v2/treehouse/front.png",
+    "bytes": 995620,
+    "sha256": "442befe1fad8b38ca906f4f3798d171d15457dd201c0465361e050dc2eed80dd"
+  },
+  {
+    "path": "artifacts/planet-rebuild/capability-v2/treehouse/quarter.png",
+    "bytes": 863064,
+    "sha256": "d2d52f775c0afc101fdb4e187f757785dbad650e6ed84929e0e0701320d16bbb"
+  },
+  {
+    "path": "artifacts/planet-rebuild/capability-v2/treehouse/reference-comparison.jpg",
+    "bytes": 150810,
+    "sha256": "56bdb82a667a16fca2b4807f6e9615c26646b826826b1232c1a356b0df7aa939"
+  },
+  {
+    "path": "artifacts/planet-rebuild/capability-v2/treehouse/side.png",
+    "bytes": 878459,
+    "sha256": "453a4a891bff6ebbaabd8d731d8cf46a98e452061b96e1011e98826040df61cf"
+  },
+  {
+    "path": "assets/art/planet-rebuild/capability-v2/README.md",
+    "bytes": 639,
+    "sha256": "3d2211940d896c14bf788ca2cdc48f88f69d0985749b1a96e97223ed71114d90"
+  },
+  {
+    "path": "assets/art/planet-rebuild/capability-v2/treehouse/report.json",
+    "bytes": 5476,
+    "sha256": "fbb37bfb6558f45b1bf7971a55c8ae5fbed0b0b1ae92767792f04fb56cef95bd"
+  },
+  {
+    "path": "assets/art/planet-rebuild/capability-v2/treehouse/treehouse.blend",
+    "bytes": 8568171,
+    "sha256": "897b43e00e8d39c1c39ab410a6ac3f1b1d42c42a4548f8fc7d38bba0a05685bb"
+  },
+  {
+    "path": "assets/art/planet-rebuild/capability-v2/treehouse/treehouse.glb",
+    "bytes": 6344800,
+    "sha256": "9b9888fc9649c01e0cab7a6a469a88da9b593bfa61c75b048b09cd432dac1659"
+  },
+  {
+    "path": "assets/art/planet-rebuild/references/companion-planet/同頻星球.png",
+    "bytes": 1964317,
+    "sha256": "2acdabb6c2b7bf0de43b90aa508d3568e54bdd56ef990bee1787130ff7b2c2b6"
+  },
+  {
+    "path": "scripts/modeling-trials-v2/.gitignore",
+    "bytes": 13,
+    "sha256": "32dae3052f331ee34d628ef535709b301259a45df7c7522c4d35dcf49873f00b"
+  },
+  {
+    "path": "scripts/modeling-trials-v2/check_scope.py",
+    "bytes": 668,
+    "sha256": "bb04e27f8b976e5e5a5780371ba740eec12c17165547dccb857514f4ac9b23f7"
+  },
+  {
+    "path": "scripts/modeling-trials-v2/common.py",
+    "bytes": 11410,
+    "sha256": "678ba0439aa07dd1b19f3dce78af86b68cd83ff286c3f7cc90b756be47db8314"
+  },
+  {
+    "path": "scripts/modeling-trials-v2/compose_review.py",
+    "bytes": 2387,
+    "sha256": "a3b544ff589c0a291a4467534844f1bb4fb2560536637568986368bcd1c1cf67"
+  },
+  {
+    "path": "scripts/modeling-trials-v2/implicit-canopy.npz",
+    "bytes": 2056442,
+    "sha256": "e4718b93c550bc6ccf0ea78ae625e418d526b187e028702bf70fe67b7c700516"
+  },
+  {
+    "path": "scripts/modeling-trials-v2/implicit-trunk.npz",
+    "bytes": 609190,
+    "sha256": "54bcc325cbe4062691f0ff1529e7d9690950690dec9b462d9ef9910e4d5f25f7"
+  },
+  {
+    "path": "scripts/modeling-trials-v2/implicit_canopy.py",
+    "bytes": 1535,
+    "sha256": "2656a9254b5220bd60e663b932498c3f8c8b523bd43bc186362f9097cc43904b"
+  },
+  {
+    "path": "scripts/modeling-trials-v2/implicit_trunk.py",
+    "bytes": 2311,
+    "sha256": "0333f62b01d826574e4079d0a9c91a851051975f2a60cb170d57ece2c2a3b836"
+  },
+  {
+    "path": "scripts/modeling-trials-v2/package_review.py",
+    "bytes": 948,
+    "sha256": "9cfc36662d845d7e086a99f8b8c80cc9df94def9f6fb3da497fca6b50c077ac8"
+  },
+  {
+    "path": "scripts/modeling-trials-v2/requirements.txt",
+    "bytes": 63,
+    "sha256": "ab19dce79e375d65a72389b0207249cfd60a3abf7e463768ca842339bd716689"
+  },
+  {
+    "path": "scripts/modeling-trials-v2/run.py",
+    "bytes": 160,
+    "sha256": "8124314592763b27cf079f237f7c9c12de9499b829cf52d82f4671674e572936"
+  },
+  {
+    "path": "scripts/modeling-trials-v2/treehouse.py",
+    "bytes": 4941,
+    "sha256": "1b097161ce96b9b1b23a8058a4ffb6db0f5c25e547d1db0c9c044b4bc663d37c"
+  },
+  {
+    "path": "scripts/modeling-trials-v2/validate.py",
+    "bytes": 2886,
+    "sha256": "c173413fbfe454c86de256e5c36955237012ade821cf743f810d181f92451b07"
+  }
+]

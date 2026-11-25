@@ -1,0 +1,36 @@
+[
+  {
+    "name": "treehouse",
+    "finite_source_vertices": true,
+    "finite_imported_vertices": true,
+    "source_reference_packed": true,
+    "glb_embedded_buffers": true,
+    "glb_animation_count": 0,
+    "roundtrip_bbox_max_error_m": 4.76837158203125e-07,
+    "source_bbox": [
+      -2.980684280395508,
+      -2.311500072479248,
+      0.0,
+      2.957420825958252,
+      1.3920177221298218,
+      5.091955184936523
+    ],
+    "import_bbox": [
+      -2.980684280395508,
+      -2.3115005493164062,
+      0.0,
+      2.957420825958252,
+      1.3920177221298218,
+      5.091955184936523
+    ],
+    "source_trunk_topology": {
+      "Continuous_tree_surface": {
+        "components": 1,
+        "non_manifold_edges": 0
+      }
+    },
+    "source_sha256": "897b43e00e8d39c1c39ab410a6ac3f1b1d42c42a4548f8fc7d38bba0a05685bb",
+    "glb_sha256": "9b9888fc9649c01e0cab7a6a469a88da9b593bfa61c75b048b09cd432dac1659",
+    "technical_pass": true
+  }
+]
