@@ -817,6 +817,14 @@ select {
   padding: 4px 5px 9px;
   min-width: 0;
 }
+.companion-preview {
+  filter: grayscale(.65);
+  opacity: .65;
+}
+.companion-preview-label {
+  color: #646679;
+  font-size: .72rem;
+}
 .companion-grid button[aria-pressed="true"] {
   border-color: #8a7c9e;
   background: #e7e1ee;

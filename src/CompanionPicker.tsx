@@ -38,8 +38,9 @@ export function CompanionPicker({
             aria-pressed={selected === c.id}
             onClick={() => onSelect(c.id)}
           >
-            <Portrait {...c} />
+            <div className={c.id === "nebula" ? undefined : "companion-preview"}><Portrait {...c} /></div>
             <span>{c.name}</span>
+            {c.id !== "nebula" && <small className="companion-preview-label">開發中</small>}
             {selected === c.id && <Icon name="check" />}
           </button>
         ))}

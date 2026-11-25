@@ -56,8 +56,34 @@ export function riverBedDepth(x: number, z: number, planet: string) {
   const width = forest ? .34 : planet === "moon" ? .36 : .40;
   return .14 * Math.exp(-(((x-center)/width)**4)) * smoothstep(start,start+.4,z);
 }
+// Surveyed tread centers. The generated terrain mask erodes narrow stairways
+// because it treats adjacent risers like walls.
+const stairs: Record<string, readonly (readonly [number, number, number])[]> = {
+  b612: [[-.60,.70,2.45],[-.84,.72,2.82],[-.93,.57,3.16],
+    [-.73,.47,3.81],[-.74,.24,4.04],[-.71,.15,4.48],[-.61,-.05,4.77],[-.40,-.03,5.12]],
+  forest: [[.40,.31,.80],[.15,.35,.80],[-.24,.34,.80],[-.60,.38,.85],[-.60,.40,1.30],[-.60,.46,1.85],[-.60,.52,2.50],
+    [-.59,.52,2.90],[-.30,.48,3.20],[.10,.49,3.34],[.42,.71,3.48],[.38,.73,4.00],
+    [.40,.94,4.54],[.68,.78,4.53],[.90,.48,4.40],
+    [1.10,.15,4.15],[1.33,-.07,3.84],[1.60,-.24,3.32]],
+};
+function stairHeight(planet: string, x: number, z: number) {
+  const path = stairs[planet];
+  if (!path) return null;
+  let best = .34 ** 2;
+  let height: number | null = null;
+  for (let i = 1; i < path.length; i++) {
+    const [ax, ay, az] = path[i - 1], [bx, by, bz] = path[i];
+    const dx = bx - ax, dz = bz - az;
+    const t = THREE.MathUtils.clamp(((x-ax)*dx+(z-az)*dz)/(dx*dx+dz*dz),0,1);
+    const distance = (x-ax-t*dx)**2+(z-az-t*dz)**2;
+    if (distance >= best) continue;
+    best = distance;
+    height = THREE.MathUtils.lerp(ay,by,t);
+  }
+  return height;
+}
 export function groundHeight(x: number, z: number, planet = navigationPlanet) {
-  const measured=userGround(planet,x,z);
+  const measured=stairHeight(planet,x,z) ?? userGround(planet,x,z);
   if(measured!==null)return measured;
   return .14;
 }
@@ -137,6 +163,7 @@ export function inNavigationObstacle(x:number,z:number,margin=0) {
  // Reading chair must remain reachable by the planner, while manual drops reserve it.
  const station = Math.abs(x-CHAIR.x)<.26 && z>CHAIR.z-.12 && z<CHAIR.z+.85;
  const chairBack = Math.abs(x-CHAIR.x)<.80+margin*.25 && z>CHAIR.z-.95-margin*.25 && z<CHAIR.z-.23+margin*.25;
+ if (!chairBack && !inDeskObstacle(x,z,margin) && stairHeight(navigationPlanet,x,z)!==null) return false;
  return chairBack || (!station && !(boarding && Math.hypot(x-CHAIR.x,z-CHAIR.z)<1.8) && solidBodyBlocked(navigationPlanet,x,groundHeight(x,z),z)) || inDeskObstacle(x,z,margin) || (!station && !userWalkable(navigationPlanet,x,z,Math.max(0,margin-.30)));
 
 }

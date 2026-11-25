@@ -153,6 +153,13 @@ def paint(key,xyz,norm,shape):
     mask=(1-ease(.82,1.05,distance/width))*(1-ease(.012,.026,abs(y-bed)))
     channel=np.maximum(channel,mask)
    apply('water',channel*ease(.12,.54,ny))
+ if key=='forest':
+  # Creek passes beneath the bridge and bends into the cliff lip.
+  center=.026-.018*(1-ease(.263,.34,z))
+  stream=(1-ease(.028,.049,abs(x-center)))*ease(.239,.267,z)*(1-ease(.385,.415,z))
+  apply('water',stream*(1-ease(.010,.025,abs(y-(.272-.18*z))))*ease(.12,.53,ny))
+  curtain=(1-ease(.034,.055,abs(x-.038)))*(1-ease(.014,.036,abs(z-(.433-.24*y))))
+  apply('water',curtain*ease(.068,.102,y)*(1-ease(.205,.229,y)))
  if key=='moon':
   # Measured upstream bed bends toward the actual lip at source z=.31.
   center=-.08-.04*ease(.21,.27,z)+.013*ease(.28,.31,z)
