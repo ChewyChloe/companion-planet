@@ -6,9 +6,10 @@
 
 ## 四座星球使用上傳的 GLB
 
-正式場景使用 `assets/art/user-models/` 中的同頻星球、月光書原、玫瑰花園與微風森林。原檔不變；`public/models/user-worlds/` 是旋轉、等比縮放並縮小內嵌貼圖的執行副本，完整保留原模型面數與輪廓。此批模型為使用者提供，未聲明額外的再散布授權。
+正式場景使用 `assets/art/user-models/` 中的同頻星球、月光書原、玫瑰花園與微風森林。原檔不變；`public/models/user-worlds/` 是已完成分區上色、PBR 材質與 AO 的執行副本，完整保留原模型面數與輪廓。此批模型為使用者提供，未聲明額外的再散布授權。
 
 - [原始模型與匯入紀錄](assets/art/user-models/RUNTIME_TRANSFORMS.json)
+- [上色與實際渲染預覽](WORLD_COLOR_QA.md)
 - [整合與驗收說明](USER_WORLD_INTEGRATION.md)
 - `npm run dev` 後開啟 `/?world-model-review`，可旋轉檢視未經配置的原始模型。
 - `python scripts/prepare-user-worlds.py` 可重新產生工作副本和地形資料，需 Python、NumPy、Pillow。

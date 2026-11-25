@@ -7,7 +7,7 @@ it('loads four independent user landscapes without altering uploaded originals o
   expect(createHash('sha256').update(readFileSync(r.source)).digest('hex')).toBe(r.sha256);
   const bytes=readFileSync(`public/models/user-worlds/${id}.glb`);hashes.add(createHash('sha256').update(bytes).digest('hex'));
   const n=bytes.readUInt32LE(12),g=JSON.parse(bytes.subarray(20,20+n).toString());expect(g.buffers.every((b:any)=>!b.uri)).toBe(true);expect(g.images.every((b:any)=>b.bufferView!==undefined&&!b.uri)).toBe(true);
-  expect(r.runtimeTriangles).toBe(r.sourceTriangles);expect(r.runtimeTriangles).toBeGreaterThan(18000);expect(r.runtimeTriangles).toBeLessThan(21000);expect(bytes.length).toBeLessThan(4000000);expect(r.walkableCells).toBeGreaterThan(200);
+  expect(r.runtimeTriangles).toBe(r.sourceTriangles);expect(r.runtimeTriangles).toBeGreaterThan(18000);expect(r.runtimeTriangles).toBeLessThan(21000);expect(bytes.length).toBeLessThan(6000000);expect(r.walkableCells).toBeGreaterThan(200);
  }expect(hashes.size).toBe(4);
 });
 it('provides actual-model landing heights and collision-safe routes to the reading chair and back on all four worlds',()=>{

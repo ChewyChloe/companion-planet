@@ -1,0 +1,33 @@
+{
+  "world": "forest",
+  "geometryHashBefore": "9da30535b465d652994e46b1bd550b679d705e0086562f08c4480712686a8de2",
+  "geometryHashAfter": "9da30535b465d652994e46b1bd550b679d705e0086562f08c4480712686a8de2",
+  "uvCoverage": 0.713,
+  "paintedPixels": 2990477,
+  "semanticPixelCounts": {
+    "creamRose": 0,
+    "rock": 1349806,
+    "grass": 282982,
+    "leaf": 924973,
+    "bark": 249248,
+    "stone": 32139,
+    "roof": 0,
+    "wood": 70532,
+    "paper": 0,
+    "cover": 0,
+    "metal": 8465,
+    "water": 23208,
+    "rose": 0,
+    "cloth": 41803,
+    "moon": 0,
+    "light": 7321,
+    "crystal": 0
+  },
+  "geometryUnchanged": true,
+  "ambientOcclusion": "Cycles CPU 24 samples, 1024 atlas",
+  "baseColorSize": 2048,
+  "packedOrmSize": 1024,
+  "emissionSize": 512,
+  "runtimeBytes": 4775204,
+  "sha256": "7bc313adc66904fe268a3471ab3c8b4b8defc913f68a1d4a7fda06645fe15e1d"
+}

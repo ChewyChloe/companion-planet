@@ -1,5 +1,19 @@
 # 同頻星球：3D 美術驗收
 
+## 最新上色與光影驗收
+
+| 項目 | 狀態 | 證據 |
+|---|---|---|
+| 彩色 PBR、AO 與幾何保存 | Passed | 48 項單元測試；四座 POSITION／NORMAL／UV／索引雜湊與核准灰模一致。 |
+| 白天、夜景及手機載入 | Passed | 12 個實際 R3F 畫面案例，材質完成標記為 storybook-pbr-1，無 WebGL／腳本錯誤。 |
+| 旅行、桌燈、行走、書本／花朵互動 | Passed | 上色後桌機與手機共 4 項互動回歸通過。 |
+| 觸控抓放 | Passed | 上色後實際 CDP 觸控通過，沒有誤轉鏡頭。 |
+| 主觀美術品質 | Needs Human Review | [白天](artifacts/world-color/four-worlds-day.jpg)、[夜景](artifacts/world-color/four-worlds-night.jpg)、[前後比較](artifacts/world-color/before-after.jpg)。 |
+| 真機 FPS | Not Tested | 尚未在使用者實體裝置測量。 |
+
+細節與輸出見 [WORLD_COLOR_QA.md](WORLD_COLOR_QA.md)。以下保留較早紀錄。
+
+
 ## 最新：2026-11-25 使用者四座 GLB 替換
 
 正式網站已改用 `public/models/user-worlds`。以下為本輪結果；後文保留歷史紀錄。

@@ -1,0 +1,11 @@
+{
+  "unitTestsPassed": 48,
+  "renderCasesPassed": 12,
+  "interactionTestsPassed": 4,
+  "actualTouchPassed": true,
+  "renderErrors": [],
+  "originalSourceModelsUnchanged": true,
+  "approvedSceneGeometryUnchanged": true,
+  "humanArtApproval": "Needs Human Review",
+  "realDeviceFps": "Not Tested"
+}

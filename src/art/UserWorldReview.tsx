@@ -37,6 +37,6 @@ export default function UserWorldReview() {
     <nav aria-label="上傳模型檢視" style={{position:"absolute",top:16,left:16,display:"flex",gap:12,flexWrap:"wrap"}}>
       {Object.entries(models).map(([key,m])=><a key={key} href={`?world-model-review&world=${key}`} style={{background:"#fff",padding:"8px 16px",color:"inherit"}}>{m.name}</a>)}
     </nav>
-    <p style={{position:"absolute",bottom:12,left:20}}>使用者提供模型原貌 · 可拖曳旋轉 · 尚未替換正式互動場景</p>
+    <p style={{position:"absolute",bottom:12,left:20}}>使用者原始灰模 · 可拖曳旋轉 · 正式場景已有上色與互動配置</p>
   </main>;
 }
