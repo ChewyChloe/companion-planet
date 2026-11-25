@@ -1,3 +1,4 @@
+import { attachNebulaFace, chooseExpression, expressionPresets, faceUniforms, type Expression, type Face } from "./nebula-expressions";
 import { CHAIR, groundHeight } from "./terrain";
 import { contactFloor } from "./world-collision";
 import { useWorld } from "../store";
@@ -8,9 +9,9 @@ import { clone } from "three/addons/utils/SkeletonUtils.js";
 import * as THREE from "three";
 import type { Action } from "../domain";
 
-export const SUPPLIED_NEBULA_URL = "models/user-residents/nebula.glb?v=arms-v2";
-export function SuppliedNebula({ action, still, held, seatBlend, pet = false }: {
-  action: Action; still?: boolean; held?: React.RefObject<boolean>; seatBlend?: React.RefObject<number>; pet?: boolean;
+export const SUPPLIED_NEBULA_URL = "models/user-residents/nebula.glb?v=modular-face-4";
+export function SuppliedNebula({ action, still, held, seatBlend, face, pet = false }: {
+  action: Action; face?: Face; still?: boolean; held?: React.RefObject<boolean>; seatBlend?: React.RefObject<number>; pet?: boolean;
 }) {
   const gltf = useLoader(GLTFLoader, import.meta.env.BASE_URL + SUPPLIED_NEBULA_URL);
   const { gl } = useThree();
@@ -18,9 +19,13 @@ export function SuppliedNebula({ action, still, held, seatBlend, pet = false }: 
   const root = useRef<THREE.Group>(null);
   const lift = useRef(0);
   const seat = useRef(0);
-  const brows = useRef<THREE.Group>(null);
+  const reactionStamp = useRef(0);
+  const reactionExpression = useRef<Expression | null>(null);
+  const faceTime = useRef(0);
+  const uniforms = useMemo(faceUniforms, []);
+  const renderedFace = useRef<Face>(expressionPresets.calm.face);
   const vertex = useMemo(()=>new THREE.Vector3(),[]);
-  const browVertex = useMemo(() => new THREE.Vector3(), []);
+
   const asset = useMemo(() => {
     const scene = clone(gltf.scene);
     const materials: THREE.Material[] = [];
@@ -37,6 +42,7 @@ export function SuppliedNebula({ action, still, held, seatBlend, pet = false }: 
         m.thickness = .32;
         m.transparent = false;
         m.opacity = 1;
+        attachNebulaFace(m, uniforms);
         materials.push(m);
         return m;
       };
@@ -63,22 +69,10 @@ export function SuppliedNebula({ action, still, held, seatBlend, pet = false }: 
       const bone = scene.getObjectByName(name);
       return bone ? [{ bone, base: bone.position.clone(), rotation: bone.quaternion.clone() }] : [];
     });
-    const browPoints = [-1,1].map(side => {
-      const x = center.x + side * .158;
-      const y = bounds.min.y + bounds.getSize(new THREE.Vector3()).y * .584;
-      const ray = new THREE.Raycaster(new THREE.Vector3(x,y,bounds.max.z+.5), new THREE.Vector3(0,0,-1));
-      const hit = ray.intersectObjects(meshes, false)[0];
-      if (!hit?.face || !(hit.object instanceof THREE.SkinnedMesh)) return null;
-      const mesh = hit.object;
-      const indices = [hit.face.a, hit.face.b, hit.face.c];
-      const points = indices.map(index => mesh.localToWorld(mesh.getVertexPosition(index, new THREE.Vector3())));
-      const weights = THREE.Triangle.getBarycoord(hit.point, points[0], points[1], points[2], new THREE.Vector3());
-      return weights ? { mesh, indices, weights } : null;
-    });
     const mixer = new THREE.AnimationMixer(scene);
     const clips = Object.fromEntries(gltf.animations.map(clip => [clip.name, mixer.clipAction(clip)]));
-    return { scene, scale, offset: [-center.x * scale, -bounds.min.y * scale, -center.z * scale] as [number, number, number], mixer, clips, materials, contacts, meshes, feet, browPoints };
-  }, [gltf, pet]);
+    return { scene, scale, offset: [-center.x * scale, -bounds.min.y * scale, -center.z * scale] as [number, number, number], mixer, clips, materials, contacts, meshes, feet };
+  }, [gltf, pet, uniforms]);
   useEffect(() => () => {
     asset.mixer.stopAllAction();
     current.current = null;
@@ -104,8 +98,8 @@ export function SuppliedNebula({ action, still, held, seatBlend, pet = false }: 
       // swing foot, and blend both into the seated position.
       const cycle = walking ? Math.sin(asset.mixer.time * 8 + index * Math.PI) : 0;
       bone.position.copy(base);
-      bone.position.x += cycle * .068 * (1-seat.current);
-      bone.position.y += Math.max(0, cycle) * .045 * (1-seat.current);
+      bone.position.x += cycle * .027 * (1-seat.current);
+      bone.position.y += Math.max(0, cycle) * .017 * (1-seat.current);
       bone.quaternion.copy(rotation);
     });
     if(root.current && !pet){
@@ -137,35 +131,30 @@ export function SuppliedNebula({ action, still, held, seatBlend, pet = false }: 
     }
     const { tapMood, reactionUntil } = useWorld.getState();
     const mood = Date.now() < reactionUntil ? tapMood : null;
-    const expression = mood ?? (action === "happy" ? "joy" : action === "rest" ? "sad"
-      : action === "stretch" ? "surprise" : action === "listen" ? "curious" : "neutral");
-    if (root.current) {
-      const bow = expression === "sad" || expression === "sleepy" ? -.10 : expression === "annoyed" ? .07 : 0;
-      root.current.rotation.x = THREE.MathUtils.damp(root.current.rotation.x, bow, 10, Math.min(dt,.05));
+    if (mood && reactionUntil !== reactionStamp.current) {
+      reactionStamp.current = reactionUntil;
+      reactionExpression.current = chooseExpression(mood, reactionExpression.current);
     }
-    if (brows.current) {
-      brows.current.visible = expression !== "neutral";
-      root.current?.updateWorldMatrix(true, true);
-      root.current?.updateMatrixWorld(true);
-      asset.meshes.forEach(mesh => mesh.skeleton.update());
-      brows.current.children.forEach((brow, i) => {
-        const anchor = asset.browPoints[i];
-        brow.visible = !!anchor;
-        if (!anchor) return;
-        brow.position.set(0, 0, 0);
-        anchor.indices.forEach((index, corner) => {
-          anchor.mesh.getVertexPosition(index, browVertex);
-          anchor.mesh.localToWorld(browVertex);
-          root.current?.worldToLocal(browVertex);
-          brow.position.addScaledVector(browVertex, anchor.weights.getComponent(corner));
-        });
-        brow.position.z += .012;
-        const side = i === 0 ? -1 : 1;
-        brow.scale.y = expression === "surprise" ? .013 : .009;
-        brow.rotation.z = side * (expression === "sad" ? -.36 : expression === "annoyed" ? .52 : expression === "curious" ? .24 : expression === "joy" ? .14 : 0);
-      });
+    const expression = mood && reactionExpression.current ? reactionExpression.current :
+      action === "happy" ? "happy" : action === "rest" ? "sleepy" :
+      action === "stretch" ? "surprised" : action === "listen" ? "curious" : "calm";
+    const targetFace = face ?? expressionPresets[expression].face;
+    if (targetFace.some((part,i) => part !== renderedFace.current[i])) {
+      uniforms.faceA.value = uniforms.faceMix.value < .5 ? uniforms.faceA.value : uniforms.faceB.value;
+      uniforms.faceB.value = [...targetFace];
+      uniforms.faceMix.value = 0;
+      renderedFace.current = targetFace;
     }
+    const step = Math.min(dt,.05);
+    uniforms.faceMix.value = Math.min(1,uniforms.faceMix.value+step*5);
+    if (!still && !face) faceTime.current += step;
+    const blink = faceTime.current % 4.7;
+    const glance = faceTime.current % 10;
+    uniforms.faceBlink.value = !still && !face && blink > 4.5 ? Math.sin((blink-4.5)/.2*Math.PI) : 0;
+    uniforms.faceGaze.value.x = !still && !face && glance > 7 ? .009*Math.sin((glance-7)*Math.PI/3) : 0;
     gl.domElement.dataset.expression = expression;
+    gl.domElement.dataset.face = targetFace.join(",");
+    gl.domElement.dataset.faceBlend = uniforms.faceMix.value.toFixed(2);
     gl.domElement.dataset.modelReady = "user-nebula";
     gl.domElement.dataset.modelPath = SUPPLIED_NEBULA_URL;
     gl.domElement.dataset.companion = "nebula";
@@ -173,13 +162,5 @@ export function SuppliedNebula({ action, still, held, seatBlend, pet = false }: 
   });
   return <group ref={root} name="SuppliedNebula" position={asset.offset} scale={asset.scale}>
     <primitive object={asset.scene} />
-    <group ref={brows} visible={false}>
-      {asset.browPoints.map((_,i) => (
-        <mesh key={i} scale={[.046,.009,.010]} raycast={() => null}>
-          <sphereGeometry args={[1,12,8]} />
-          <meshStandardMaterial color="#284051" roughness={.82} />
-        </mesh>
-      ))}
-    </group>
   </group>;
 }

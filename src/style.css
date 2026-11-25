@@ -1120,3 +1120,9 @@ select {
   background: #e8deef;
 }
 .companion-grid button:disabled { cursor: default; }
+
+.speech-kaomoji { display: inline-block; white-space: nowrap; }
+
+.nebula-review { display: flex; flex-direction: column; height: 100dvh; background: #ede7ed; }
+.nebula-review > section { display: flex; flex-wrap: wrap; gap: 10px; padding: 10px; }
+.nebula-review > section label { display: flex; gap: 5px; align-items: center; }

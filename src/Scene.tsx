@@ -600,7 +600,13 @@ export default function Scene({
       {speech && (
         <div className="scene-speech">
           <div className="character-speech" role="note" aria-live="polite">
-            {speech}
+            {(() => {
+              const faceStart = speech.search(/\s(?=[^\s()]*\()/);
+              return faceStart < 0 ? speech : <>
+                {speech.slice(0, faceStart)}{" "}
+                <span className="speech-kaomoji">{speech.slice(faceStart+1)}</span>
+              </>;
+            })()}
           </div>
         </div>
       )}

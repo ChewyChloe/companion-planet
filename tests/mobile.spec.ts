@@ -90,7 +90,7 @@ test("touch rotation, character tap, timer and mobile keyboard chat work", async
   await page.getByRole("button", { name: "切換為白天" }).tap();
   await openTimerSettings(page);
   await page.getByLabel("專注時長", { exact: true }).click();
-  await page.getByRole("button", { name: "1 分鐘展示", exact: true }).last().click();
+  await page.getByRole("button", { name: "1 分鐘", exact: true }).last().click();
   await page.getByRole("button", { name: "開始專注", exact: false }).tap();
   await expect(page.locator("main")).toHaveAttribute("data-phase", "focus");
   await page.getByRole("button", { name: "和星雲仔說說話" }).tap();

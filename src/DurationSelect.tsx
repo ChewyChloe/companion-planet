@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 const durations = [
   [25, "25 分鐘"], [45, "45 分鐘"], [5, "5 分鐘"],
-  [1, "1 分鐘展示"], [1 / 6, "10 秒展示"],
+  [1, "1 分鐘"], [1 / 6, "10 秒"],
 ] as const;
 
 export function DurationSelect({value, disabled, onChange}: {

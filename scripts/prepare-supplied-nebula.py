@@ -51,6 +51,9 @@ out=root/'public/models/user-residents/nebula.glb'
 bpy.ops.export_scene.gltf(filepath=str(out),export_format='GLB',export_animations=True,export_animation_mode='ACTIONS',export_force_sampling=True,export_cameras=False,export_lights=False)
 import runpy
 runpy.run_path(str(root/'scripts/repair-nebula-arms.py'))['repair'](out)
+import subprocess
+subprocess.run(['python3', str(root/'scripts/refine-nebula-face-feet.py')], check=True)
 report['armTracks']='rest-relative-v1'
+report['surfaceRefinement']='native-feet-and-neutral-face-v1'
 report['bytes']=out.stat().st_size
 (root/'assets/art/user-models/NEBULA_RUNTIME.json').write_text(json.dumps(report,indent=2)+'\n')

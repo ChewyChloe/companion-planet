@@ -627,10 +627,16 @@ function App() {
 }
 const UserWorldReview = React.lazy(() => import("./art/UserWorldReview"));
 const Review = React.lazy(() => import("./art/ArtReview"));
+const NebulaExpressionReview = import.meta.env.DEV
+  ? React.lazy(() => import("./art/NebulaExpressionReview"))
+  : null;
+
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <NebulaMaterialPanel />
-    {new URLSearchParams(location.search).has("world-model-review") ? (
+    {NebulaExpressionReview && new URLSearchParams(location.search).has("nebula-expressions") ? (
+      <React.Suspense fallback={<p>載入模型…</p>}><NebulaExpressionReview /></React.Suspense>
+    ) : new URLSearchParams(location.search).has("world-model-review") ? (
       <React.Suspense fallback={<p>載入模型…</p>}><UserWorldReview /></React.Suspense>
     ) : new URLSearchParams(location.search).has("art-review") ? (
       <React.Suspense fallback={<p>載入 3D 驗收場景…</p>}>
