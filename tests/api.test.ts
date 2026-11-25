@@ -24,3 +24,19 @@ it("serves mock chat; rejects unsafe origin and invalid payloads", async () => {
     await new Promise<void>((resolve) => server.close(() => resolve()));
   }
 });
+
+it("allows embedded GLB texture fetches without allowing remote connections", async () => {
+  const server = await startServer({ port: 0, staticFiles: true });
+  const address = server.address() as { port: number };
+  try {
+    const response = await fetch(`http://127.0.0.1:${address.port}/`);
+    const policy = response.headers.get("content-security-policy") || "";
+    expect(policy.split(";").map((rule) => rule.trim())).toContain(
+      "connect-src 'self' blob:",
+    );
+    expect(policy).toContain("script-src 'self';");
+    expect(policy).not.toContain("connect-src *");
+  } finally {
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+  }
+});

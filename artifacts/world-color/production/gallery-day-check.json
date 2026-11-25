@@ -1,0 +1,54 @@
+{
+  "cases": [
+    {
+      "id": "b612",
+      "mobile": false,
+      "loaded": true,
+      "finish": "storybook-pbr-1"
+    },
+    {
+      "id": "moon",
+      "mobile": false,
+      "loaded": true,
+      "finish": "storybook-pbr-1"
+    },
+    {
+      "id": "rose",
+      "mobile": false,
+      "loaded": true,
+      "finish": "storybook-pbr-1"
+    },
+    {
+      "id": "forest",
+      "mobile": false,
+      "loaded": true,
+      "finish": "storybook-pbr-1"
+    },
+    {
+      "id": "b612",
+      "mobile": true,
+      "loaded": true,
+      "finish": "storybook-pbr-1"
+    },
+    {
+      "id": "moon",
+      "mobile": true,
+      "loaded": true,
+      "finish": "storybook-pbr-1"
+    },
+    {
+      "id": "rose",
+      "mobile": true,
+      "loaded": true,
+      "finish": "storybook-pbr-1"
+    },
+    {
+      "id": "forest",
+      "mobile": true,
+      "loaded": true,
+      "finish": "storybook-pbr-1"
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

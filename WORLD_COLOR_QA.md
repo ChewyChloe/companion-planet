@@ -30,3 +30,14 @@
 
 
 最新自動驗證：48 項單元、12 個日夜／手機渲染案例、4 項互動回歸，以及實際觸控抓放全部通過。結果見 `artifacts/world-color/verification-summary.json`；API 供應商實際付費呼叫與真機 FPS 未在本輪驗證。
+
+### Production texture loading correction (2026-11-25)
+
+Reproduced the user's white-world report with `npm run build` + `npm start`.
+The GLBs contained StorybookPaint and embedded images, but the production CSP
+blocked GLTFLoader/ImageBitmapLoader's fetches of local `blob:` image URLs.
+Consequently all four texture maps were unavailable and the scene rendered white.
+Allow `blob:` specifically in `connect-src`; scripts and remote connections remain
+restricted. The capture script now accepts BASE_URL/OUTPUT_DIR so the same checks
+can target the production server, and reports CSP failures as errors.
+Production browser evidence is under `artifacts/world-color/production/`.
