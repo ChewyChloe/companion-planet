@@ -135,7 +135,13 @@ def paint(key,xyz,norm,shape):
  if key in ['b612','forest']:
   c=[-.045,.205,.354] if key=='b612' else [.045,.185,.406]
   apply('water',ell(c,[.058,.13,.035]))
-  if key=='b612':apply('water',ell([.06,.089,.37],[.12,.012,.095]))
+  if key=='b612':
+   apply('water',ell([.06,.089,.37],[.12,.012,.095]))
+   # Follow the shallow upstream channel into the top lip of the falls.
+   center=-.044+.075*(z-.23)
+   channel=(1-ease(.029,.043,abs(x-center)))*ease(.214,.239,z)*(1-ease(.35,.379,z))
+   bed=.366-.364*z
+   apply('water',channel*(1-ease(.013,.030,abs(y-bed)))*ease(.06,.47,ny))
  if key=='moon':apply('water',ell([-.11,.20,.22],[.05,.17,.045]))
  if key=='rose':
   # Only the inner fountain bowls are water; their rim and pedestal stay limestone.
@@ -152,7 +158,7 @@ def paint(key,xyz,norm,shape):
 
 def run(key):
  path=ROOT/f'public/models/user-worlds/{key}.glb';g,b=read_glb(path);geometry_before=geometry_digest(g,b);original_g,original_b=read_glb(ROOT/TRANS[key]['source']);xyz,norm,valid,shape=raster(original_g,original_b,key)
- yy,xx=np.where(valid);color,rough,metal,emit,labels,names=paint(key,xyz[valid],norm[valid],shape[valid]);base_im=g['images'][g['textures'][g['materials'][0]['pbrMetallicRoughness']['baseColorTexture']['index']]['source']];bv=g['bufferViews'][base_im['bufferView']];old=Image.open(io.BytesIO(b[bv.get('byteOffset',0):bv.get('byteOffset',0)+bv['byteLength']])).convert('RGB').resize((SIZE,SIZE))
+ yy,xx=np.where(valid);color,rough,metal,emit,labels,names=paint(key,xyz[valid],norm[valid],shape[valid]);base_im=g['images'][g['textures'][g['materials'][0]['pbrMetallicRoughness']['baseColorTexture']['index']]['source']];bv=g['bufferViews'][base_im['bufferView']];source_image=original_g['images'][original_g['textures'][original_g['materials'][0]['pbrMetallicRoughness']['baseColorTexture']['index']]['source']];source_view=original_g['bufferViews'][source_image['bufferView']];old=Image.open(io.BytesIO(original_b[source_view.get('byteOffset',0):source_view.get('byteOffset',0)+source_view['byteLength']])).convert('RGB').resize((SIZE,SIZE))
  gray=np.asarray(old,dtype=np.float32).mean(2)/255;blur=np.asarray(old.filter(ImageFilter.GaussianBlur(18)),dtype=np.float32).mean(2)/255;detail=np.clip(gray/(blur+.001),.70,1.15)
  color*=detail[valid,None]**.6
  atlas=np.full((SIZE,SIZE,3),180,np.uint8);atlas[yy,xx]=np.clip(color**(1/2.2)*255,0,255).astype(np.uint8)
@@ -167,6 +173,12 @@ def run(key):
  emission=np.zeros((SIZE,SIZE,3),np.uint8);emission[yy,xx]=(emit[:,None]*255).astype(np.uint8)
  target=ROOT/'assets/art/world-color';Image.fromarray(atlas).save(target/f'{key}-albedo.jpg',quality=94,subsampling=0);Image.fromarray(packed).resize((1024,1024),Image.Resampling.LANCZOS).save(target/f'{key}-orm.png');Image.fromarray(emission).resize((512,512),Image.Resampling.LANCZOS).save(target/f'{key}-emission.png')
  # Repack buffer views unchanged except the albedo image; append packed PBR textures.
+ material=g['materials'][0]
+ existing={}
+ for suffix,slot in [('orm','occlusionTexture'),('emission','emissiveTexture')]:
+  if slot in material:
+   texture=material[slot]['index'];image=g['textures'][texture]['source']
+   existing[suffix]=(texture,g['images'][image]['bufferView'])
  views=[];chunks=[]
  def block(blob,target=None):
   offset=sum(map(len,chunks));view={'buffer':0,'byteOffset':offset,'byteLength':len(blob)}
@@ -175,15 +187,24 @@ def run(key):
  for i,v in enumerate(g['bufferViews']):
   blob=b[v.get('byteOffset',0):v.get('byteOffset',0)+v['byteLength']]
   if i==base_im['bufferView']:blob=(target/f'{key}-albedo.jpg').read_bytes()
+  for suffix,(_,view_index) in existing.items():
+   if i==view_index:blob=(target/f'{key}-{suffix}.png').read_bytes()
   block(blob,v.get('target'))
- for suffix,size in [('orm',1024),('emission',512)]:
+ textures={}
+ for suffix in ['orm','emission']:
+  if suffix in existing:
+   textures[suffix]=existing[suffix][0];continue
+  textures[suffix]=len(g['textures'])
   im=len(g['images']);g['images'].append({'bufferView':block((target/f'{key}-{suffix}.png').read_bytes()),'mimeType':'image/png'});g['textures'].append({'sampler':0,'source':im})
- orm=len(g['textures'])-2;emissive=len(g['textures'])-1;m=g['materials'][0];m['name']='StorybookPaint';pbr=m['pbrMetallicRoughness'];pbr['baseColorFactor']=[1,1,1,1];pbr['metallicFactor']=1;pbr['roughnessFactor']=1;pbr['metallicRoughnessTexture']={'index':orm};m['occlusionTexture']={'index':orm,'strength':.7};m['emissiveTexture']={'index':emissive};m['emissiveFactor']=[.8,.63,.35]
+ orm=textures['orm'];emissive=textures['emission'];m=g['materials'][0];m['name']='StorybookPaint';pbr=m['pbrMetallicRoughness'];pbr['baseColorFactor']=[1,1,1,1];pbr['metallicFactor']=1;pbr['roughnessFactor']=1;pbr['metallicRoughnessTexture']={'index':orm};m['occlusionTexture']={'index':orm,'strength':.7};m['emissiveTexture']={'index':emissive};m['emissiveFactor']=[.8,.63,.35]
  g['bufferViews']=views;binary=b''.join(chunks);g['buffers']=[{'byteLength':len(binary)}];g['asset']['generator']='Companion Planet semantic PBR painting; source Tripo';js=json.dumps(g,separators=(',',':'),ensure_ascii=False).encode();js+=b' '*((-len(js))%4);path.write_bytes(struct.pack('<III',0x46546c67,2,28+len(js)+len(binary))+struct.pack('<II',len(js),0x4e4f534a)+js+struct.pack('<II',len(binary),0x004e4942)+binary)
  after_g,after_b=read_glb(path);geometry_after=geometry_digest(after_g,after_b)
  if geometry_after!=geometry_before:raise RuntimeError('Painting changed the model geometry')
  report={'world':key,'geometryHashBefore':geometry_before,'geometryHashAfter':geometry_after,'uvCoverage':round(float(valid.mean()),3),'paintedPixels':int(valid.sum()),'semanticPixelCounts':{name:int((labels==i).sum()) for i,name in enumerate(names)},'geometryUnchanged':True,'ambientOcclusion':'Cycles CPU 24 samples, 1024 atlas','baseColorSize':2048,'packedOrmSize':1024,'emissionSize':512,'runtimeBytes':path.stat().st_size,'sha256':hashlib.sha256(path.read_bytes()).hexdigest()};(target/f'{key}-paint.json').write_text(json.dumps(report,indent=2));print('PAINTED',key,report['runtimeBytes'],flush=True)
 if __name__=='__main__':
  import sys,subprocess
+ if len(sys.argv)>1:
+  for key in sys.argv[1:]:run(key)
+  sys.exit(0)
  subprocess.run([sys.executable,str(ROOT/'scripts/prepare-user-worlds.py')],check=True,stdout=subprocess.DEVNULL)
  for key in PALETTES:run(key)

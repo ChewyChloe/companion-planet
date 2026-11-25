@@ -160,6 +160,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
   const up = useMemo(() => new THREE.Vector3(0, 1, 0), []);
   const supportRotation = useMemo(() => new THREE.Quaternion(), []);
   const frames = useRef(0);
+  const travelProgress = useRef({ x: Infinity, z: Infinity, best: Infinity, stalled: 0 });
   const next = useMemo(() => new THREE.Vector3(), []);
   useFrame((_state, delta) => {
     const state = useWorld.getState();
@@ -248,9 +249,11 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
     waypoint(position.current, target.current, next, action.current === "read");
     if ((!manual || walking.current) && !held.current)
       position.current.lerp(next, Math.min(1, .82 * motionDt / Math.max(.001,position.current.distanceTo(next))));
+    const plannedX = position.current.x - beforeX;
+    const plannedZ = position.current.z - beforeZ;
     gaitClock.current += Math.hypot(position.current.x-beforeX, position.current.z-beforeZ) / .48 * (Math.PI*2/7.1);
     const actual =
-      distance > 0.07 && !pet
+      distance > 0.07 && !pet && Math.hypot(plannedX, plannedZ) > .0001
         ? action.current === "approach"
           ? "approach"
           : action.current === "return"
@@ -303,10 +306,30 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
         gl.domElement.dataset.supportTilt = THREE.MathUtils.radToDeg(root.current.quaternion.angleTo(new THREE.Quaternion())).toFixed(3);
       }
     }
+    const progress = travelProgress.current;
+    if (progress.x !== target.current.x || progress.z !== target.current.z || held.current) {
+      Object.assign(progress, { x: target.current.x, z: target.current.z, best: Infinity, stalled: 0 });
+    }
+    if (!pet && !held.current && distance > .07 && (!manual || walking.current)) {
+      const remaining = position.current.distanceTo(target.current);
+      if (remaining < progress.best - .06) {
+        progress.best = remaining;
+        progress.stalled = 0;
+      } else if ((progress.stalled += motionDt) > 4) {
+        // Abandon an unreachable command instead of pushing into the same obstacle every frame.
+        walking.current = false;
+        arrivalAction.current = "idle";
+        manualUntil.current = Date.now() + 8000;
+        target.current.copy(position.current);
+        behavior.current = { ...behavior.current, action: "idle", target: [position.current.x, position.current.z] };
+      }
+    }
     if (model.current) {
       if (pet) heading.current = 0;
       else if (!held.current) {
-        heading.current = headingFromStep(heading.current, position.current.x-beforeX, position.current.z-beforeZ);
+        const movedX = position.current.x - beforeX, movedZ = position.current.z - beforeZ;
+        if (plannedX * movedX + plannedZ * movedZ > .35 * (plannedX ** 2 + plannedZ ** 2))
+          heading.current = headingFromStep(heading.current, plannedX, plannedZ);
         if (distance < .08 && (actual === "read" || seatBlend.current > .9)) heading.current = 0;
       }
       model.current.rotation.y = turnToward(model.current.rotation.y, heading.current, motionDt);

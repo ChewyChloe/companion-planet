@@ -1,14 +1,36 @@
+import { ImprovedNoise } from "three/addons/math/ImprovedNoise.js";
 import { useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 
 import * as THREE from "three";
 import { planets, planetFor, type PlanetId } from "../planets";
 import { useWorld } from "../store";
+function paintPlanet(id: PlanetId) {
+  const shape = new THREE.SphereGeometry(1, 64, 40);
+  const positions = shape.attributes.position;
+  const colors = new Float32Array(positions.count * 3);
+  const noise = new ImprovedNoise();
+  const base = new THREE.Color(planetFor(id).color);
+  const dark = base.clone().multiplyScalar(.28);
+  const light = base.clone().lerp(new THREE.Color("#f4ead4"), .68);
+  const color = new THREE.Color();
+  const seed = planets.findIndex(planet => planet.id === id) * 17;
+  for (let i = 0; i < positions.count; i++) {
+    const x = positions.getX(i) + seed, y = positions.getY(i), z = positions.getZ(i);
+    const sample = (frequency: number) => noise.noise(x * frequency, y * frequency, z * frequency);
+    const terrain = sample(2.3) + .45 * sample(5) + .25 * sample(11) + .14 * sample(23);
+    const clouds = THREE.MathUtils.smoothstep(sample(4) + .35 * sample(12), .14, .57);
+    color.copy(dark).lerp(base, THREE.MathUtils.smoothstep(terrain, -.32, .32)).lerp(light, clouds * .68);
+    color.toArray(colors, i * 3);
+  }
+  shape.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+  return shape;
+}
 function Destination({ id, index }: { id: PlanetId; index: number }) {
   const root = useRef<THREE.Group>(null);
   const halo = useRef<THREE.ShaderMaterial>(null);
   const { camera, gl } = useThree();
-  const p = planetFor(id);
+  const geometry = useMemo(() => paintPlanet(id), [id]);
   const other = useMemo(() => new THREE.Vector3(), []);
   const positions = [
     [-0.78, 0.46],
@@ -49,18 +71,8 @@ function Destination({ id, index }: { id: PlanetId; index: number }) {
         if (e.delta < 6) useWorld.getState().visit(id);
       }}
     >
-      <mesh>
-        <sphereGeometry args={[1, 32, 24]} />
-        <meshPhysicalMaterial
-          color={p.color}
-          roughness={0.42}
-          transparent
-          opacity={0.9}
-          depthWrite={false}
-          thickness={0.25}
-          iridescence={0.3}
-          clearcoat={0.2}
-        />
+      <mesh geometry={geometry}>
+        <meshStandardMaterial vertexColors roughness={0.83} />
       </mesh>
       <mesh scale={1.32}>
         <sphereGeometry args={[1, 32, 20]} />
