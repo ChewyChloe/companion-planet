@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { companions } from "../src/companions";
-test.describe.configure({ timeout: 120000 });
+// Nine real model loads plus a reload and capture on software WebGL.
+test.describe.configure({ timeout: 180000 });
 test("all nine residents switch real 3D geometry and persist through reload", async ({
   page,
 }, info) => {
@@ -63,7 +64,7 @@ test("grabbing moves the creature without orbiting; release stays put and taps r
   );
 });
 
-test("a tapped character can speak, quiet mode suppresses bubbles, mini mode retains species", async ({
+test("a tapped character can speak, quiet mode suppresses bubbles, and the mini entry stays hidden", async ({
   page,
 }) => {
   await page.addInitScript(() => {
@@ -82,11 +83,10 @@ test("a tapped character can speak, quiet mode suppresses bubbles, mini mode ret
   await page.getByRole("button", { name: "安靜陪我", exact: true }).click();
   await page.getByRole("button", { name: "打個招呼" }).click();
   await expect(page.getByRole("note")).toHaveCount(0);
-  await page.getByRole("button", { name: "體驗迷你陪伴" }).click();
+  await expect(page.getByRole("button", { name: "體驗迷你陪伴" })).toHaveCount(0);
   await expect(canvas).toHaveAttribute("data-companion", "fern");
   await page.getByRole("button", { name: "更換角色", exact: true }).click();
   await page.getByRole("button", { name: "花苞寶", exact: true }).click();
   await expect(canvas).toHaveAttribute("data-companion", "blossom");
-  await page.getByRole("button", { name: "返回星球" }).click();
-  await expect(canvas).toHaveAttribute("data-companion", "blossom");
+  await expect(page.getByRole("button", { name: "返回星球" })).toHaveCount(0);
 });

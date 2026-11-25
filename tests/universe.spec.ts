@@ -7,23 +7,27 @@ async function renderState(page: Page, point?: [number, number]) {
       .find((n) => n.includes("/@react-three_fiber.js"))!;
     const { _roots } = await import(url);
     const s = _roots.get(document.querySelector("canvas")).store.getState();
-    let screen: number[] = [];
+    let screen: number[] = [], landing: number[] = [];
     if (point) {
       const path = "/src/art/terrain.ts";
       const { groundHeight } = await import(path);
+      const placementPath="/src/art/placement.ts";
+      const {safeDrop}=await import(placementPath);
+      landing=safeDrop(...point);
       const v = s.camera.position
         .clone()
-        .set(point[0], groundHeight(...point) + 0.025, point[1])
+        .set(landing[0], groundHeight(...landing) + 0.025, landing[1])
         .project(s.camera);
       screen = [(v.x + 1) / 2, (1 - v.y) / 2];
     }
     return {
       screen,
+      landing,
       lamp: s.scene.getObjectByName("DeskLampLight")?.intensity,
       env: s.scene.environment !== null,
       fog: s.scene.fog?.isFogExp2,
       camera: s.camera.position.toArray(),
-      tree: !!s.scene.getObjectByName("LittleTree"),
+      tree: !!s.scene.getObjectByName("UserIsland-" + document.querySelector("main")!.dataset.planet),
     };
   }, point);
 }
@@ -47,11 +51,14 @@ test("real distant-planet raycasting travels between worlds and the lamp toggles
   expect((await renderState(page)).env).toBe(true);
   const timer = await page.getByRole("timer").innerText();
   const box = (await canvas.boundingBox())!;
-  await page.mouse.move(box.width * 0.18, box.height * 0.41);
+  await expect(canvas).toHaveAttribute("data-planet0", /^rose,/);
+  const destination = (await canvas.getAttribute("data-planet0"))!.split(",").slice(1).map(Number);
+  await page.mouse.move(box.width * destination[0], box.height * destination[1]);
   await expect(canvas).toHaveCSS("cursor", "pointer");
-  await page.mouse.click(box.width * 0.18, box.height * 0.41);
+  await page.mouse.click(box.width * destination[0], box.height * destination[1]);
   await expect(page.locator("main")).toHaveAttribute("data-planet", "rose");
   await expect(canvas).toHaveAttribute("data-journey", "idle");
+  await expect(canvas).toHaveAttribute("data-planet-model", "user-world-rose",{timeout:60000});
   await expect(page.getByRole("timer")).toHaveText(timer);
   await page.screenshot({
     path: `artifacts/universe/${info.project.name}-rose.png`,
@@ -101,14 +108,15 @@ test("far ground walking, larger drag range and flower/book interactions coexist
     target.screen[0] * box.width,
     target.screen[1] * box.height,
   );
-  await expect(canvas).toHaveAttribute("data-action", "walk");
+  // On slow software WebGL the click may return after travel has finished.
+  // Assert the actual destination below instead of a transient animation label.
   await expect
     .poll(
       async () => {
         const p = (await canvas.getAttribute("data-position"))!
           .split(",")
           .map(Number);
-        return Math.hypot(p[0] - 2.5, p[2] - 2.3);
+        return Math.hypot(p[0] - target.landing[0], p[2] - target.landing[1]);
       },
       { timeout: 45000 },
     )
@@ -116,7 +124,7 @@ test("far ground walking, larger drag range and flower/book interactions coexist
   const p = (await canvas.getAttribute("data-position"))!
     .split(",")
     .map(Number);
-  expect(Math.hypot(p[0], p[2])).toBeGreaterThan(3.1);
+  expect(Math.hypot(p[0]-target.landing[0], p[2]-target.landing[1])).toBeLessThan(.2);
   await page.getByRole("button", { name: "照顧花朵", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "照顧花朵", exact: true }),

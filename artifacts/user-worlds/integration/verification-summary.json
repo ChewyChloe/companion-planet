@@ -1,0 +1,19 @@
+{
+  "unitTests": 46,
+  "browserRegression": {
+    "startTime": "2026-11-25T09:14:00.704Z",
+    "duration": 525732.826,
+    "expected": 16,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "sceneCases": 8,
+  "sourceOverlapSamplesPerCase": 521,
+  "sourceOverlapSamplesInside": 0,
+  "actualTouch": true,
+  "finalGalleryPassed": true,
+  "fogDensity": 0.008,
+  "approvedResidentAssetsModified": false,
+  "backendModified": false
+}

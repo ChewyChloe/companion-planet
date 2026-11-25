@@ -65,7 +65,7 @@ export function Atmosphere({ reduced }: { reduced: boolean }) {
   );
   useEffect(() => {
     const old = scene.fog;
-    scene.fog = new THREE.FogExp2("#ddcbd5", 0.019);
+    scene.fog = new THREE.FogExp2("#ddcbd5", 0.008);
     return () => {
       scene.fog = old;
       sky.dispose();
@@ -87,7 +87,7 @@ export function Atmosphere({ reduced }: { reduced: boolean }) {
         <sphereGeometry args={[95, 32, 20]} />
       </mesh>
       <mesh
-        position={[0, -2.15, 0]}
+        position={[0, -4.1, 0]}
         rotation={[-Math.PI / 2, 0, 0]}
         material={water}
       >
@@ -95,21 +95,21 @@ export function Atmosphere({ reduced }: { reduced: boolean }) {
       </mesh>
       {Array.from({ length: 14 }, (_, i) => {
         const a = i * 2.39996,
-          r = 4.9 + (i % 3) * 0.6;
+          r = 5.3 + (i % 3) * 0.6;
         return (
           <sprite
             key={i}
-            position={[Math.cos(a) * r, -0.3 - (i % 3) * 0.18, Math.sin(a) * r]}
-            scale={[4.5, 2.2, 1]}
+            position={[Math.cos(a) * r, -3.0 - (i % 3) * 0.18, Math.sin(a) * r]}
+            scale={[3.2, 1.0, 1]}
             renderOrder={3}
           >
             <spriteMaterial
               map={cloud}
               color={night ? "#74708f" : i % 2 ? "#e5d9e3" : "#d8d2e3"}
               transparent
-              opacity={0.6}
+              opacity={0.22}
               depthWrite={false}
-              depthTest={false}
+              depthTest={true}
             />
           </sprite>
         );

@@ -1,20 +1,22 @@
+import transforms from "../../assets/art/user-models/RUNTIME_TRANSFORMS.json";
 import * as THREE from "three";
-export const WALK_RADIUS = 4.15;
+import {userGround,userWalkable,userHome} from "./user-world-ground";
+export const WALK_RADIUS = 7.0;
 export const SURFACE_RADIUS = 4.7;
 export const CHAIR = {
   x: 0.72,
   z: 0.23,
-  seatHeight: 0.38,
-  seatDepth: 1.5,
-  seatCenterZ: -0.22,
-  backZ: -1.02,
-  deskZ: 1.1,
-  rearLegZ: -0.83,
-  frontLegZ: 0.24,
-  seatedRootOffset: 0.24,
+  seatHeight: transforms.b612.seatHeight,
+  seatDepth: 1.2,
+  seatCenterZ: 0.02,
+  backZ: -0.64,
+  deskZ: transforms.b612.deskDistance,
+  rearLegZ: -0.50,
+  frontLegZ: 0.44,
+  seatedRootOffset: transforms.b612.seatHeight-.14,
 };
-export const APPROACH: [number, number] = [-0.65, 1.25];
-export const HOME: [number, number] = [-0.72, 0.12];
+export const APPROACH: [number, number] = userHome("b612");
+export const HOME: [number, number] = userHome("b612");
 export function smoothstep(a: number, b: number, x: number) {
   const t = Math.max(0, Math.min(1, (x - a) / (b - a)));
   return t * t * (3 - 2 * t);
@@ -45,15 +47,35 @@ export function noise3(x: number, y: number, z: number) {
     fz,
   );
 }
-export function groundHeight(x: number, z: number) {
+/** Continuous stream beds shared with the exported cliff's river mouth. */
+export function riverBedDepth(x: number, z: number, planet: string) {
+  if (planet === "rose") return 0;
+  const forest = planet === "forest", start = forest ? .25 : planet === "moon" ? 2.4 : 2.1;
+  const center = forest ? -1.95 + smoothstep(.3,4.7,z)*1.10 : planet === "moon" ? -1.5 : -1.8;
+  const width = forest ? .34 : planet === "moon" ? .36 : .40;
+  return .14 * Math.exp(-(((x-center)/width)**4)) * smoothstep(start,start+.4,z);
+}
+export function groundHeight(x: number, z: number, planet = navigationPlanet) {
+  const measured=userGround(planet,x,z);
+  if(measured!==null)return measured;
+  return .14;
+}
+/** Historical generator retained for archived studies only. */
+export function legacyGroundHeight(x:number,z:number,planet="b612") {
   const radius = Math.hypot(x, z);
   const hills =
     (noise3(x * 1.15, 0, z * 1.15) - 0.5) * 0.14 +
     Math.exp(-((x + 1.5) ** 2 + (z + 1.1) ** 2) / 0.35) * 0.16;
-  const natural =
+  let natural =
     0.13 +
-    0.35 * (Math.sqrt(Math.max(0.001, 4.95 ** 2 - radius ** 2)) - 4.95) +
+    0.08 * (Math.sqrt(Math.max(0.001, 4.95 ** 2 - radius ** 2)) - 4.95) +
     hills;
+  const shapes: Record<string, readonly [number, number]> = {
+    b612: [.30, .48], moon: [.24, .62], rose: [.18, .58], forest: [.38, .40],
+  };
+  const shape = shapes[planet] || shapes.b612;
+  natural += shape[0] * Math.exp(-((x + 2) ** 2 / 2.1 + (z + 1.4) ** 2 / 1.8))
+    + shape[1] * Math.exp(-((x - 1.7) ** 2 / 2.4 + (z + 2) ** 2 / 1.7));
   const pad = Math.max(Math.abs((x - 0.72) / 0.95), Math.abs((z - 0.58) / 1.6));
   const station = 0.14 + (natural - 0.14) * smoothstep(0.8, 1.25, pad);
   const dx = x + 1.1,
@@ -63,7 +85,11 @@ export function groundHeight(x: number, z: number) {
     Math.abs((Math.cos(a) * dx - Math.sin(a) * dz) / 0.65),
     Math.abs((Math.sin(a) * dx + Math.cos(a) * dz) / 0.47),
   );
-  return 0.11 + (station - 0.11) * smoothstep(1, 1.45, rest);
+  return 0.11 + (station - 0.11) * smoothstep(1, 1.45, rest) - riverBedDepth(x,z,planet);
+}
+/** The forest bridge is a real support surface, while soil stays below its water channel. */
+export function walkingHeight(x: number, z: number) {
+  return groundHeight(x,z);
 }
 export function groundNormal(x: number, z: number, out = new THREE.Vector3()) {
   const h = 0.015;
@@ -83,57 +109,88 @@ export function inDeskObstacle(x: number, z: number, margin = 0) {
     z < CHAIR.z + CHAIR.deskZ + 0.4 + margin
   );
 }
-export function waypoint(
-  from: THREE.Vector3,
-  target: THREE.Vector3,
-  out: THREE.Vector3,
-) {
-  // Visibility graph around the table: every corner can connect to every visible
-  // corner, so a destination on its far side cannot get stuck at one waypoint.
-  const clear = (a: THREE.Vector3, b: THREE.Vector3) => {
-    for (let i = 1; i < 40; i++)
-      if (
-        inDeskObstacle(
-          a.x + ((b.x - a.x) * i) / 40,
-          a.z + ((b.z - a.z) * i) / 40,
-          0.4,
-        )
-      )
-        return false;
-    return true;
-  };
-  if (clear(from, target)) return out.copy(target);
-  const nodes = [
-    from,
-    new THREE.Vector3(-0.55, 0, 0.27),
-    new THREE.Vector3(1.99, 0, 0.27),
-    new THREE.Vector3(1.99, 0, 2.05),
-    new THREE.Vector3(-0.55, 0, 2.05),
-    target,
-  ];
-  const distance = nodes.map(() => Infinity),
-    previous = nodes.map(() => -1),
-    seen = new Set<number>();
-  distance[0] = 0;
-  for (let n = 0; n < nodes.length; n++) {
-    let u = -1;
-    for (let i = 0; i < nodes.length; i++)
-      if (!seen.has(i) && (u < 0 || distance[i] < distance[u])) u = i;
-    if (u < 0 || !Number.isFinite(distance[u])) break;
-    seen.add(u);
-    for (let v = 1; v < nodes.length; v++)
-      if (!seen.has(v) && clear(nodes[u], nodes[v])) {
-        const d = distance[u] + nodes[u].distanceTo(nodes[v]);
-        if (d < distance[v]) {
-          distance[v] = d;
-          previous[v] = u;
-        }
-      }
-  }
-  let index = nodes.length - 1;
-  if (previous[index] < 0) return out.copy(from);
-  while (previous[index] > 0) index = previous[index];
-  return out.copy(nodes[index]);
+/** Conservative shared landmark footprints keep all four islands walkable. */
+export const LANDMARK_FOOTPRINTS: Record<string,readonly (readonly [number,number,number])[]> = {
+ b612:[[-2.15,-1.2,1.0],[1.7,-2,1.35],[3.1,.6,.38],[1.75,1.9,.30],[2.65,-.3,.55]],
+ moon:[[-2.1,-1.1,1.1],[1.65,-2,1.35]],
+ rose:[[-2.45,.6,.80],[1.45,-2.2,1.70],[-1.95,2.2,.78],[2.55,-.3,.60]],
+ forest:[[-2,-1.35,1.1],[1.8,-1.9,1.25],[2.8,-.1,.75]],
+};
+let navigationPlanet='b612';
+export function configureLandmarkNavigation(id:string) {
+ const fitted=transforms[id as keyof typeof transforms];
+ CHAIR.deskZ=fitted.deskDistance;CHAIR.seatHeight=fitted.seatHeight;CHAIR.seatedRootOffset=fitted.seatHeight-.14;
+ if(id===navigationPlanet)return;navigationPlanet=id;grid=null;route=[];HOME.splice(0,2,...userHome(id));APPROACH.splice(0,2,...userHome(id));
+}
+export function inNavigationObstacle(x:number,z:number,margin=0) {
+ // Reading chair must remain reachable by the planner, while manual drops reserve it.
+ const station = Math.abs(x-CHAIR.x)<.72 && z>CHAIR.z-1.05 && z<CHAIR.z+.45;
+ return inDeskObstacle(x,z,margin) || (!station && !userWalkable(navigationPlanet,x,z,Math.max(0,margin-.30)));
+
+}
+const NAV_STEP=.20,NAV_MARGIN=.42;
+const navClear=(a:THREE.Vector3,b:THREE.Vector3)=>{
+ const steps=Math.max(2,Math.ceil(a.distanceTo(b)/.07));
+ let previous=groundHeight(a.x,a.z);
+ for(let i=1;i<=steps;i++){
+  const x=a.x+(b.x-a.x)*i/steps,z=a.z+(b.z-a.z)*i/steps,h=groundHeight(x,z);
+  if(inNavigationObstacle(x,z,NAV_MARGIN)||Math.abs(h-previous)>.35)return false;
+  previous=h;
+ }
+ return true;
+};
+const routeTarget=new THREE.Vector3(Infinity,0,Infinity),routeFrom=new THREE.Vector3(Infinity,0,Infinity);
+let route:THREE.Vector3[]=[];
+let grid: {point:THREE.Vector3; edges:number[];reachable:boolean}[] | null=null;
+function navGrid() {
+ if(grid)return grid;
+ const nodes: {point:THREE.Vector3; edges:number[];reachable:boolean}[]=[],lookup=new Map<string,number>();
+ const extent=Math.ceil(WALK_RADIUS/NAV_STEP);
+ for(let x=-extent;x<=extent;x++)for(let z=-extent;z<=extent;z++){
+  const p=new THREE.Vector3(x*NAV_STEP,0,z*NAV_STEP);
+  if(Math.hypot(p.x,p.z)>WALK_RADIUS||inNavigationObstacle(p.x,p.z,NAV_MARGIN))continue;
+  lookup.set(`${x},${z}`,nodes.length);nodes.push({point:p,edges:[],reachable:true});
+ }
+ for(const [key,i] of lookup){const [x,z]=key.split(',').map(Number);for(let dx=-1;dx<=1;dx++)for(let dz=-1;dz<=1;dz++){
+  if(!dx&&!dz)continue;const j=lookup.get(`${x+dx},${z+dz}`);if(j!==undefined&&navClear(nodes[i].point,nodes[j].point))nodes[i].edges.push(j);
+ }}
+ // Connectivity uses the same clearance and step-height rules as actual movement.
+ const start=nodes.map((n,i)=>({i,d:(n.point.x-HOME[0])**2+(n.point.z-HOME[1])**2})).sort((a,b)=>a.d-b.d)[0]?.i;
+ const seen=new Set<number>(),queue=start===undefined?[]:[start];
+ while(queue.length){const i=queue.pop()!;if(seen.has(i))continue;seen.add(i);queue.push(...nodes[i].edges.filter(j=>!seen.has(j)));}
+ nodes.forEach((n,i)=>n.reachable=seen.has(i));
+ grid=nodes;return nodes;
+}
+/** Nearest landing on the same connected terrace as the resident's safe spawn. */
+export function navigationLanding(x:number,z:number):[number,number] {
+ const blocked=(a:number,b:number)=>inNavigationObstacle(a,b,.5)||(Math.abs(a-CHAIR.x)<.95&&b<CHAIR.z+.68&&b>CHAIR.z-.95);
+ const target=new THREE.Vector3(x,0,z);
+ const nodes=navGrid().filter(n=>n.reachable&&!blocked(n.point.x,n.point.z)).sort((a,b)=>a.point.distanceToSquared(target)-b.point.distanceToSquared(target));
+ const nearest=nodes[0];if(!nearest)return [...HOME];
+ if(!blocked(x,z)&&navClear(nearest.point,target))return [x,z];
+ return [nearest.point.x,nearest.point.z];
+}
+
+function planRoute(from:THREE.Vector3,target:THREE.Vector3) {
+ const nodes=navGrid();
+ const nearest=(p:THREE.Vector3)=>nodes.map((n,i)=>({i,d:n.reachable?n.point.distanceToSquared(p):Infinity})).filter(v=>Number.isFinite(v.d)).sort((a,b)=>a.d-b.d).find(v=>navClear(p,nodes[v.i].point))?.i;
+ const start=nearest(from),goal=nearest(target);if(start===undefined||goal===undefined)return [];
+ const cost=nodes.map(()=>Infinity),previous=nodes.map(()=>-1),open=new Set([start]);cost[start]=0;
+ while(open.size){let current=-1,best=Infinity;for(const i of open){const score=cost[i]+nodes[i].point.distanceTo(nodes[goal].point);if(score<best){current=i;best=score;}}
+  if(current===goal)break;open.delete(current);
+  for(const next of nodes[current].edges){const trial=cost[current]+nodes[current].point.distanceTo(nodes[next].point);if(trial<cost[next]){cost[next]=trial;previous[next]=current;open.add(next);}}
+ }
+ if(!Number.isFinite(cost[goal]))return [];
+ const path=[target.clone()];let at=goal;while(at!==start){path.unshift(nodes[at].point.clone());at=previous[at];if(at<0)return [];}
+ path.unshift(nodes[start].point.clone());return path;
+}
+export function waypoint(from:THREE.Vector3,target:THREE.Vector3,out:THREE.Vector3) {
+ if(navClear(from,target)){route=[];return out.copy(target);}
+ if(routeTarget.distanceToSquared(target)>.0001||routeFrom.distanceTo(from)>.8||!route.length){route=planRoute(from,target);routeTarget.copy(target);}
+ routeFrom.copy(from);
+ while(route.length&&from.distanceTo(route[0])<.16)route.shift();
+ for(let i=route.length-1;i>0;i--)if(navClear(from,route[i])){route.splice(0,i);break;}
+ return out.copy(route[0]||from);
 }
 
 const craters = [
@@ -188,7 +245,8 @@ export function createRockGeometry() {
   return geometry;
 }
 export function createSoilGeometry(
-  palette = { base: "#a5a58e", moss: "#879b71" },
+  palette = { base: "#b0b4a2", moss: "#939f87" },
+  planet = navigationPlanet,
 ) {
   const vertices: number[] = [],
     colors: number[] = [],
@@ -203,7 +261,7 @@ export function createSoilGeometry(
       const irregular = 1 + 0.018 * Math.sin(a * 7) + 0.012 * Math.sin(a * 11);
       const x = Math.cos(a) * r * irregular,
         z = Math.sin(a) * r * irregular;
-      vertices.push(x, groundHeight(x, z) + 0.012, z);
+      vertices.push(x, groundHeight(x, z, planet) + 0.012, z);
       uv.push(x * 0.3, z * 0.3);
       const color = new THREE.Color(palette.base).lerp(
         new THREE.Color(palette.moss),

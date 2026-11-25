@@ -1,3 +1,4 @@
+import {suppliedView} from "./supplied-world-config";
 import { useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
@@ -23,8 +24,9 @@ export function JourneyCamera() {
         ? 1
         : Math.min(1, (Date.now() - journey.started) / 1700),
       ease = (t: number) => t * t * (3 - 2 * t);
-    const scale = Math.max(1, 0.6 / (size.width / size.height)),
-      home = new THREE.Vector3(6 * scale, 4.2 * scale, 10 * scale);
+    const scale = Math.max(1, 1.05 / (size.width / size.height)),
+      view=suppliedView(p>=.5?journey.target:state.planetId,scale),
+      home = new THREE.Vector3(...view.position);
     if (!state.reduced) {
       if (p < 0.5)
         camera.position.copy(start.current).lerp(far.current, ease(p * 2));
@@ -37,7 +39,7 @@ export function JourneyCamera() {
               .add(new THREE.Vector3(0, 1, 0)),
           )
           .lerp(home, ease((p - 0.5) * 2));
-      camera.lookAt(0, -0.6, 0);
+      camera.lookAt(...view.focus);
       camera.updateMatrixWorld();
     }
     const host = gl.domElement.closest(".world") as HTMLElement | null;

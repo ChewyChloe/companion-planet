@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
@@ -15,12 +15,23 @@ export function NebulaBloom() {
     composer.addPass(render);composer.addPass(bloom);composer.addPass(output);
     return { composer, render, bloom, output };
   },[gl,scene,camera]);
-  useEffect(() => {pipeline.composer.setPixelRatio(1);pipeline.composer.setSize(size.width,size.height);},[pipeline,size]);
+  const resolution = useRef(0);
+  useEffect(() => {resolution.current=0;},[pipeline,size]);
   useEffect(() => {
     // QA invokes this exact final browser pipeline, including Bloom.
     scene.userData.renderMaterialPreview = () => pipeline.composer.render();
     return () => {delete scene.userData.renderMaterialPreview;pipeline.bloom.dispose();pipeline.output.dispose();pipeline.composer.dispose();};
   },[pipeline,scene]);
-  useFrame(() => pipeline.composer.render(),1);
+  useFrame(() => {
+    // Match the renderer's adaptive DPR: a full-size offscreen buffer negates
+    // RenderQuality's fill-rate reduction on phones and software WebGL.
+    const ratio = Math.min(1, gl.getPixelRatio());
+    if(resolution.current !== ratio) {
+      pipeline.composer.setPixelRatio(ratio);
+      pipeline.composer.setSize(size.width,size.height);
+      resolution.current=ratio;
+    }
+    pipeline.composer.render();
+  },1);
   return null;
 }

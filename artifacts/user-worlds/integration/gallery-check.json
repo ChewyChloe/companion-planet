@@ -1,0 +1,46 @@
+{
+  "cases": [
+    {
+      "id": "b612",
+      "mobile": false,
+      "loaded": true
+    },
+    {
+      "id": "moon",
+      "mobile": false,
+      "loaded": true
+    },
+    {
+      "id": "rose",
+      "mobile": false,
+      "loaded": true
+    },
+    {
+      "id": "forest",
+      "mobile": false,
+      "loaded": true
+    },
+    {
+      "id": "b612",
+      "mobile": true,
+      "loaded": true
+    },
+    {
+      "id": "moon",
+      "mobile": true,
+      "loaded": true
+    },
+    {
+      "id": "rose",
+      "mobile": true,
+      "loaded": true
+    },
+    {
+      "id": "forest",
+      "mobile": true,
+      "loaded": true
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

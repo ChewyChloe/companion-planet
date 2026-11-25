@@ -1,3 +1,5 @@
+import { suppliedLamp,suppliedView } from "./art/supplied-world-config";
+import { userHome } from "./art/user-world-ground";
 import { headingFromStep, turnToward } from "./art/locomotion";
 import { RESIDENT_SCALE, residentFocusHeight } from "./art/resident-assets";
 import { NebulaBloom } from "./art/NebulaBloom";
@@ -26,25 +28,25 @@ import { RenderQuality } from "./art/RenderQuality";
 import SculptCharacter from "./art/SculptCharacter";
 import { World, ArtLights } from "./art/World";
 import {
-  groundHeight as height,
+  walkingHeight as height,
   groundNormal,
   waypoint,
   CHAIR,
-  HOME,
   smoothstep,
 } from "./art/terrain";
 function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
   const poseLocked = new URLSearchParams(location.search).has("still");
-  const heading = useRef(.35);
+  const heading = useRef(useWorld.getState().planetId === "forest" ? 2.6 : .35);
   const root = useRef<THREE.Group>(null);
   const model = useRef<THREE.Group>(null);
   const clock = useRef(0);
   const gaitClock = useRef(0);
   const seatBlend = useRef(0);
   const action = useRef<Action>("idle");
-  const target = useRef(new THREE.Vector3(HOME[0], 0, HOME[1]));
-  const position = useRef(new THREE.Vector3(HOME[0], 0, HOME[1]));
-  const behavior = useRef({ ...initialBehavior, until: 20 });
+  const spawn = userHome(useWorld.getState().planetId);
+  const target = useRef(new THREE.Vector3(spawn[0], 0, spawn[1]));
+  const position = useRef(new THREE.Vector3(spawn[0], 0, spawn[1]));
+  const behavior = useRef({ ...initialBehavior, target:spawn, home:spawn, until: 20 });
   const rendered = useRef<Action>("idle");
   const [visual, setVisual] = ReactUseState<Action>("idle");
   const { gl, camera, controls } = useThree();
@@ -176,9 +178,9 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
         walking.current = true;
         arrivalAction.current = reaction;
         target.current.set(
-          reaction === "read" ? CHAIR.x : -1.1,
+          reaction === "read" ? CHAIR.x : safeDrop(-1.1,.65)[0],
           0,
-          reaction === "read" ? CHAIR.z : 0.65,
+          reaction === "read" ? CHAIR.z : safeDrop(-1.1,.65)[1],
         );
       }
     }
@@ -262,7 +264,8 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
         root.current.quaternion.identity();
       } else {
         const surface = height(position.current.x, position.current.z);
-        seatBlend.current =
+        const seating = action.current === "read" || arrivalAction.current === "read";
+        seatBlend.current = seating ?
           1 -
           smoothstep(
             0.12,
@@ -271,9 +274,11 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
               position.current.x - CHAIR.x,
               position.current.z - CHAIR.z,
             ),
-          );
-        const climb = 1 - smoothstep(.12,1.45,Math.hypot(position.current.x-CHAIR.x,position.current.z-CHAIR.z));
-        const supportY = surface + (held.current ? .28 : 0) + CHAIR.seatedRootOffset*climb + Math.sin(Math.PI*climb)*.40 + (actual === "rest" ? .065 : 0);
+          ) : 0;
+        const climb = seating ? 1 - smoothstep(.12,1.45,Math.hypot(position.current.x-CHAIR.x,position.current.z-CHAIR.z)) : 0;
+        const seatDistance=Math.hypot(position.current.x-CHAIR.x,position.current.z-CHAIR.z);
+        const clearanceArc=seating ? .85*smoothstep(.12,.35,seatDistance)*(1-smoothstep(1.15,1.6,seatDistance)) : 0;
+        const supportY = surface + (held.current ? .28 : 0) + CHAIR.seatedRootOffset*climb + clearanceArc + (actual === "rest" ? .065 : 0);
         root.current.position.set(
           position.current.x,
           Math.max(supportY, THREE.MathUtils.damp(root.current.position.y,supportY,5,motionDt)),
@@ -307,11 +312,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
       gl.domElement.dataset.action = actual;
       gl.domElement.dataset.planet = state.planetId;
       gl.domElement.dataset.lampOn = String(state.lampOn);
-      const lamp = new THREE.Vector3(
-        CHAIR.x - 0.1,
-        height(CHAIR.x, CHAIR.z) + 1.46,
-        CHAIR.z + CHAIR.deskZ + 0.08,
-      ).project(camera);
+      const lamp = new THREE.Vector3(...suppliedLamp(state.planetId)).project(camera);
       gl.domElement.dataset.lampScreen = `${(lamp.x + 1) / 2},${(1 - lamp.y) / 2}`;
       gl.domElement.dataset.reaction = state.reaction || "none";
       gl.domElement.dataset.frames = String(frames.current);
@@ -429,6 +430,7 @@ function RendererHealth({ onLost }: { onLost: (lost: boolean) => void }) {
 }
 function CameraFraming({ pet }: { pet: boolean }) {
   const { camera, size } = useThree();
+  const planetId=useWorld(s=>s.planetId);
   useEffect(() => {
     if (camera instanceof THREE.PerspectiveCamera) {
       camera.fov = pet ? 34 : 40;
@@ -437,21 +439,23 @@ function CameraFraming({ pet }: { pet: boolean }) {
         camera.lookAt(0, 0.3, 0);
       } else {
         const aspect = size.width / size.height,
-          scale = Math.max(1, 0.6 / aspect);
-        camera.position.set(6 * scale, 4.2 * scale, 10 * scale);
+          scale = Math.max(1, 1.05 / aspect);
+        if(useWorld.getState().journey)return;
+        const view=suppliedView(planetId,scale);
+        camera.position.set(...view.position);
         camera.setViewOffset(
           size.width,
           size.height,
           0,
-          -size.height * 0.2,
+          -size.height * 0.025,
           size.width,
           size.height,
         );
-        camera.lookAt(0, -0.6, 0);
+        camera.lookAt(...suppliedView(planetId).focus);
       }
       camera.updateProjectionMatrix();
     }
-  }, [camera, pet, size.width, size.height]);
+  }, [camera, pet, size.width, size.height,planetId]);
   return null;
 }
 export default function Scene({
@@ -510,9 +514,9 @@ export default function Scene({
             <World key={planetId} />
             <OrbitControls
               makeDefault
-              target={[0, -0.6, 0]}
+              target={suppliedView(planetId).focus}
               minDistance={8}
-              maxDistance={35}
+              maxDistance={80}
               minPolarAngle={0.45}
               maxPolarAngle={1.55}
               enablePan={false}
@@ -536,8 +540,8 @@ export default function Scene({
                 key={p.id}
                 className={`distant-planet ${hoveredPlanet === p.id ? "hovered" : ""}`}
                 style={{
-                  left: `${[18, 54, 82.5][i]}%`,
-                  top: `${[41, 18, 35][i]}%`,
+                  left: `${[11, 67.5, 89][i]}%`,
+                  top: `${[27, 7.5, 25][i]}%`,
                 }}
                 onMouseEnter={() => useWorld.getState().hoverPlanet(p.id)}
                 onMouseLeave={() => useWorld.getState().hoverPlanet(null)}

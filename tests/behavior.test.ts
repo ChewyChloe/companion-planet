@@ -1,4 +1,4 @@
-import { APPROACH, inDeskObstacle } from "../src/art/terrain";
+import { APPROACH, inDeskObstacle, WALK_RADIUS } from "../src/art/terrain";
 import { it, expect } from "vitest";
 import { advanceBehavior, initialBehavior } from "../src/behavior";
 it("prioritizes focus and rejects distracting reactions", () => {
@@ -38,7 +38,7 @@ it("uses bounded random positions and changes to stretch on break", () => {
   );
   expect(walk.action).toBe("walk");
   expect(walk.target[0]).toBeLessThan(1.1);
-  expect(Math.hypot(...walk.target)).toBeLessThanOrEqual(4.15);
+  expect(Math.hypot(...walk.target)).toBeLessThanOrEqual(WALK_RADIUS);
   expect(inDeskObstacle(...walk.target, 0.4)).toBe(false);
   const rest = advanceBehavior(walk, "break", null, 0, 1000, 1);
   expect(rest.action).toBe("stretch");

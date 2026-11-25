@@ -1,3 +1,5 @@
+import transforms from "../../assets/art/user-models/RUNTIME_TRANSFORMS.json";
+import { SuppliedInteractions } from "./SuppliedInteractions";
 import { residentSeatLift } from "./resident-assets";
 import { useWorld } from "../store";
 import { useFrame, useThree } from "@react-three/fiber";
@@ -157,7 +159,12 @@ export function Book({
     </group>
   );
 }
-export function ReadingStation({ wood }: { wood: Maps }) {
+export function ReadingStation({ wood, suppliedWorld }: { wood: Maps; suppliedWorld?: keyof typeof transforms }) {
+  const fitted = suppliedWorld ? transforms[suppliedWorld] : null;
+  const addChair = !suppliedWorld || suppliedWorld === "moon" || suppliedWorld === "forest";
+  const addAccessories = !suppliedWorld || suppliedWorld === "moon" || suppliedWorld === "forest";
+  const suppliedDesk = fitted?.deskDistance ?? CHAIR.deskZ;
+  const suppliedHeight = fitted ? fitted.deskHeight-.82 : 0;
   const { gl } = useThree();
   const lampOn = useWorld((s) => s.lampOn);
   const light = useRef<THREE.PointLight>(null),
@@ -192,7 +199,7 @@ export function ReadingStation({ wood }: { wood: Maps }) {
   );
   return (
     <group name="ReadingStation" position={[CHAIR.x, floor, CHAIR.z]}>
-      <group name="ReadingChair">
+      {addChair && <group name="ReadingChair">
         {residentSeatLift() > 0 && <RoundedBox name="ResidentSeatCushion" args={[.68,residentSeatLift(),.70]} radius={.035} smoothness={4} position={[0,.38+residentSeatLift()/2,CHAIR.seatCenterZ]}>
           <meshStandardMaterial color="#d7cfb9" roughness={.92} />
         </RoundedBox>}
@@ -200,48 +207,48 @@ export function ReadingStation({ wood }: { wood: Maps }) {
           name="Seat"
           wood={wood}
           position={[0, 0.335, CHAIR.seatCenterZ]}
-          size={[1.55, 0.09, CHAIR.seatDepth]}
+          size={[1.28, 0.09, CHAIR.seatDepth]}
           radius={0.045}
         />
         <Wood
           name="ChairBack"
           wood={wood}
           position={[0, 0.81, CHAIR.backZ]}
-          size={[1.30, 0.58, 0.11]}
+          size={[1.18, 0.58, 0.11]}
           radius={0.055}
         />
-        {[-0.57, 0.57].flatMap((x) =>
+        {[-0.47, 0.47].flatMap((x) =>
           [CHAIR.rearLegZ, CHAIR.frontLegZ].map((z) => (
             <Leg key={`${x}${z}`} x={x} z={z} top={0.3} wood={wood} />
           )),
         )}
         <Wood
           wood={wood}
-          position={[-0.56, 0.57, CHAIR.backZ + 0.06]}
+          position={[-0.49, 0.57, CHAIR.backZ + 0.06]}
           size={[0.045, 0.6, 0.045]}
           radius={0.02}
         />
         <Wood
           wood={wood}
-          position={[0.56, 0.57, CHAIR.backZ + 0.06]}
+          position={[0.49, 0.57, CHAIR.backZ + 0.06]}
           size={[0.045, 0.6, 0.045]}
           radius={0.02}
         />
-      </group>
-      <group name="Desk" position={[0, 0, CHAIR.deskZ]}>
-        <Wood
+      </group>}
+      {addAccessories && <group name="Desk" position={[0, suppliedHeight, suppliedDesk]}>
+        {!suppliedWorld && <Wood
           name="DeskSurface"
           wood={wood}
           position={[0, 0.82, 0]}
           size={[1.45, 0.09, 0.8]}
           radius={0.045}
-        />
-        {[-0.59, 0.59].flatMap((x) =>
+        />}
+        {!suppliedWorld && [-0.59, 0.59].flatMap((x) =>
           [-0.28, 0.28].map((z) => (
             <Leg key={`${x}${z}`} x={x} z={z} wood={wood} />
           )),
         )}
-        <Book position={[0.08, 0.87, -0.13]} />
+        {(!suppliedWorld || suppliedWorld === "forest") && <Book position={[0.08, 0.87, -0.13]} />}
         <group
           name="DeskLamp"
           onPointerOver={(e) => {
@@ -315,7 +322,8 @@ export function ReadingStation({ wood }: { wood: Maps }) {
             />
           </mesh>
         ))}
-      </group>
+      </group>}
+      {suppliedWorld && <SuppliedInteractions id={suppliedWorld} />}
     </group>
   );
 }

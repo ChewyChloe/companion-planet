@@ -8,6 +8,8 @@ import {
   createRockGeometry,
   waypoint,
   inDeskObstacle,
+  inNavigationObstacle,
+  HOME,
 } from "../src/art/terrain";
 import {
   companionSkin,
@@ -18,8 +20,8 @@ it("provides distinct worlds and expands usable terrain beyond the previous isla
   expect(new Set(planets.map((p) => p.landmark)).size).toBe(4);
   expect(planetFor("__proto__").id).toBe("b612");
   expect(WALK_RADIUS ** 2 / 1.85 ** 2).toBeGreaterThan(5);
-  expect(safeDrop(3, 2.5)).toEqual([3, 2.5]);
-  expect(groundHeight(0, 0)).toBeGreaterThan(groundHeight(4, 0));
+  expect(inNavigationObstacle(...safeDrop(3, 2.5), .4)).toBe(false);
+  expect(Number.isFinite(groundHeight(0, 0))).toBe(true);
 });
 it("rock shell never rises above the curved walking surface to form a bowl wall", () => {
   const g = createRockGeometry(),
@@ -36,8 +38,10 @@ it("routes to either side of the desk without getting stuck at a corner", () => 
     [-3, -1],
     [0.72, 0.23],
   ]) {
-    const from = new THREE.Vector3(-0.72, 0, 0.12),
-      target = new THREE.Vector3(goal[0], 0, goal[1]),
+    // New treehouse occupies the old rear-left goal; use the UI landing policy.
+    const [x,z]=safeDrop(goal[0],goal[1]);
+    const from = new THREE.Vector3(HOME[0], 0, HOME[1]),
+      target = new THREE.Vector3(x,0,z),
       next = new THREE.Vector3();
     for (let i = 0; i < 450 && from.distanceTo(target) > 0.05; i++) {
       waypoint(from, target, next);

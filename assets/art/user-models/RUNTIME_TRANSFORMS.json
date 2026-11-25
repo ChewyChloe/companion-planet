@@ -1,0 +1,134 @@
+{
+  "b612": {
+    "source": "assets/art/user-models/同頻星球.glb",
+    "sha256": "2e823502ae1530924a26f92425dbe6eaa929308ea342cecad32a3c41521fd3bb",
+    "scale": 11,
+    "rotationY": 1.1595326231061789,
+    "translation": [
+      -1.4284150451017548,
+      -3.38,
+      1.7963395430047806
+    ],
+    "sourceTriangles": 20153,
+    "chairBackAdjustedVertices": 0,
+    "chairBackMaxOffset": 0,
+    "removedReadingZoneTriangles": 0,
+    "runtimeTriangles": 20153,
+    "walkableCells": 988,
+    "deskDistance": 1.428078362695829,
+    "seatClearance": 0.04,
+    "seatHeight": 0.35899999999999965,
+    "deskHeight": 0.8536,
+    "bounds": [
+      [
+        -6.562584400177002,
+        -3.380000114440918,
+        -3.8295202255249023
+      ],
+      [
+        3.484130382537842,
+        5.157353401184082,
+        6.703616619110107
+      ]
+    ]
+  },
+  "moon": {
+    "source": "assets/art/user-models/月光書原.glb",
+    "sha256": "813f902d94a43ed4df476e040ff543be93477f7308faa70f938367a36f44f102",
+    "scale": 11,
+    "rotationY": 1.7417885283961008,
+    "translation": [
+      -0.8754897656061267,
+      -3.7821599999999997,
+      2.6264374408371496
+    ],
+    "sourceTriangles": 20034,
+    "chairBackAdjustedVertices": 0,
+    "chairBackMaxOffset": 0,
+    "removedReadingZoneTriangles": 0,
+    "runtimeTriangles": 20034,
+    "walkableCells": 620,
+    "deskDistance": 1.4545119937628566,
+    "seatClearance": 0,
+    "seatHeight": 0.38,
+    "deskHeight": 0.84084,
+    "bounds": [
+      [
+        -5.3038859367370605,
+        -3.7821600437164307,
+        -2.9117136001586914
+      ],
+      [
+        3.688786029815674,
+        6.819707870483398,
+        7.9601593017578125
+      ]
+    ]
+  },
+  "rose": {
+    "source": "assets/art/user-models/玫瑰花園.glb",
+    "sha256": "183462b38ac8509b19efcbd534e5d2b5e68b05a64aad143916dc96f9ab5902e5",
+    "scale": 11,
+    "rotationY": 0.8436369824827643,
+    "translation": [
+      -0.19009609830655538,
+      -3.59373,
+      0.536282911451463
+    ],
+    "sourceTriangles": 19727,
+    "chairBackAdjustedVertices": 180,
+    "chairBackMaxOffset": 0.34,
+    "removedReadingZoneTriangles": 0,
+    "runtimeTriangles": 19727,
+    "walkableCells": 1393,
+    "deskDistance": 1.5902214971506328,
+    "seatClearance": 0,
+    "seatHeight": 0.6112700000000001,
+    "deskHeight": 0.8147699999999997,
+    "bounds": [
+      [
+        -5.0326056480407715,
+        -3.5937299728393555,
+        -5.181113243103027
+      ],
+      [
+        4.654381275177002,
+        6.0712175369262695,
+        5.458990573883057
+      ]
+    ]
+  },
+  "forest": {
+    "source": "assets/art/user-models/微風森林.glb",
+    "sha256": "dfceb6805b96e59686771f32d8855c8f12e455471fb5d8dffb9a4e321a67626b",
+    "scale": 11,
+    "rotationY": 1.7999588577990788,
+    "translation": [
+      -1.1763111970415305,
+      -2.83609455,
+      3.7220629782372074
+    ],
+    "sourceTriangles": 20166,
+    "chairBackAdjustedVertices": 0,
+    "chairBackMaxOffset": 0,
+    "removedReadingZoneTriangles": 0,
+    "runtimeTriangles": 20166,
+    "walkableCells": 579,
+    "deskDistance": 2.058002402816868,
+    "seatClearance": 0,
+    "seatHeight": 0.38,
+    "deskHeight": 0.9377054500000002,
+    "bounds": [
+      [
+        -6.103160381317139,
+        -2.836094617843628,
+        -1.4324836730957031
+      ],
+      [
+        3.687241315841675,
+        6.573054790496826,
+        8.951127052307129
+      ]
+    ]
+  }
+}

@@ -1,0 +1,113 @@
+
+> companion-planet@0.1.0 check
+> npm run typecheck && npm run lint && npm run test && npm run build && npm ls --depth=0
+
+
+> companion-planet@0.1.0 typecheck
+> tsc --noEmit
+
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice
+
+> companion-planet@0.1.0 lint
+> eslint .
+
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice
+
+> companion-planet@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.12 /workspace/companion-planet
+
+
+ Test Files  13 passed (13)
+      Tests  46 passed (46)
+   Start at  09:23:18
+   Duration  2.38s (transform 793ms, setup 0ms, import 2.39s, tests 2.08s, environment 1ms)
+
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice
+
+> companion-planet@0.1.0 build
+> npm run typecheck && vite build
+
+
+> companion-planet@0.1.0 typecheck
+> tsc --noEmit
+
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice
+vite v7.3.8 building client environment for production...
+transforming...
+✓ 641 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                               1.19 kB │ gzip:   0.57 kB
+dist/assets/同頻星球-BW8CK9IJ.glb            10,378.04 kB
+dist/assets/月光書原-DpXOmwxC.glb            10,762.68 kB
+dist/assets/玫瑰花園-CUDoTmfc.glb            12,070.13 kB
+dist/assets/微風森林-BHXZN1Pn.glb            12,126.05 kB
+dist/assets/index-B-30u92Z.css               15.40 kB │ gzip:   4.07 kB
+dist/assets/UserWorldReview-C398o7kl.js       2.30 kB │ gzip:   1.27 kB
+dist/assets/ArtReview-Z-_eJFOL.js             2.39 kB │ gzip:   1.31 kB
+dist/assets/index-Bnrxt1oo.js             1,536.99 kB │ gzip: 411.21 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 6.99s
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice
+companion-planet@0.1.0 /workspace/companion-planet
+├── @eslint/js@9.39.5
+├── @playwright/test@1.65.1
+├── @react-three/drei@10.7.9
+├── @react-three/fiber@9.8.2
+├── @types/react-dom@19.3.0
+├── @types/react@19.3.0
+├── @types/three@0.181.0
+├── @vitejs/plugin-react@5.2.0
+├── concurrently@9.2.5
+├── electron-builder@26.18.0
+├── electron@39.8.10
+├── eslint@9.39.5
+├── express@5.3.0
+├── globals@16.5.0
+├── react-dom@19.3.1
+├── react@19.3.1
+├── three@0.181.2
+├── typescript-eslint@8.73.0
+├── typescript@5.9.3
+├── undici@7.30.2
+├── vite@7.3.8
+├── vitest@4.1.12
+└── zustand@5.1.0
+
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice

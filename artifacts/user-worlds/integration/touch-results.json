@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "input": "CDP actual touchStart / touchMove / touchEnd",
+  "resident": "puff",
+  "before": "-0.750,0.000,0.150",
+  "after": "-0.656,0.000,3.235",
+  "cameraUnchanged": true,
+  "errors": []
+}

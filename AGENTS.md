@@ -102,3 +102,15 @@ The user removes the picker model-review link and drag instruction and temporari
 ### Larger residents, supported seated pose and denser jelly (latest)
 
 The user explicitly requests taller/larger residents, no chair penetration, and less transparency. Planet characters now have a uniform 1.18 presentation scale (approved rest GLB POSITION remains unchanged); focus/drag anchors follow that scale. The runtime Seated corrective supports the whole underside and recomputes its normals; do not restore the old center-only lift. The chair is wider/deeper, the back and desk have more clearance, and the terrain station pad matches its footprint. Climbing uses an arc and avoids lagging below the support height. See SEATING_QA.md and actual R3F mesh/furniture measurements in artifacts/seating.
+
+### Four complete worlds, best-effort zero-budget review (latest)
+
+The user explicitly resumed work on all four planets after rejecting the isolated tree studies. Deliver a runnable revision and real browser pictures; the user only reviews images and will not operate Blender or buy services. Prefer suitable freely modifiable assets, record exact download URLs, license evidence, formats, hashes and whether actually used. Do not claim the procedural work matches the reference's hand-sculpted quality. Preserve the rejected capability studies as historical evidence.
+
+### User-supplied GLB replacement (latest)
+
+The user uploaded four Tripo GLBs to `assets/art/user-models` and explicitly requested replacement. Runtime landscapes are now `public/models/user-worlds/{b612,moon,rose,forest}.glb`, loaded by `PlanetArchitecture`. Keep source SHA-256 values unchanged. The runtime preparation script performs rigid placement and embedded texture resizing; preserve every source triangle. Rose additionally has a localized smooth chair-back correction (180 vertices, maximum .34 units) to clear the approved resident depth. Original uploaded files remain untouched. Earlier procedural planets-v3 are historical and are not loaded or required by production.
+
+The source models are merged meshes. Preserve their fixed desks, stools/chairs, architecture and terrain. Only Moon/Forest get missing live chairs and desk accessories. Main/Rose lamp and book interactions use measured spatial proxies. Do not overlay a second full desk or a generic visible soil disk. Ground and landing masks come from `user-world-navigation.json`; `navigationLanding` selects connected routes with body clearance instead of using the former circular terrain approximation. `CHAIR` fits measured support heights. Approved resident rest meshes and backend AI code remain unchanged.
+
+Use `scripts/check-user-world-integration.mjs` for actual desktop/touch-sized R3F evidence. Inspect screenshots and source-mesh ray parity checks; do not call unmeasured chair clearance passed. Run browser suites sequentially. `npm run check` covers type/lint/unit/build. Keep mini entry hidden, and adaptive renderer DPR in Bloom. Real-device FPS and paid live API calls remain unverified.

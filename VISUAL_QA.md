@@ -1,5 +1,25 @@
 # 同頻星球：3D 美術驗收
 
+## 最新：2026-11-25 使用者四座 GLB 替換
+
+正式網站已改用 `public/models/user-worlds`。以下為本輪結果；後文保留歷史紀錄。
+
+| 項目 | 狀態 | 證據與範圍 |
+|---|---|---|
+| 四個獨立模型載入 | Passed | 四座 × 桌機／手機尺寸，真正 R3F 場景，無 WebGL／腳本錯誤。 |
+| 入座與來源模型交疊取樣 | Passed | 八個案例，每例 521 個實際蒙皮後的星雲仔表面取樣，來源模型內部取樣數均為零；不是全部姿勢與全部角色的證明。 |
+| 桌燈點擊 | Passed | 八個案例實際 Raycaster 點擊並平滑關閉 PointLight。 |
+| 角色、旅行、計時與對話 | Passed | 桌機／手機共 16 項網站回歸，沒有失敗、略過或重試通過。 |
+| 實際觸控抓放 | Passed | Chromium CDP touchStart／touchMove／touchEnd，蓬蓬仔移動且鏡頭不誤轉。 |
+| 型別、lint、單元與建置 | Passed | `npm run check`，46 項單元測試。 |
+| 美術與原始設計的一致性 | Needs Human Review | 保留使用者模型的灰模造型，由使用者審閱四座實際截圖；不以測試取代審美。 |
+| 真機 Safari／Android FPS | Not Tested | 雲端手機尺寸與觸控模擬不能代表實體裝置效能。 |
+
+[四座實際場景](artifacts/user-worlds/integration/four-worlds.jpg) · [手機總覽](artifacts/user-worlds/integration/phone-worlds.jpg) · [詳細配置與證據](USER_WORLD_INTEGRATION.md)
+
+---
+
+
 > 本文件保留 8ddeb5f 的 3D 美術重製紀錄。後續使用者要求改為全螢幕湖畔版面，新的構圖、控制入口與版面測試以 [LAYOUT_QA.md](LAYOUT_QA.md) 為準，先前紙感／無漸層版面規則已由新參考取代。
 
 日期：2026-11-24（台北）。自動化回歸：43 項通過（單元 27、Web 6、手機觸控 3、版面／字型 6、Electron 1），另完成 9 動作與 4 視角擷取。這是實際可互動模型的技術驗收與美術審閱交付；不是原概念圖已完全重現的宣告。

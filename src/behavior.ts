@@ -61,7 +61,7 @@ export function advanceBehavior(
             : action === "return"
               ? current.home
               : action === "rest"
-                ? [-1.1, 0.65]
+                ? safeDrop(-1.1, .65)
                 : action === "read"
                   ? desk
                   : current.target,
@@ -80,7 +80,7 @@ export function advanceBehavior(
   const action = chooseAction(phase, random());
   let target = current.target;
   if (phase === "focus") target = desk;
-  else if (action === "rest") target = [-1.1, 0.65];
+  else if (action === "rest") target = safeDrop(-1.1, .65);
   else if (action === "walk") {
     const angle = random() * Math.PI * 2;
     const radius = 1.3 + random() * 2.5;

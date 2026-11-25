@@ -11,21 +11,21 @@ function Destination({ id, index }: { id: PlanetId; index: number }) {
   const p = planetFor(id);
   const other = useMemo(() => new THREE.Vector3(), []);
   const positions = [
-    [-0.64, 0.18],
-    [0.08, 0.64],
-    [0.65, 0.3],
+    [-0.78, 0.46],
+    [0.35, 0.85],
+    [0.78, 0.50],
   ];
-  useFrame(() => {
+  useFrame((_state, delta) => {
     if (!root.current) return;
     const [x, y] = positions[index];
     root.current.position.set(x, y, 0.98).unproject(camera);
-    other.set(x, y + [0.065, 0.045, 0.09][index], 0.98).unproject(camera);
+    other.set(x, y + [0.045, 0.032, 0.055][index], 0.98).unproject(camera);
     const hovered = useWorld.getState().hoveredPlanet === id;
     const scale =
       other.distanceTo(root.current.position) * (hovered ? 1.15 : 1);
-    root.current.scale.lerp(new THREE.Vector3(scale, scale, scale), 0.16);
+    root.current.scale.lerp(new THREE.Vector3(scale, scale, scale), 1-Math.exp(-Math.min(delta,.1)*16));
     if (halo.current)
-      halo.current.uniforms.strength.value = hovered ? 0.48 : 0.26;
+      halo.current.uniforms.strength.value = hovered ? 0.35 : 0.16;
     root.current.quaternion.copy(camera.quaternion);
     gl.domElement.dataset[`planet${index}`] =
       `${id},${(x + 1) / 2},${(1 - y) / 2}`;
@@ -33,6 +33,7 @@ function Destination({ id, index }: { id: PlanetId; index: number }) {
   return (
     <group
       ref={root}
+      scale={0}
       name={`Destination-${id}`}
       onPointerOver={(e) => {
         e.stopPropagation();
@@ -67,7 +68,7 @@ function Destination({ id, index }: { id: PlanetId; index: number }) {
           ref={halo}
           transparent
           depthWrite={false}
-          uniforms={{ strength: { value: 0.26 } }}
+          uniforms={{ strength: { value: 0.16 } }}
           vertexShader="varying vec3 vNormal;varying vec3 vView;void main(){vec4 p=modelViewMatrix*vec4(position,1.);vNormal=normalize(normalMatrix*normal);vView=normalize(-p.xyz);gl_Position=projectionMatrix*p;}"
           fragmentShader="uniform float strength;varying vec3 vNormal;varying vec3 vView;void main(){float rim=pow(1.-abs(dot(normalize(vNormal),normalize(vView))),2.);gl_FragColor=vec4(1.,.86,.72,rim*strength);}"
         />
