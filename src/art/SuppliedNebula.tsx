@@ -60,7 +60,7 @@ export function SuppliedNebula({ action, still, held, seatBlend, pet = false }: 
     });
     const feet = ["Foot.L", "Foot.R"].flatMap(name => {
       const bone = scene.getObjectByName(name);
-      return bone ? [{ bone, base: bone.position.clone() }] : [];
+      return bone ? [{ bone, base: bone.position.clone(), rotation: bone.quaternion.clone() }] : [];
     });
     const browPoints = [-1,1].map(side => {
       const x = center.x + side * .158;
@@ -92,15 +92,16 @@ export function SuppliedNebula({ action, still, held, seatBlend, pet = false }: 
     if (!still && !held?.current) asset.mixer.update(Math.min(dt, .05));
     const targetSeat = !pet && !held?.current && action === "read" ? (seatBlend?.current ?? 0) : 0;
     seat.current = THREE.MathUtils.damp(seat.current, targetSeat, 12, Math.min(dt,.05));
-    for (const {bone, base} of asset.feet) {
-      // The uploaded rig uses local +X as forward. Bring its feet under the
-      // belly while seated, then restore the authored gait on departure.
-      if (action === "read" || seat.current > .001) {
-        bone.position.copy(base);
-        bone.position.x += .105 * seat.current;
-        bone.position.y += .085 * seat.current;
-      }
-    }
+    const walking = action === "walk" || action === "approach" || action === "return";
+    asset.feet.forEach(({bone, base, rotation}, index) => {
+      // +X is forward in this rig. Alternate a planted foot with a lifted
+      // swing foot, and blend both into the seated position.
+      const cycle = walking ? Math.sin(asset.mixer.time * 8 + index * Math.PI) : 0;
+      bone.position.copy(base);
+      bone.position.x += .105 * seat.current + cycle * .068 * (1-seat.current);
+      bone.position.y += .085 * seat.current + Math.max(0, cycle) * .045 * (1-seat.current);
+      bone.quaternion.copy(rotation);
+    });
     if(root.current && !pet){
       root.current.scale.set(asset.scale*(1+.075*seat.current),asset.scale*(1-.16*seat.current),asset.scale);
       gl.domElement.dataset.seatedPose = seat.current.toFixed(3);
