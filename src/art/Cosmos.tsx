@@ -6,7 +6,7 @@ import * as THREE from "three";
 import { planets, planetFor, type PlanetId } from "../planets";
 import { useWorld } from "../store";
 function paintPlanet(id: PlanetId) {
-  const shape = new THREE.SphereGeometry(1, 64, 40);
+  const shape = new THREE.SphereGeometry(1, 96, 64);
   const positions = shape.attributes.position;
   const colors = new Float32Array(positions.count * 3);
   const noise = new ImprovedNoise();
@@ -15,14 +15,37 @@ function paintPlanet(id: PlanetId) {
   const light = base.clone().lerp(new THREE.Color("#f4ead4"), .68);
   const color = new THREE.Color();
   const seed = planets.findIndex(planet => planet.id === id) * 17;
+  const craters = Array.from({ length: 24 }, (_, i) => {
+    const y = 1 - 2 * (i + .5) / 24;
+    const angle = i * 2.399963 + seed;
+    const ring = Math.sqrt(1 - y * y);
+    return {
+      center: new THREE.Vector3(ring * Math.cos(angle), y, ring * Math.sin(angle)),
+      radius: .085 + .22 * ((i * 7 % 19) / 18),
+    };
+  });
+  const direction = new THREE.Vector3();
   for (let i = 0; i < positions.count; i++) {
     const x = positions.getX(i) + seed, y = positions.getY(i), z = positions.getZ(i);
     const sample = (frequency: number) => noise.noise(x * frequency, y * frequency, z * frequency);
     const terrain = sample(2.3) + .45 * sample(5) + .25 * sample(11) + .14 * sample(23);
-    const clouds = THREE.MathUtils.smoothstep(sample(4) + .35 * sample(12), .14, .57);
-    color.copy(dark).lerp(base, THREE.MathUtils.smoothstep(terrain, -.32, .32)).lerp(light, clouds * .68);
+    direction.fromBufferAttribute(positions, i).normalize();
+    let relief = .045 * terrain + .012 * sample(28);
+    let basin = 0;
+    for (const crater of craters) {
+      const r = direction.distanceTo(crater.center) / crater.radius;
+      const bowl = 1 - THREE.MathUtils.smoothstep(r, .15, .95);
+      const rim = Math.exp(-((r - .97) ** 2) / .018);
+      relief += crater.radius * (.16 * rim - .32 * bowl);
+      basin = Math.max(basin, bowl);
+    }
+    const radius = 1 + relief;
+    positions.setXYZ(i, direction.x * radius, direction.y * radius, direction.z * radius);
+    color.copy(dark).lerp(base, .68 + .22 * terrain - .22 * basin)
+      .lerp(light, THREE.MathUtils.smoothstep(terrain, .02, .58) * .46);
     color.toArray(colors, i * 3);
   }
+  shape.computeVertexNormals();
   shape.setAttribute("color", new THREE.BufferAttribute(colors, 3));
   return shape;
 }
