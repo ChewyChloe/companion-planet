@@ -11,3 +11,36 @@ playwright-report-electron/
 test-results-mobile/
 
 test-results-design/
+
+# Regenerated browser screenshots
+/artifacts/break-desktop.png
+/artifacts/break-mobile.png
+/artifacts/home-desktop.png
+/artifacts/home-mobile.png
+/artifacts/layout/phone-chat.png
+/artifacts/layout/phone-font-fallback.png
+/artifacts/layout/phone-scene.png
+/artifacts/layout/tablet-chat.png
+/artifacts/layout/tablet-font-fallback.png
+/artifacts/layout/tablet-scene.png
+/artifacts/layout/wide-chat.png
+/artifacts/layout/wide-font-fallback.png
+/artifacts/layout/wide-scene.png
+/artifacts/phone-landscape-chat.png
+/artifacts/phone-landscape-touch.png
+/artifacts/phone-small-chat.png
+/artifacts/phone-small-touch.png
+/artifacts/phone-standard-chat.png
+/artifacts/phone-standard-touch.png
+/artifacts/planet-desktop.png
+/artifacts/planet-mobile.png
+/artifacts/planet-overview.png
+/artifacts/universe/desktop-exploring.png
+/artifacts/universe/desktop-lamp-off.png
+/artifacts/universe/desktop-rose.png
+/artifacts/universe/mobile-exploring.png
+/artifacts/universe/mobile-lamp-off.png
+/artifacts/universe/mobile-rose.png
+/artifacts/universe/phone-landscape-touch-world.png
+/artifacts/universe/phone-small-touch-world.png
+/artifacts/universe/phone-standard-touch-world.png
