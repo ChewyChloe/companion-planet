@@ -193,7 +193,7 @@
     ]
   },
   "source": "references/companion-planet/同頻星球.png",
-  "status": "Needs Human Review",
+  "status": "Failed",
   "gray_only": true,
   "website_integrated": false,
   "source_image_packed_in_blend": true,
@@ -215,6 +215,13 @@
       "elevation": 0
     }
   },
-  "reference_fidelity_self_assessment": "Needs Human Review",
-  "user_approval": "Pending"
+  "reference_fidelity_self_assessment": "Failed",
+  "user_approval": "Rejected",
+  "rejection_reasons": [
+    "Main trunk is a simplified Y silhouette without the reference twisting growth columns.",
+    "Roots remain flat extended forms instead of organic buttress continuity.",
+    "Canopy clusters are too large and sparse and fail the reference cloud silhouette.",
+    "Door does not convincingly grow out of the trunk."
+  ],
+  "next_stage_authorized": false
 }

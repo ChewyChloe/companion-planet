@@ -22,5 +22,5 @@ for name,label in labels.items():
  ref=ROOT/'artifacts/planet-rebuild/capability-v1/references/treehouse-hero.png';comparison.paste(framed(Image.open(ref),(680,680)),(10,65));comparison.paste(framed(Image.open(folder/'quarter.png'),(680,680),True),(710,65))
  d.text((25,15),label+'｜原圖裁切',font=font,fill='#34323c');d.text((725,15),'Blender 灰模試件｜45 度',font=font,fill='#34323c');d.text((25,770),'原圖與試件分別置中縮放；不是相機標定或逐像素還原。',font=small,fill='#514d5b');d.text((25,803),'島體試件僅含地形／岩體／下層水域；原圖中的建築不屬本試件。' if name=='island' else '原始設計圖已封裝於 .blend；方法與差距見 REVIEW.md。',font=small,fill='#514d5b')
  comparison.save(folder/'reference-comparison.jpg',quality=95)
- r=json.loads((S/name/'report.json').read_text());r['reference_fidelity_self_assessment']='Needs Human Review';r['user_approval']='Pending';(S/name/'report.json').write_text(json.dumps(r,ensure_ascii=False,indent=2))
+ r=json.loads((S/name/'report.json').read_text());r['reference_fidelity_self_assessment']='Failed';r['user_approval']='Rejected';(S/name/'report.json').write_text(json.dumps(r,ensure_ascii=False,indent=2))
 print('TREE_V2_COMPARISON_READY')

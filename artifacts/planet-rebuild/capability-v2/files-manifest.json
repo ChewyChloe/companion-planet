@@ -1,8 +1,8 @@
 [
   {
     "path": "artifacts/planet-rebuild/capability-v2/REVIEW.md",
-    "bytes": 4881,
-    "sha256": "20c6275e8146e692465a8d2dfb83f5797174106142617ad203462e4075ddd040"
+    "bytes": 5883,
+    "sha256": "39e5681d0f9a7f0b83b6c60380e339db925b8e1ca332e5540de6d00f0415b8a4"
   },
   {
     "path": "artifacts/planet-rebuild/capability-v2/protected-files-before.json",
@@ -51,13 +51,13 @@
   },
   {
     "path": "assets/art/planet-rebuild/capability-v2/README.md",
-    "bytes": 639,
-    "sha256": "3d2211940d896c14bf788ca2cdc48f88f69d0985749b1a96e97223ed71114d90"
+    "bytes": 642,
+    "sha256": "fa737e5d288bea9e9ba128f515a810b4e3ab96c5b80ef3365bb2c696bfac354b"
   },
   {
     "path": "assets/art/planet-rebuild/capability-v2/treehouse/report.json",
-    "bytes": 5476,
-    "sha256": "fbb37bfb6558f45b1bf7971a55c8ae5fbed0b0b1ae92767792f04fb56cef95bd"
+    "bytes": 5836,
+    "sha256": "051ed6a64f27884c6d365f74763980e02d1a637bd92bd7dd42eb9c5a883fb6f1"
   },
   {
     "path": "assets/art/planet-rebuild/capability-v2/treehouse/treehouse.blend",
@@ -91,8 +91,8 @@
   },
   {
     "path": "scripts/modeling-trials-v2/compose_review.py",
-    "bytes": 2387,
-    "sha256": "a3b544ff589c0a291a4467534844f1bb4fb2560536637568986368bcd1c1cf67"
+    "bytes": 2376,
+    "sha256": "df84f4bf208cbbe29c4d2136e2ef48f94d0927bb18980602b0e9fc7bcc5b5e1f"
   },
   {
     "path": "scripts/modeling-trials-v2/implicit-canopy.npz",
