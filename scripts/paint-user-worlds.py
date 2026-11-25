@@ -12,7 +12,7 @@ TRANS=json.loads((ROOT/'assets/art/user-models/RUNTIME_TRANSFORMS.json').read_te
 PALETTES={
 'b612':dict(rock='#a5a098',grass='#94a381',leaf='#91a17c',bark='#967559',stone='#d7cbb5',roof='#839da4',wood='#b7956e',paper='#eddfbd',cover='#768fa5',metal='#ad9363',water='#79aab2',rose='#dfbf9d',cloth='#b7b3a1',moon='#e9d3a0',light='#f2cc88',crystal='#a2bfc7'),
 'moon':dict(rock='#8f91a5',grass='#a3b3ad',leaf='#86a5a7',bark='#998b8c',stone='#d4cfde',roof='#7d92af',wood='#ae9488',paper='#ede0c8',cover='#8880a3',metal='#b2a17f',water='#8cb8c5',rose='#d1b2cc',cloth='#aaa4bc',moon='#e4ce9c',light='#f2d49d',crystal='#b2bfdb'),
-'rose':dict(rock='#aea0a1',grass='#a3ad8c',leaf='#7d9678',bark='#9c8069',stone='#e1d3c0',roof='#bda89e',wood='#b69c83',paper='#f1e2cd',cover='#b37f8a',metal='#ad946b',water='#88b7b8',rose='#c98198',cloth='#c4abb0',moon='#dfc59b',light='#f2cb8e',crystal='#c4b3c9'),
+'rose':dict(rock='#987784',grass='#99aa79',leaf='#547954',bark='#9c8069',stone='#d2aa99',roof='#a86577',wood='#a4765d',paper='#f1e2cd',cover='#b37f8a',metal='#ad946b',water='#88b7b8',rose='#bf5479',cloth='#c4abb0',moon='#dfc59b',light='#f2cb8e',crystal='#c4b3c9'),
 'forest':dict(rock='#999f94',grass='#849874',leaf='#749373',bark='#927459',stone='#c8c6b2',roof='#819b8a',wood='#b19471',paper='#e7dbbd',cover='#7b8e82',metal='#aa946d',water='#79aba8',rose='#c9b1b0',cloth='#c9bb9b',moon='#d8c99f',light='#f0cf91',crystal='#a6c1b6')}
 for palette in PALETTES.values():palette['creamRose']='#e7d7c8'
 ROUGH=dict(creamRose=.72,rock=.94,grass=.95,leaf=.78,bark=.87,stone=.85,roof=.48,wood=.73,paper=.94,cover=.8,metal=.34,water=.22,rose=.72,cloth=.96,moon=.59,light=.35,crystal=.24)
@@ -102,6 +102,10 @@ def paint(key,xyz,norm,shape):
   structural=(((x-.265)**2+(z+.198)**2<.15**2)&(y>.40))|(((x-.35)**2+(z-.20)**2<.105**2)&(y<.50))|((x*x+(z-.18)**2<.16**2)&(y>.35)&(y<.47))|((x>0)&(x<.16)&(z>-.035)&(z<.11)&(y>.35)&(y<.55))
   structural|=((x*x+z*z)>.27**2)&(y>.325)&(y<.46)
  thin_leaf=leaf_confidence*ease(floor+.025,floor+.06,y)*(~structural)
+ if key=='rose':
+  gazebo=((x-.265)**2+(z+.198)**2)
+  apply('roof',(1-ease(.14**2,.17**2,gazebo))*ease(.53,.60,y))
+  apply('wood',ell([.04,.40,.10],[.085,.030,.085])*ease(.364,.382,y))
  apply('leaf',thin_leaf)
  if key=='rose':
   # Petal cores sit inside broader foliage volumes, leaving leaf silhouettes green.

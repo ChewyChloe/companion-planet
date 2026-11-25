@@ -8,7 +8,7 @@ import { useWorld } from "../store";
 import type { PlanetId } from "../planets";
 /** Complete user landscapes; only placement and texture resolution differ from the originals. */
 export function PlanetArchitecture({id}:{id:PlanetId}) {
- const gltf=useLoader(GLTFLoader,`${import.meta.env.BASE_URL}models/user-worlds/${id}.glb?v=${id === "forest" ? "forest-water-1" : (id === "b612" || id === "moon") ? "upstream-water-2" : "storybook-pbr-1"}`);
+ const gltf=useLoader(GLTFLoader,`${import.meta.env.BASE_URL}models/user-worlds/${id}.glb?v=${id === "rose" ? "rose-garden-2" : id === "forest" ? "forest-water-1" : (id === "b612" || id === "moon") ? "upstream-water-2" : "storybook-pbr-1"}`);
  const {gl}=useThree();
  const asset=useMemo(()=>{
   const scene=gltf.scene.clone(true),materials:THREE.MeshStandardMaterial[]=[];let triangles=0;

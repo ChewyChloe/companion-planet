@@ -1,5 +1,5 @@
 import { resolveBodyContact, collisionRevision } from "./art/world-collision";
-import { suppliedLamp,suppliedView } from "./art/supplied-world-config";
+import { suppliedFlower,suppliedLamp,suppliedView } from "./art/supplied-world-config";
 import { userHome } from "./art/user-world-ground";
 import { headingFromStep, turnToward } from "./art/locomotion";
 import { RESIDENT_SCALE, residentFocusHeight } from "./art/resident-assets";
@@ -351,6 +351,9 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
       gl.domElement.dataset.lampOn = String(state.lampOn);
       const lamp = new THREE.Vector3(...suppliedLamp(state.planetId)).project(camera);
       gl.domElement.dataset.lampScreen = `${(lamp.x + 1) / 2},${(1 - lamp.y) / 2}`;
+      const flower = new THREE.Vector3(...suppliedFlower(state.planetId)).project(camera);
+      gl.domElement.dataset.flowerScreen = `${(flower.x + 1) / 2},${(1 - flower.y) / 2}`;
+      gl.domElement.dataset.flowersBloom = String(state.flowersBloom);
       gl.domElement.dataset.reaction = state.reaction || "none";
       gl.domElement.dataset.frames = String(frames.current);
       gl.domElement.dataset.camera = camera.position

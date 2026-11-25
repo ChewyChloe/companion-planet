@@ -125,10 +125,11 @@ test("far ground walking, larger drag range and flower/book interactions coexist
     .split(",")
     .map(Number);
   expect(Math.hypot(p[0]-target.landing[0], p[2]-target.landing[1])).toBeLessThan(.2);
-  await page.getByRole("button", { name: "照顧花朵", exact: true }).click();
-  await expect(
-    page.getByRole("button", { name: "照顧花朵", exact: true }),
-  ).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("button", { name: "照顧花朵", exact: true })).toHaveCount(0);
+  const flower = (await canvas.getAttribute("data-flower-screen"))!.split(",").map(Number);
+  const flowerBox = (await canvas.boundingBox())!;
+  await page.mouse.click(flowerBox.x + flowerBox.width * flower[0], flowerBox.y + flowerBox.height * flower[1]);
+  await expect(canvas).toHaveAttribute("data-flowers-bloom", "true");
   await page.screenshot({
     path: `artifacts/universe/${info.project.name}-exploring.png`,
   });

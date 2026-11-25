@@ -165,10 +165,11 @@ test("touch distant planets and the physical lamp while keeping the timer", asyn
   await expect(
     page.getByRole("button", { name: "開啟桌燈", exact: true }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "照顧花朵", exact: true }).tap();
-  await expect(
-    page.getByRole("button", { name: "照顧花朵", exact: true }),
-  ).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("button", { name: "照顧花朵", exact: true })).toHaveCount(0);
+  const flower = (await canvas.getAttribute("data-flower-screen"))!.split(",").map(Number);
+  const flowerBox = (await canvas.boundingBox())!;
+  await page.touchscreen.tap(flowerBox.x + flowerBox.width * flower[0], flowerBox.y + flowerBox.height * flower[1]);
+  await expect(canvas).toHaveAttribute("data-flowers-bloom", "true");
   await expect(page.getByRole("timer")).toHaveText(timer);
   await page.screenshot({
     path: `artifacts/universe/${info.project.name}-touch-world.png`,

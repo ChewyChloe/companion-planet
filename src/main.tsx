@@ -2,7 +2,8 @@ import { usePlanetMusic } from "./usePlanetMusic";
 import { getNebulaMaterialVariant, nebulaMaterialVariants } from "./art/nebula-material-test";
 import { planetFor } from "./planets";
 import { CompanionPicker } from "./CompanionPicker";
-import { companionFor, randomGreeting } from "./companions";
+import { companionFor } from "./companions";
+import { focusCompleteLine, tapDialogue } from "./tap-dialogue";
 import { Icon } from "./Icon";
 import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
@@ -103,6 +104,12 @@ function App() {
   const [picker, setPicker] = useState(false);
   const [speech, setSpeech] = useState("");
   const lastGreeting = useRef(-1);
+  const taps = useRef({ count: 0, at: 0 });
+  const [speechVersion, setSpeechVersion] = useState(0);
+  const showSpeech = (text: string) => {
+    setSpeech(text);
+    setSpeechVersion(version => version + 1);
+  };
   useEffect(() => {
     if (state.silent) setSpeech("");
   }, [state.silent]);
@@ -113,7 +120,7 @@ function App() {
     if (!speech) return;
     const timer = setTimeout(() => setSpeech(""), 5500);
     return () => clearTimeout(timer);
-  }, [speech]);
+  }, [speech, speechVersion]);
   const [pet, setPet] = useState(false);
   const [chat, setChat] = useState(false);
   const [timerOpen, setTimerOpen] = useState(false);
@@ -165,7 +172,7 @@ function App() {
             current.notifications,
           )
         )
-          setNotice("這一小段完成了。起身伸展，喝一口水吧。");
+          showSpeech(focusCompleteLine);
         if (
           next.phase !== current.timer.phase ||
           next.running !== current.timer.running ||
@@ -211,14 +218,14 @@ function App() {
     if (phase === "focus") setChat(false);
   };
   const interact = () => {
-    const greeting = randomGreeting(
-      lastGreeting.current,
-      state.silent,
-      state.timer.phase === "focus",
-    );
+    const now = Date.now();
+    const count = now - taps.current.at < 950 ? taps.current.count + 1 : 1;
+    taps.current = { at: now, count };
+    const focusing = state.timer.phase === "focus" && state.timer.running;
+    const greeting = tapDialogue(lastGreeting.current, count, focusing, new Date(now).getHours());
     lastGreeting.current = greeting.index;
-    state.react(greeting.action);
-    setSpeech(greeting.text);
+    state.react(focusing ? "listen" : count === 3 ? "stretch" : "happy");
+    if (!state.silent) showSpeech(greeting.text);
   };
   const send = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -464,14 +471,6 @@ function App() {
             >
               <Icon name="moon" />
               <span>休息</span>
-            </button>
-            <button
-              aria-label="照顧花朵"
-              aria-pressed={state.flowersBloom}
-              onClick={state.toggleFlowers}
-            >
-              <Icon name="leaf" />
-              <span>{state.flowersBloom ? "花開了" : "澆花"}</span>
             </button>
           </div>
           <div className="scene-caption">
