@@ -1,4 +1,4 @@
-import { DurationSelect } from "./DurationSelect";
+import { TimerInput } from "./TimerInput";
 import { usePlanetMusic } from "./usePlanetMusic";
 import { getNebulaMaterialVariant, nebulaMaterialVariants } from "./art/nebula-material-test";
 import { planetFor } from "./planets";
@@ -12,6 +12,7 @@ import Scene from "./Scene";
 import { useWorld } from "./store";
 import {
   initialTimer,
+  formatTimerPart,
   pause,
   resume,
   startTimer,
@@ -125,14 +126,12 @@ function App() {
   }, [speech, speechVersion]);
   const [pet, setPet] = useState(false);
   const [chat, setChat] = useState(false);
-  const [timerOpen, setTimerOpen] = useState(false);
   useEffect(() => {
     const close = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setPicker(false);
         setSpeech("");
         setChat(false);
-        setTimerOpen(false);
       }
     };
     window.addEventListener("keydown", close);
@@ -200,7 +199,6 @@ function App() {
   useEffect(() => window.desktop?.onMode((mode) => setPet(mode === "pet")), []);
   const mode = async () => {
     setChat(false);
-    setTimerOpen(false);
     const next = !pet;
     if (window.desktop) await window.desktop.setMode(next ? "pet" : "planet");
     setPet(next);
@@ -209,14 +207,13 @@ function App() {
     state.setTimer(
       startTimer(
         state.timer,
-        phase === "break" ? 5 : minutes,
+        phase === "break" ? 5 : useWorld.getState().focusMinutes,
         Date.now(),
         phase,
       ),
     );
     setNotice("");
     setIntent("");
-    setTimerOpen(false);
     if (phase === "focus") setChat(false);
   };
   const interact = () => {
@@ -298,9 +295,13 @@ function App() {
     }
   };
   const time = Math.ceil(state.timer.remaining / 1000);
-  const display = `${Math.floor(time / 60)
-    .toString()
-    .padStart(2, "0")}:${(time % 60).toString().padStart(2, "0")}`;
+  const display = `${formatTimerPart(Math.floor(time / 60))}:${formatTimerPart(time % 60)}`;
+  const breakReady = state.timer.phase === "break" && !state.timer.running && state.timer.remaining === 300_000;
+  const timerActive = state.timer.phase !== "idle" && !breakReady;
+  const timerLabel = state.timer.running ? "暫停"
+    : state.timer.phase === "focus" ? "繼續專注"
+    : timerActive ? "繼續休息" : "開始專注";
+  const audioLabel = audio.on ? "關閉環境音" : "開啟環境音";
   return (
     <main
       className={pet ? "app pet" : "app"}
@@ -321,44 +322,53 @@ function App() {
         <>
           {window.desktop && <div className="window-drag" />}
           <section className="focus-hud" aria-label="番茄鐘">
-            <button
-              className="time-card"
-              aria-label="計時設定"
-              aria-expanded={timerOpen}
-              aria-controls="timer-settings"
-              onClick={() => {
-                setTimerOpen(!timerOpen);
-              }}
-            >
-              <span className="time" role="timer" aria-label="剩餘時間">
-                {display}
-              </span>
-            </button>
+            <div className="time-card">
+              {state.timer.phase === "idle" ? (
+                <TimerInput minutes={minutes} onChange={setMinutes} />
+              ) : (
+                <span className="time" role="timer" aria-label="剩餘時間">{display}</span>
+              )}
+              {breakReady && (
+                <button className="timer-break" onClick={() => begin("break")}>
+                  開始休息
+                </button>
+              )}
+              {timerActive && (
+                <button
+                  className="timer-reset control-tooltip"
+                  aria-label="重新開始"
+                  data-tooltip="重新開始"
+                  onClick={() => {
+                    state.setTimer({
+                      ...initialTimer,
+                      remaining: Math.round(minutes * 60_000),
+                      completed: state.timer.completed,
+                    });
+                    setNotice("");
+                  }}
+                >
+                  <Icon name="reset" />
+                </button>
+              )}
+            </div>
             <div className="timer-buttons">
               <button
-                className="round-control"
-                aria-label={
-                  state.timer.running
-                    ? "暫停"
-                    : state.timer.phase === "focus"
-                      ? "繼續專注"
-                      : "開始專注"
-                }
-                onClick={() =>
-                  state.timer.running
-                    ? state.setTimer(pause(state.timer, Date.now()))
-                    : state.timer.phase === "focus"
-                      ? state.setTimer(resume(state.timer, Date.now()))
-                      : begin()
-                }
+                className="round-control control-tooltip"
+                aria-label={timerLabel}
+                data-tooltip={timerLabel}
+                onClick={() => {
+                  if (state.timer.running) state.setTimer(pause(state.timer, Date.now()));
+                  else if (timerActive) state.setTimer(resume(state.timer, Date.now()));
+                  else begin();
+                }}
               >
                 <Icon name={state.timer.running ? "pause" : "play"} />
               </button>
               <button
-                className="round-control"
+                className="round-control control-tooltip"
                 aria-label="安靜陪我"
                 aria-pressed={state.silent}
-                title={state.silent ? "已開啟安靜陪伴" : "安靜陪我"}
+                data-tooltip={state.silent ? "已開啟安靜陪伴" : "安靜陪我"}
                 onClick={() => state.setSilent(!state.silent)}
               >
                 <Icon name={state.silent ? "moon" : "mute"} />
@@ -376,57 +386,15 @@ function App() {
               <Icon name={state.night ? "moon" : "settings"} />
             </button>
             <button
-              className="round-control"
-              aria-label={audio.on ? "關閉環境音" : "開啟環境音"}
+              className="round-control control-tooltip"
+              aria-label={audioLabel}
+              data-tooltip={audioLabel}
               aria-pressed={audio.on}
               onClick={() => void audio.toggle()}
             >
               <Icon name={audio.on ? "sound" : "mute"} />
             </button>
           </nav>
-          {timerOpen && (
-            <section
-              className="timer-popover floating-panel"
-              id="timer-settings"
-              aria-label="計時設定"
-            >
-              <div className="panel-heading">
-                <h2>留一段時間給自己</h2>
-                <button
-                  aria-label="收合計時設定"
-                  onClick={() => setTimerOpen(false)}
-                >
-                  <Icon name="close" />
-                </button>
-              </div>
-              <div className="duration">
-                <DurationSelect value={minutes} disabled={state.timer.running} onChange={duration => {
-                  setMinutes(duration);
-                  if (state.timer.phase === "idle") state.setTimer({ ...state.timer, remaining: duration * 60000 });
-                }} />
-              </div>
-              <div className="popover-actions">
-                <span>{state.timer.completed} 段完成</span>
-                <button
-                  aria-label="重設計時器"
-                  onClick={() => {
-                    state.setTimer({
-                      ...initialTimer,
-                      remaining: minutes * 60000,
-                      completed: state.timer.completed,
-                    });
-                    setNotice("");
-                  }}
-                >
-                  <Icon name="reset" />
-                  重新開始
-                </button>
-              </div>
-              {state.timer.phase === "break" && !state.timer.running && (
-                <button onClick={() => begin("break")}>開始 5 分鐘休息</button>
-              )}
-            </section>
-          )}
           <div
             key={state.planetId}
             className={`planet-arrival ${state.reduced ? "still" : ""}`}

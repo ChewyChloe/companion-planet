@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { openTimerSettings } from "./ui";
+import { setFocusDuration } from "./ui";
 test("immersive lakeside keeps corner controls, open center and local Huninn", async ({
   page,
 }, info) => {
@@ -54,11 +54,8 @@ test("immersive lakeside keeps corner controls, open center and local Huninn", a
   await expect(
     page.getByRole("button", { name: "開啟環境音" }),
   ).toHaveAttribute("aria-pressed", "false");
-  await openTimerSettings(page);
-  await page.getByLabel("專注時長", { exact: true }).click();
-  await page.getByRole("button", { name: "5 分鐘", exact: true }).last().click();
-  await expect(page.getByRole("timer")).toHaveText("05:00");
-  await page.getByRole("button", { name: "收合計時設定" }).click();
+  await setFocusDuration(page, "5");
+  await expect(page.getByRole("textbox", { name: "分鐘", exact: true })).toHaveValue("05");
   await page.getByRole("button", { name: "和星雲仔說說話" }).click();
   await page.getByLabel("想對星雲仔說的話").fill("今天好累");
   await page.getByRole("button", { name: "送出訊息" }).click();

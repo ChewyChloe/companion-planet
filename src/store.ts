@@ -1,7 +1,7 @@
 import type { TapMood } from "./tap-dialogue";
 import { planetFor, type PlanetId } from "./planets";
 import { create } from "zustand";
-import { initialTimer, restoreTimer, type Timer, type Action } from "./domain";
+import { initialTimer, normalizeFocusMinutes, restoreTimer, type Timer, type Action } from "./domain";
 import { type CompanionId } from "./companions";
 type WorldMemory = Partial<
   Record<PlanetId, { lampOn: boolean; flowersBloom: boolean }>
@@ -105,12 +105,17 @@ export const useWorld = create<State>((set) => ({
     (saved.reduced === undefined &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches),
   notifications: saved.notifications !== false,
-  focusMinutes: [25, 45, 5, 1, 1 / 6].includes(saved.focusMinutes)
-    ? saved.focusMinutes
-    : 25,
-  setFocusMinutes: (focusMinutes) => {
-    if ([25, 45, 5, 1, 1 / 6].includes(focusMinutes)) set({ focusMinutes });
-  },
+  focusMinutes: normalizeFocusMinutes(saved.focusMinutes),
+  setFocusMinutes: (minutes) =>
+    set((s) => {
+      const focusMinutes = normalizeFocusMinutes(minutes);
+      return {
+        focusMinutes,
+        timer: s.timer.phase === "idle"
+          ? { ...s.timer, remaining: Math.round(focusMinutes * 60_000) }
+          : s.timer,
+      };
+    }),
   reaction: null,
   reactionUntil: 0,
   setTimer: (timer) => set({ timer }),

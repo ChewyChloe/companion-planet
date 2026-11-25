@@ -1,4 +1,4 @@
-import { openTimerSettings } from "./ui";
+import { setFocusDuration } from "./ui";
 import { test, expect } from "@playwright/test";
 // Software WebGL plus three full-scene screenshots can exceed two minutes.
 test.describe.configure({ timeout: 180000 });
@@ -46,9 +46,7 @@ test("planet renders, camera rotates, character responds, timer and conversation
   await page.screenshot({
     path: `artifacts/planet-${testInfo.project.name}.png`,
   });
-  await openTimerSettings(page);
-  await page.getByLabel("專注時長", { exact: true }).click();
-  await page.getByRole("button", { name: "1 分鐘", exact: true }).last().click();
+  await setFocusDuration(page, "1");
   await page.getByRole("button", { name: "開始專注", exact: false }).click();
   await expect(page.locator("main")).toHaveAttribute("data-phase", "focus");
   await expect(canvas).toHaveAttribute("data-action", "read", {
@@ -59,8 +57,6 @@ test("planet renders, camera rotates, character responds, timer and conversation
   await page.waitForTimeout(700);
   await expect(page.getByRole("timer")).toHaveText(paused);
   await page.reload();
-  await openTimerSettings(page);
-  await expect(page.getByLabel("專注時長")).toHaveText("1 分鐘");
   await expect(page.getByRole("timer")).toHaveText(paused);
   await page.getByRole("button", { name: "繼續專注" }).click();
   await page.getByRole("button", { name: "和星雲仔說說話" }).click();
@@ -85,9 +81,7 @@ test("silent mode suppresses completion notices and AI proposals require confirm
 }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "安靜陪我" }).click();
-  await openTimerSettings(page);
-  await page.getByLabel("專注時長", { exact: true }).click();
-  await page.getByRole("button", { name: "10 秒", exact: true }).last().click();
+  await setFocusDuration(page, "0", "10");
   await page.getByRole("button", { name: "開始專注", exact: false }).click();
   await expect(page.locator("main")).toHaveAttribute("data-phase", "break", {
     timeout: 18000,

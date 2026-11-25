@@ -23,15 +23,17 @@ export const initialTimer: Timer = {
   deadline: null,
   completed: 0,
 };
+export const formatTimerPart = (value: number) => String(value).padStart(2, "0");
+export function normalizeFocusMinutes(minutes: number): number {
+  return Math.min(5400, Math.max(1, Math.round((Number.isFinite(minutes) ? minutes : 25) * 60))) / 60;
+}
 export function startTimer(
   timer: Timer,
   minutes: number,
   now: number,
   phase: Phase = "focus",
 ): Timer {
-  const duration =
-    Math.min(90, Math.max(1 / 60, Number.isFinite(minutes) ? minutes : 25)) *
-    60_000;
+  const duration = Math.round(normalizeFocusMinutes(minutes) * 60_000);
   return {
     ...timer,
     phase,
