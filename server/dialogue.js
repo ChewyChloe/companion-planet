@@ -11,6 +11,71 @@ import {
   actions,
 } from "../shared/dialogue.js";
 export { fallback, validateReply, urgent } from "../shared/dialogue.js";
+const errorBodyLimit = 8_192;
+
+async function readProviderError(response) {
+  const reader = response.body?.getReader();
+  if (!reader) return {};
+  const decoder = new TextDecoder();
+  let text = "", bytes = 0;
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      bytes += value.byteLength;
+      if (bytes > errorBodyLimit) return {};
+      text += decoder.decode(value, { stream: true });
+    }
+    const error = JSON.parse(text + decoder.decode())?.error;
+    return error && typeof error === "object" ? error : {};
+  } catch {
+    return {};
+  } finally {
+    void reader.cancel().catch(() => {});
+  }
+}
+
+function providerDiagnostic(requestUrl, model, error, sensitiveValues) {
+  const url = new URL(requestUrl);
+  const secrets = [...new Set([
+    ...sensitiveValues, url.username, url.password,
+    ...url.searchParams.values(), url.hash.slice(1),
+  ].flatMap((value) => {
+    if (typeof value !== "string" || !value.trim()) return [];
+    const trimmed = value.trim();
+    return [value, trimmed, encodeURIComponent(trimmed.toWellFormed()), JSON.stringify(trimmed).slice(1, -1)];
+  }))].sort((a, b) => b.length - a.length);
+  const clean = (value, limit) => {
+    if (typeof value !== "string") return undefined;
+    let safe = value;
+    const marker = "\u0000";
+    for (const secret of secrets) safe = safe.replaceAll(secret, marker);
+    return safe
+      .replace(/https?:\/\/[^\s<>"']+/gi, (text) => {
+        try { return new URL(text).origin; } catch { return marker; }
+      })
+      .replace(/\b(?:Bearer|Basic)[ \t]+[^\s,;"']+/gi, marker)
+      .replace(/\b(?:gsk_|sk-|AIza|ghp_|gho_|github_pat_|xox[baprs]-)[\w-]+/gi, marker)
+      .replace(/\b(?:api[-_ ]?key|authorization|access[-_ ]?token|password|secret)\s*["']?\s*[:=]\s*(?:"[^"]*"|'[^']*'|[^\s,;]+)/gi, marker)
+      .replace(/\beyJ[\w-]+\.[\w-]+\.[\w-]+\b/g, marker)
+      .replace(/\b[\w.+-]+@[\w.-]+\.[a-z]{2,}\b/gi, marker)
+      .replaceAll(marker, "[redacted]")
+      .replace(/[\p{Cc}\p{Cf}\p{Zl}\p{Zp}]/gu, " ")
+      .slice(0, limit);
+  };
+  return {
+    code: Number.isFinite(error.code) ? error.code : clean(error.code, 80),
+    type: clean(error.type, 80),
+    message: clean(error.message, 320),
+    // Only the origin and redacted path are useful for diagnosing a route.
+    url: clean(url.origin, 160) + clean(url.pathname, 240),
+    model: clean(model, 120),
+  };
+}
+
+/**
+ * @param {{message: string, phase: string, hour: number, history?: {role: string, content: string}[], companionId?: string}} context
+ */
 export async function getReply(
   { message, phase, hour, history = [], companionId = "nebula" },
   {
@@ -25,8 +90,10 @@ export async function getReply(
   if (urgent(message)) return { ...backup, provider: "safety" };
   if (!apiKey) return { ...backup, provider: "mock" };
   try {
+    const endpoint = new URL(baseUrl);
+    endpoint.pathname = `${endpoint.pathname.replace(/\/$/, "")}/chat/completions`;
     const response = await fetcher(
-      `${baseUrl.replace(/\/$/, "")}/chat/completions`,
+      endpoint.href,
       {
         method: "POST",
         signal: AbortSignal.timeout(timeout),
@@ -51,7 +118,14 @@ export async function getReply(
       },
     );
     if (!response.ok) {
-      console.warn(`[LLM] provider_http_${response.status}`);
+      const error = await readProviderError(response);
+      const diagnostic = providerDiagnostic(endpoint, model, error, [
+        apiKey, message, ...history.map((entry) => entry.content),
+      ]);
+      console.warn(`[LLM] provider_http_${response.status} ${JSON.stringify({
+        status: response.status,
+        ...diagnostic,
+      })}`);
       return { ...backup, provider: "fallback" };
     }
     const data = await response.json();
