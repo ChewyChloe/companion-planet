@@ -24,3 +24,20 @@ it("ships the supplied skinned Nebula with finite, usable animation transforms",
     }
   }
 });
+
+it("keeps arm animations near the visible rest pose instead of folding them into the body", () => {
+  const b=readFileSync("public/models/user-residents/nebula.glb"),length=b.readUInt32LE(12);
+  const g=JSON.parse(b.subarray(20,20+length).toString());
+  for(const clip of g.animations)for(const channel of clip.channels){
+    const node=g.nodes[channel.target.node];
+    if(channel.target.path!=="rotation" || !["Hand.L","Hand.R"].includes(node.name))continue;
+    const a=g.accessors[clip.samplers[channel.sampler].output],v=g.bufferViews[a.bufferView];
+    const offset=28+length+(v.byteOffset||0)+(a.byteOffset||0);
+    expect(a.count).toBeGreaterThan(1);
+    for(let i=0;i<a.count;i++){
+      const q=Array.from({length:4},(_,c)=>b.readFloatLE(offset+i*16+c*4));
+      const dot=Math.abs(q.reduce((s,x,j)=>s+x*node.rotation[j],0));
+      expect(dot,`${clip.name} ${node.name}`).toBeGreaterThan(Math.cos(.9/2));
+    }
+  }
+});

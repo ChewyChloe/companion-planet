@@ -8,7 +8,7 @@ import { clone } from "three/addons/utils/SkeletonUtils.js";
 import * as THREE from "three";
 import type { Action } from "../domain";
 
-export const SUPPLIED_NEBULA_URL = "models/user-residents/nebula.glb";
+export const SUPPLIED_NEBULA_URL = "models/user-residents/nebula.glb?v=arms-v2";
 export function SuppliedNebula({ action, still, held, seatBlend, pet = false }: {
   action: Action; still?: boolean; held?: React.RefObject<boolean>; seatBlend?: React.RefObject<number>; pet?: boolean;
 }) {

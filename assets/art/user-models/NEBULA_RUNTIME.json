@@ -68,5 +68,6 @@
     "Walk_JellyRig",
     "Wave_JellyRig"
   ],
-  "bytes": 4798404
+  "bytes": 4809632,
+  "armTracks": "rest-relative-v1"
 }

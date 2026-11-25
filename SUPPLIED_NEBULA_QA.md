@@ -71,3 +71,18 @@ normal Nebula routes use `models/user-residents/nebula.glb`.
   result. Inspect its sampled contacts rather than assuming every frame is clear.
 - Fully authored seated leg folding, additional facial expressions, and recovery
   of invalid source animation rotations require additional animation assets/work.
+
+## Arm visibility correction
+
+The mesh retains both arms, but the original AntennaSway/Bounce rotation tracks
+apply half-turns to Hand.L/Hand.R instead of their rig rest orientations, folding
+them into the torso. Rest-only previews did not reveal this playback problem.
+`repair-nebula-arms.py` replaces those tracks with rest-relative rotations:
+relaxed idle hands, bounded alternating walking swings, a small bounce gesture,
+and a raised right-hand wave. Geometry, UVs and skin weights are byte-identical;
+original uploaded files remain untouched. The preparation script applies this
+repair after export. The runtime URL is versioned `arms-v2` to refresh cached GLBs.
+
+Validation: 55 unit tests and build/lint passed; all four clips captured while
+playing in real R3F, with no page errors. Idle and waving screenshots were visually
+reviewed for both arms. See `artifacts/nebula-arms/`.

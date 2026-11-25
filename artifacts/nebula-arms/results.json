@@ -1,0 +1,25 @@
+{
+  "cases": [
+    {
+      "pose": "idle",
+      "clip": "AntennaSway",
+      "animated": true
+    },
+    {
+      "pose": "walk",
+      "clip": "Walk",
+      "animated": true
+    },
+    {
+      "pose": "happy",
+      "clip": "Bounce",
+      "animated": true
+    },
+    {
+      "pose": "listen",
+      "clip": "Wave",
+      "animated": true
+    }
+  ],
+  "errors": []
+}
