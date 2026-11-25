@@ -9,8 +9,8 @@
 正式場景使用 `assets/art/user-models/` 中的同頻星球、月光書原、玫瑰花園與微風森林。原檔不變；`public/models/user-worlds/` 是已完成分區上色、PBR 材質與 AO 的執行副本，完整保留原模型面數與輪廓。此批模型為使用者提供，未聲明額外的再散布授權。
 
 - [原始模型與匯入紀錄](assets/art/user-models/RUNTIME_TRANSFORMS.json)
-- [上色與實際渲染預覽](WORLD_COLOR_QA.md)
-- [整合與驗收說明](USER_WORLD_INTEGRATION.md)
+- [上色與實際渲染預覽](docs/archive/WORLD_COLOR_QA.md)
+- [整合與驗收說明](docs/archive/USER_WORLD_INTEGRATION.md)
 - `npm run dev` 後開啟 `/?world-model-review`，可旋轉檢視未經配置的原始模型。
 - `python scripts/prepare-user-worlds.py` 可重新產生工作副本和地形資料，需 Python、NumPy、Pillow。
 
@@ -23,9 +23,9 @@ npm ci
 npm run dev
 ```
 
-Vite 開發服務使用 5173，後端使用 3001。由終端顯示的網址開啟全螢幕湖畔場景。拖曳場景旋轉、滾輪或雙指縮放，按住角色可抓起並拖放到小島空地；直接點一下會隨機做動作或出現短句。右下星球圖示可切換九位居民，選擇會記住。左上播放／暫停專注，點時間數字開啟時長與重設；右上切換白天／夜晚、環境音，右下開啟聊天；迷你陪伴的網頁入口暫時隱藏。桌機、平板與手機使用同一響應式版面。計時以截止時間計算，暫停／重新整理不會重新起算。版面驗證見 [LAYOUT_QA.md](LAYOUT_QA.md)，九位居民與拖放操作見 [INTERACTION_QA.md](INTERACTION_QA.md)。
+Vite 開發服務使用 5173，後端使用 3001。由終端顯示的網址開啟全螢幕湖畔場景。拖曳場景旋轉、滾輪或雙指縮放，按住角色可抓起並拖放到小島空地；直接點一下會隨機做動作或出現短句。右下星球圖示可切換九位居民，選擇會記住。左上播放／暫停專注，點時間數字開啟時長與重設；右上切換白天／夜晚、環境音，右下開啟聊天；迷你陪伴的網頁入口暫時隱藏。桌機、平板與手機使用同一響應式版面。計時以截止時間計算，暫停／重新整理不會重新起算。版面驗證見 [LAYOUT_QA.md](docs/archive/LAYOUT_QA.md)，九位居民與拖放操作見 [INTERACTION_QA.md](docs/archive/INTERACTION_QA.md)。
 
-點空地可以讓角色走過去；點遠方星球可前往玫瑰花園、微風森林或月光書原。點燈罩開關桌燈，點書本讀書；下方可選讀書、休息及照顧花朵；下方互動列也提供較好按的手機控制。早期互動規格見 [UNIVERSE_QA.md](UNIVERSE_QA.md)；本輪場景驗證見 [整合紀錄](USER_WORLD_INTEGRATION.md)。
+點空地可以讓角色走過去；點遠方星球可前往玫瑰花園、微風森林或月光書原。點燈罩開關桌燈，點書本讀書；下方可選讀書、休息及照顧花朵；下方互動列也提供較好按的手機控制。早期互動規格見 [UNIVERSE_QA.md](docs/archive/UNIVERSE_QA.md)；本輪場景驗證見 [整合紀錄](docs/archive/USER_WORLD_INTEGRATION.md)。
 
 「安靜陪我」停止主動提示，仍可主動聊天。專注期間不主動發話，結束最多提醒一次。右上角日夜按鈕直接切換場景光線，不會變動計時狀態。環境音為本機合成的低音量和弦，需手動開啟，不使用外部音訊素材。
 
@@ -72,7 +72,7 @@ E2E 預設使用 `/usr/bin/chromium`；其他系統請設定 `CHROMIUM_PATH` 為
 
 ## 素材與架構
 
-星雲仔已重製為原創 Blender 連續皮膚骨架模型 `public/models/nebula-sculpt.glb`，可編輯來源、真實外觀參數與重建指令見 [assets/art/README.md](assets/art/README.md)。場景包含自訂月岩地形、坑洞、苔蘚、木桌／靠背椅／曲面書頁／彎頸桌燈與休息區。模型替換需提供相同命名骨架與控制節點，不能直接換任意 GLB。美術診斷見 [ART_AUDIT.md](ART_AUDIT.md)，四視角、參考對照與驗收狀態見 [VISUAL_QA.md](VISUAL_QA.md)。
+星雲仔已重製為原創 Blender 連續皮膚骨架模型 `public/models/nebula-sculpt.glb`，可編輯來源、真實外觀參數與重建指令見 [assets/art/README.md](assets/art/README.md)。場景包含自訂月岩地形、坑洞、苔蘚、木桌／靠背椅／曲面書頁／彎頸桌燈與休息區。模型替換需提供相同命名骨架與控制節點，不能直接換任意 GLB。美術診斷見 [ART_AUDIT.md](docs/archive/ART_AUDIT.md)，四視角、參考對照與驗收狀態見 [VISUAL_QA.md](docs/archive/VISUAL_QA.md)。
 
 - `src/domain.ts`：純計時與行為規則。
 - `src/behavior.ts`：動作優先權、冷卻、活動目標與返回路徑。
@@ -96,8 +96,14 @@ E2E 預設使用 `/usr/bin/chromium`；其他系統請設定 `CHROMIUM_PATH` 為
 
 ## 手機版與公開網址
 
-手機使用 Safari／Chrome 開啟網頁版，支援觸控旋轉、計時、聊天、安靜與音效；Windows ZIP 不適用手機。推薦部署公開 HTTPS 網站，設定已提供於 `render.yaml`。也可 `npm run build && npm start` 後，在同 Wi-Fi 手機開啟電腦網路地址。詳細連線、部署與實機限制見 [MOBILE.md](MOBILE.md)。使用者已透過 Render 試用初版；實際網址與部署狀態請以你的 Render 服務頁面為準。
+手機使用 Safari／Chrome 開啟網頁版，支援觸控旋轉、計時、聊天、安靜與音效；Windows ZIP 不適用手機。推薦部署公開 HTTPS 網站，設定已提供於 `render.yaml`。也可 `npm run build && npm start` 後，在同 Wi-Fi 手機開啟電腦網路地址。詳細連線、部署與實機限制見 [MOBILE.md](docs/MOBILE.md)。使用者已透過 Render 試用初版；實際網址與部署狀態請以你的 Render 服務頁面為準。
 
 ## 響應式美術與字型
 
 桌機、平板與手機共用淺色手帖風格、方正卡片及 SVG 圖示；3D 角色與場景採霧面材質、紙葉植栽、步道與小水池。Huninn 來自 Google Fonts，並提供本機 WOFF2 與 `Noto Sans TC, sans-serif` 後備；外部字型載入採非阻塞方式，字型下載失敗仍顯示文字。授權與來源記錄在 `public/fonts/`。`npx playwright test --config=playwright.design.config.ts` 驗證桌機／平板／手機與字型失敗情境，截圖位於 `artifacts/redesign/`。
+
+## 維護文件
+
+- [API 設定與連線排查](docs/API_CONNECTION_QA.md)
+- [手機版說明](docs/MOBILE.md)
+- [歷史開發與驗收紀錄](docs/archive/)

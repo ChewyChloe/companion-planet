@@ -82,7 +82,7 @@
 
 ## 手機擴充最新結果
 
-手機版擴充後，靜態檢查與 21 項 Vitest、6 項既有 Web、3 項手機觸控、1 項 Electron 測試通過。正式網頁入口、區網／HTTPS 來源驗證、觸控／鍵盤版面與 Render 設定已完成；尚未部署公開網站或實機驗證。詳見 [手機驗收報告](artifacts/MOBILE_REPORT.md) 與 [手機連線說明](MOBILE.md)。原先 Windows ZIP 未因本次手機擴充重打包。
+手機版擴充後，靜態檢查與 21 項 Vitest、6 項既有 Web、3 項手機觸控、1 項 Electron 測試通過。正式網頁入口、區網／HTTPS 來源驗證、觸控／鍵盤版面與 Render 設定已完成；尚未部署公開網站或實機驗證。詳見 [手機驗收報告](../../artifacts/MOBILE_REPORT.md) 與 [手機連線說明](../MOBILE.md)。原先 Windows ZIP 未因本次手機擴充重打包。
 
 ## 響應式視覺重設計
 

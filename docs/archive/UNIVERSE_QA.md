@@ -50,7 +50,7 @@
 
 燈光比較在插值完成後擷取，關燈 PointLight 強度為 0.0043，開燈為 1.3。手機基準由保存的原始 runner log 解析，再以原始重跑 JSON 更新同名案例；詳見 test-report.json 的證據說明。
 
-可檢視：[修改前後](artifacts/universe/before-after.png)、[四星球](artifacts/universe/four-worlds.png)、[九角色](artifacts/interaction/nine-residents.png)，以及星雲仔的 [正面](artifacts/interaction/nebula-front.png)、[側面](artifacts/interaction/nebula-side.png)、[背面](artifacts/interaction/nebula-back.png)、[45 度](artifacts/interaction/nebula-quarter.png)。
+可檢視：[修改前後](../../artifacts/universe/before-after.png)、[四星球](../../artifacts/universe/four-worlds.png)、[九角色](../../artifacts/interaction/nine-residents.png)，以及星雲仔的 [正面](../../artifacts/interaction/nebula-front.png)、[側面](../../artifacts/interaction/nebula-side.png)、[背面](../../artifacts/interaction/nebula-back.png)、[45 度](../../artifacts/interaction/nebula-quarter.png)。
 
 ## 證據與重現
 

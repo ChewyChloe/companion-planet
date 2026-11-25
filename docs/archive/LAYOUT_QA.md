@@ -25,10 +25,10 @@
 | 真實手機 GPU、長時間耗電、原生鍵盤 | Not Tested | 雲端使用軟體渲染，不能推論實機 FPS |
 | Render 最新線上部署 | Not Tested | 原始碼推送不等於已完成線上驗證 |
 
-- [桌機](artifacts/layout/desktop.png)／[大螢幕](artifacts/layout/wide.png)／[平板](artifacts/layout/tablet.png)
-- [手機](artifacts/layout/phone.png)／[小手機](artifacts/layout/small-phone.png)／[橫向](artifacts/layout/landscape.png)
-- [修改前後](artifacts/layout/before-after.png)
-- [六尺寸實際畫面檢查](artifacts/layout/visual-results.json)／[自動化測試彙總](artifacts/layout/test-report.json)
+- [桌機](../../artifacts/layout/desktop.png)／[大螢幕](../../artifacts/layout/wide.png)／[平板](../../artifacts/layout/tablet.png)
+- [手機](../../artifacts/layout/phone.png)／[小手機](../../artifacts/layout/small-phone.png)／[橫向](../../artifacts/layout/landscape.png)
+- [修改前後](../../artifacts/layout/before-after.png)
+- [六尺寸實際畫面檢查](../../artifacts/layout/visual-results.json)／[自動化測試彙總](../../artifacts/layout/test-report.json)
 
 審閱圖以同一個真正 R3F renderer 暫停當前姿態、DPR 1 重繪擷取；正常執行仍使用自動 DPR。倒影有解析度與更新頻率限制，並非離線光線追蹤效果。
 

@@ -48,10 +48,10 @@
 
 ## 比較圖與測試
 
-- [三種近照](artifacts/nebula-material/three-browser-materials.png)
-- [實際星球場景](artifacts/nebula-material/three-live-planets.png)
-- [相同背景卡的透射對照](artifacts/nebula-material/three-transmission-probes.png)
-- [手機 B 方案](artifacts/nebula-material/mist-phone.png)
+- [三種近照](../../artifacts/nebula-material/three-browser-materials.png)
+- [實際星球場景](../../artifacts/nebula-material/three-live-planets.png)
+- [相同背景卡的透射對照](../../artifacts/nebula-material/three-transmission-probes.png)
+- [手機 B 方案](../../artifacts/nebula-material/mist-phone.png)
 - `artifacts/nebula-material/visual-results.json`：十個實際瀏覽器渲染紀錄，包含攝影機、姿態、透射參數、內部星點數及 WebGL error。
 
 三組比較固定相同攝影機、角色位置／姿態與光照；截圖使用同一個實際 Composer 最終管線，包含 Bloom，沒有另用直接渲染繞過後處理。近照合成只採相同裁切，未修圖或生成補畫。原始完整瀏覽器截圖一併保留。

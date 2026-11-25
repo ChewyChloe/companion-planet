@@ -15,10 +15,10 @@
 
 ## 可檢視輸出
 
-- [四座白天實際渲染](artifacts/world-color/four-worlds-day.jpg)
-- [四座夜景實際渲染](artifacts/world-color/four-worlds-night.jpg)
-- [上色前後比較](artifacts/world-color/before-after.jpg)
-- [手機畫面](artifacts/world-color/phone-worlds-day.jpg)
+- [四座白天實際渲染](../../artifacts/world-color/four-worlds-day.jpg)
+- [四座夜景實際渲染](../../artifacts/world-color/four-worlds-night.jpg)
+- [上色前後比較](../../artifacts/world-color/before-after.jpg)
+- [手機畫面](../../artifacts/world-color/phone-worlds-day.jpg)
 
 以上為實際 React Three Fiber 場景擷取，包含網站的角色與後製流程。原始灰模旋轉檢視 `/?world-model-review` 仍使用未上色的來源檔；正式首頁使用彩色執行副本。
 

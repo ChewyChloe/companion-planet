@@ -8,7 +8,7 @@
 | 白天、夜景及手機載入 | Passed | 12 個實際 R3F 畫面案例，材質完成標記為 storybook-pbr-1，無 WebGL／腳本錯誤。 |
 | 旅行、桌燈、行走、書本／花朵互動 | Passed | 上色後桌機與手機共 4 項互動回歸通過。 |
 | 觸控抓放 | Passed | 上色後實際 CDP 觸控通過，沒有誤轉鏡頭。 |
-| 主觀美術品質 | Needs Human Review | [白天](artifacts/world-color/four-worlds-day.jpg)、[夜景](artifacts/world-color/four-worlds-night.jpg)、[前後比較](artifacts/world-color/before-after.jpg)。 |
+| 主觀美術品質 | Needs Human Review | [白天](../../artifacts/world-color/four-worlds-day.jpg)、[夜景](../../artifacts/world-color/four-worlds-night.jpg)、[前後比較](../../artifacts/world-color/before-after.jpg)。 |
 | 真機 FPS | Not Tested | 尚未在使用者實體裝置測量。 |
 
 細節與輸出見 [WORLD_COLOR_QA.md](WORLD_COLOR_QA.md)。以下保留較早紀錄。
@@ -29,7 +29,7 @@
 | 美術與原始設計的一致性 | Needs Human Review | 保留使用者模型的灰模造型，由使用者審閱四座實際截圖；不以測試取代審美。 |
 | 真機 Safari／Android FPS | Not Tested | 雲端手機尺寸與觸控模擬不能代表實體裝置效能。 |
 
-[四座實際場景](artifacts/user-worlds/integration/four-worlds.jpg) · [手機總覽](artifacts/user-worlds/integration/phone-worlds.jpg) · [詳細配置與證據](USER_WORLD_INTEGRATION.md)
+[四座實際場景](../../artifacts/user-worlds/integration/four-worlds.jpg) · [手機總覽](../../artifacts/user-worlds/integration/phone-worlds.jpg) · [詳細配置與證據](USER_WORLD_INTEGRATION.md)
 
 ---
 
@@ -56,15 +56,15 @@
 
 ## 可檢視交付
 
-- [角色前後四視角比較](artifacts/art/character-before-after.png)：上為原型、下為重製；做等高輪廓裁切，原始相機與燈光不同，不是像素級相似度測試。
-- 最終原始四視角：[正面](artifacts/art/after/front.png)／[側面](artifacts/art/after/side.png)／[背面](artifacts/art/after/back.png)／[45 度](artifacts/art/after/quarter.png)。
-- [側面加厚前後比較](artifacts/art/depth-before-after.png)。
-- [完整星球前後比較](artifacts/art/planet-before-after.png)、[新參考與實際模型對照](artifacts/art/new-reference-comparison.png)、[PDF 概念對照](artifacts/art/reference-comparison.png)。
-- [閱讀](artifacts/art/after/read.png)、[椅面／手部近照](artifacts/art/after/read-contact.png)、[休息](artifacts/art/after/rest.png)、[手機](artifacts/art/after/mobile.png)。
-- [網頁迷你陪伴](artifacts/art/after/pet.png)、[真正 Electron 320×420 桌寵](artifacts/desktop-pet.png)。Linux 測試只確認原生視窗設定／生命週期，未當成 Windows 合成效果的證明。
-- 各動作實際截圖位於 artifacts/art/after/pose-*.png；逐動作 pose 抽樣、控制節點、實際 renderer 計數與錯誤紀錄在 [visual-results.json](artifacts/art/visual-results.json)。
-- [自動化測試彙總](artifacts/art/test-report.json)、[單元結果](artifacts/art/unit-results.json)、[Web](artifacts/web-results.json)、[Mobile](artifacts/mobile-results.json)、[Design](artifacts/redesign/design-results.json)、[Electron](artifacts/electron-results.json)。
-- [美術診斷及修正歷程](ART_AUDIT.md)、[可編輯模型與真實參數說明](assets/art/README.md)。GLB 及 BLEND 隨原始碼提供，Render 不需要安裝 Blender。
+- [角色前後四視角比較](../../artifacts/art/character-before-after.png)：上為原型、下為重製；做等高輪廓裁切，原始相機與燈光不同，不是像素級相似度測試。
+- 最終原始四視角：[正面](../../artifacts/art/after/front.png)／[側面](../../artifacts/art/after/side.png)／[背面](../../artifacts/art/after/back.png)／[45 度](../../artifacts/art/after/quarter.png)。
+- [側面加厚前後比較](../../artifacts/art/depth-before-after.png)。
+- [完整星球前後比較](../../artifacts/art/planet-before-after.png)、[新參考與實際模型對照](../../artifacts/art/new-reference-comparison.png)、[PDF 概念對照](../../artifacts/art/reference-comparison.png)。
+- [閱讀](../../artifacts/art/after/read.png)、[椅面／手部近照](../../artifacts/art/after/read-contact.png)、[休息](../../artifacts/art/after/rest.png)、[手機](../../artifacts/art/after/mobile.png)。
+- [網頁迷你陪伴](../../artifacts/art/after/pet.png)、[真正 Electron 320×420 桌寵](../../artifacts/desktop-pet.png)。Linux 測試只確認原生視窗設定／生命週期，未當成 Windows 合成效果的證明。
+- 各動作實際截圖位於 artifacts/art/after/pose-*.png；逐動作 pose 抽樣、控制節點、實際 renderer 計數與錯誤紀錄在 [visual-results.json](../../artifacts/art/visual-results.json)。
+- [自動化測試彙總](../../artifacts/art/test-report.json)、[單元結果](../../artifacts/art/unit-results.json)、[Web](../../artifacts/web-results.json)、[Mobile](../../artifacts/mobile-results.json)、[Design](../../artifacts/redesign/design-results.json)、[Electron](../../artifacts/electron-results.json)。
+- [美術診斷及修正歷程](ART_AUDIT.md)、[可編輯模型與真實參數說明](../../assets/art/README.md)。GLB 及 BLEND 隨原始碼提供，Render 不需要安裝 Blender。
 
 四視角使用同一 R3F 資產；整體審閱圖從真正 renderer 暫停當前姿態，以 DPR 1 重繪截取，未替換成靜態概念圖。效能數據採正常自動 DPR 執行，與審閱圖的解析度設定區別記錄。所有字型／版面測試仍驗證淺色紙感、Huninn 本機備援、無 emoji／漸層／玻璃 UI。
 
