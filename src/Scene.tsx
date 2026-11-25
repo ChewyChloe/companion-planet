@@ -24,7 +24,7 @@ import { OrbitControls, Stats } from "@react-three/drei";
 import * as THREE from "three";
 import { useWorld } from "./store";
 import { type Action, allowedAction } from "./domain";
-import { advanceBehavior, initialBehavior } from "./behavior";
+import { advanceBehavior, idlePause, initialBehavior } from "./behavior";
 import { RenderQuality } from "./art/RenderQuality";
 import SculptCharacter from "./art/SculptCharacter";
 import { World, ArtLights } from "./art/World";
@@ -47,7 +47,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
   const spawn = userHome(useWorld.getState().planetId);
   const target = useRef(new THREE.Vector3(spawn[0], 0, spawn[1]));
   const position = useRef(new THREE.Vector3(spawn[0], 0, spawn[1]));
-  const behavior = useRef({ ...initialBehavior, target:spawn, home:spawn, until: 20 });
+  const behavior = useRef({ ...initialBehavior, target:spawn, home:spawn, until: idlePause() });
   const rendered = useRef<Action>("idle");
   const [visual, setVisual] = ReactUseState<Action>("idle");
   const { gl, camera, controls } = useThree();
@@ -241,14 +241,24 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
         0,
         behavior.current.target[1],
       );
+    const strolling = !pet && !manual && state.timer.phase === "idle" && action.current === "walk";
     const distance =
       manual && !walking.current
         ? 0
         : position.current.distanceTo(target.current);
     const beforeX = position.current.x, beforeZ = position.current.z;
-    waypoint(position.current, target.current, next, action.current === "read");
-    if ((!manual || walking.current) && !held.current)
-      position.current.lerp(next, Math.min(1, .82 * motionDt / Math.max(.001,position.current.distanceTo(next))));
+    if (!pet && !held.current && distance > (strolling ? .07 : .001)) {
+      waypoint(position.current, target.current, next, action.current === "read");
+      const speed = strolling ? .42 : .82;
+      position.current.lerp(next, Math.min(1, speed * motionDt / Math.max(.001, position.current.distanceTo(next))));
+    } else if (strolling) {
+      behavior.current = {
+        ...behavior.current,
+        action: "idle",
+        target: [position.current.x, position.current.z],
+        until: _state.clock.elapsedTime + idlePause(),
+      };
+    }
     const plannedX = position.current.x - beforeX;
     const plannedZ = position.current.z - beforeZ;
     gaitClock.current += Math.hypot(position.current.x-beforeX, position.current.z-beforeZ) / .48 * (Math.PI*2/7.1);
@@ -319,9 +329,9 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
         // Abandon an unreachable command instead of pushing into the same obstacle every frame.
         walking.current = false;
         arrivalAction.current = "idle";
-        manualUntil.current = Date.now() + 8000;
+        manualUntil.current = Date.now() + (strolling ? 2000 : 8000);
         target.current.copy(position.current);
-        behavior.current = { ...behavior.current, action: "idle", target: [position.current.x, position.current.z] };
+        behavior.current = { ...behavior.current, action: "idle", target: [position.current.x, position.current.z], until: strolling ? 0 : behavior.current.until };
       }
     }
     if (model.current) {

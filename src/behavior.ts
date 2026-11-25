@@ -17,6 +17,7 @@ export const initialBehavior: Behavior = {
   phase: "idle",
   reactionId: 0,
 };
+export const idlePause = (random = Math.random) => 1.5 + random() * 2.5;
 const desk: [number, number] = [CHAIR.x, CHAIR.z];
 /** High-level planner; render frames only interpolate its bounded destinations. */
 export function advanceBehavior(
@@ -77,14 +78,22 @@ export function advanceBehavior(
       until: elapsed + 6,
     };
   if (elapsed < current.until) return current;
+  if (phase === "idle") {
+    const [x, z] = current.target;
+    const startAngle = random() * Math.PI * 2;
+    const radius = 0.9 + random() * 1.3;
+    for (let attempt = 0; attempt < 6; attempt++) {
+      const angle = startAngle + attempt * Math.PI / 3;
+      const target = safeDrop(x + Math.cos(angle) * radius, z + Math.sin(angle) * radius);
+      const distance = Math.hypot(target[0] - x, target[1] - z);
+      if (distance >= 0.55 && distance <= 2.8)
+        return { ...current, action: "walk", target, until: elapsed + 14 };
+    }
+    return { ...current, action: "idle", until: elapsed + idlePause(random) };
+  }
   const action = chooseAction(phase, random());
   let target = current.target;
   if (phase === "focus") target = desk;
   else if (action === "rest") target = safeDrop(-1.1, .65);
-  else if (action === "walk") {
-    const angle = random() * Math.PI * 2;
-    const radius = 1.3 + random() * 2.5;
-    target = safeDrop(Math.cos(angle) * radius, Math.sin(angle) * radius);
-  }
   return { ...current, action, target, until: elapsed + 5 + random() * 7 };
 }
