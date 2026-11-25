@@ -1,0 +1,30 @@
+{
+  "home": {
+    "planet": "同頻星球",
+    "source": "assets/misic/同頻星球 (Lo-fi Study Companion).wav",
+    "sourceSha256": "e7ef26078b7caea307a2b3e906b84c2e5b39c5dda4aa48967a5977b9cb411ac7",
+    "outputSha256": "66c743f00f6de50a8189f3e09108faf8630fb50f5fee39d68abd68ba10448e81",
+    "bytes": 3160844
+  },
+  "moon": {
+    "planet": "月光書原",
+    "source": "assets/misic/月光書原 (Midnight Lo-fi Library).wav",
+    "sourceSha256": "06db2840182819be6ffeb6dc970449ec442e22f65658087bcbedd8ff034d82bf",
+    "outputSha256": "5f70eecdcea24aaebaf3c2c304a996ada443d40eae67eda5ac87e73ab3c28f8b",
+    "bytes": 3554444
+  },
+  "rose": {
+    "planet": "玫瑰花園",
+    "source": "assets/misic/玫瑰花園 (Rose Garden Lo-fi).wav",
+    "sourceSha256": "320ce755d144e0b8d9d69598dbffdcd83a4cf405a48ce38599f2bac8d73fd7e0",
+    "outputSha256": "1bc936843126beb871bfb263812f86cdca8ebbe0e9b88b00fdd20d5b2df8209d",
+    "bytes": 3543404
+  },
+  "forest": {
+    "planet": "微風森林",
+    "source": "assets/misic/微風森林 (Whispering Forest Lo-fi).wav",
+    "sourceSha256": "b7959c81595d0242b8987a083245f608ec51de12858bcb0872198c8c962af544",
+    "outputSha256": "636db77b760cce8cb7549fa1a356cecd83cffe0e831ceb66779dd40eca1e0a17",
+    "bytes": 3595244
+  }
+}

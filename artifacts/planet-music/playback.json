@@ -1,0 +1,112 @@
+{
+  "cases": [
+    {
+      "mobile": false,
+      "planet": "b612",
+      "src": "http://127.0.0.1:3005/assets/home-CQ7gb6zz.mp3",
+      "paused": false,
+      "time": 0.245203,
+      "ready": 4,
+      "loop": true,
+      "volume": 0.35,
+      "error": null,
+      "count": 1
+    },
+    {
+      "mobile": false,
+      "planet": "rose",
+      "src": "http://127.0.0.1:3005/assets/rose-pPRl3yt7.mp3",
+      "paused": false,
+      "time": 0.307246,
+      "ready": 4,
+      "loop": true,
+      "volume": 0.35,
+      "error": null,
+      "count": 1
+    },
+    {
+      "mobile": false,
+      "planet": "forest",
+      "src": "http://127.0.0.1:3005/assets/forest-DB4ht8PZ.mp3",
+      "paused": false,
+      "time": 0.371601,
+      "ready": 4,
+      "loop": true,
+      "volume": 0.35,
+      "error": null,
+      "count": 1
+    },
+    {
+      "mobile": false,
+      "planet": "moon",
+      "src": "http://127.0.0.1:3005/assets/moon-xp2JxyYE.mp3",
+      "paused": false,
+      "time": 0.252969,
+      "ready": 4,
+      "loop": true,
+      "volume": 0.35,
+      "error": null,
+      "count": 1
+    },
+    {
+      "mobile": false,
+      "muteAcrossTravel": true,
+      "resume": true,
+      "errors": []
+    },
+    {
+      "mobile": true,
+      "planet": "b612",
+      "src": "http://127.0.0.1:3005/assets/home-CQ7gb6zz.mp3",
+      "paused": false,
+      "time": 0.676145,
+      "ready": 4,
+      "loop": true,
+      "volume": 0.35,
+      "error": null,
+      "count": 1
+    },
+    {
+      "mobile": true,
+      "planet": "rose",
+      "src": "http://127.0.0.1:3005/assets/rose-pPRl3yt7.mp3",
+      "paused": false,
+      "time": 0.284577,
+      "ready": 4,
+      "loop": true,
+      "volume": 0.35,
+      "error": null,
+      "count": 1
+    },
+    {
+      "mobile": true,
+      "planet": "forest",
+      "src": "http://127.0.0.1:3005/assets/forest-DB4ht8PZ.mp3",
+      "paused": false,
+      "time": 0.244904,
+      "ready": 4,
+      "loop": true,
+      "volume": 0.35,
+      "error": null,
+      "count": 1
+    },
+    {
+      "mobile": true,
+      "planet": "moon",
+      "src": "http://127.0.0.1:3005/assets/moon-xp2JxyYE.mp3",
+      "paused": false,
+      "time": 0.309801,
+      "ready": 4,
+      "loop": true,
+      "volume": 0.35,
+      "error": null,
+      "count": 1
+    },
+    {
+      "mobile": true,
+      "muteAcrossTravel": true,
+      "resume": true,
+      "errors": []
+    }
+  ]
+}

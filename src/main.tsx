@@ -1,3 +1,4 @@
+import { usePlanetMusic } from "./usePlanetMusic";
 import { getNebulaMaterialVariant, nebulaMaterialVariants } from "./art/nebula-material-test";
 import { planetFor } from "./planets";
 import { CompanionPicker } from "./CompanionPicker";
@@ -63,52 +64,6 @@ function NebulaMaterialPanel() {
     <p><a href={`?art-review&nebula-material=${variant}`}>近照／旋轉檢視</a> · <a href="/">離開測試</a></p>
     <small>手機使用輕量薄殼；桌面使用實際透射。尚未製作新動畫。</small>
   </aside>;
-}
-function useAmbient() {
-  const context = useRef<AudioContext | null>(null);
-  const [on, setOn] = useState(false);
-  const gain = useRef<GainNode | null>(null);
-  const sources = useRef<OscillatorNode[]>([]);
-  const stop = () => {
-    sources.current.forEach((s) => s.stop());
-    sources.current = [];
-    void context.current?.close();
-    context.current = null;
-    setOn(false);
-  };
-  useEffect(
-    () => () => {
-      sources.current.forEach((s) => s.stop());
-      void context.current?.close();
-    },
-    [],
-  );
-  const toggle = async () => {
-    if (on) {
-      stop();
-      return;
-    }
-    try {
-      const c = new AudioContext();
-      context.current = c;
-      await c.resume();
-      gain.current = c.createGain();
-      gain.current.gain.value = 0.022;
-      gain.current.connect(c.destination);
-      [130.81, 196, 261.63].forEach((f) => {
-        const o = c.createOscillator();
-        o.type = "sine";
-        o.frequency.value = f;
-        o.connect(gain.current!);
-        o.start();
-        sources.current.push(o);
-      });
-      setOn(true);
-    } catch {
-      stop();
-    }
-  };
-  return { on, toggle };
 }
 function App() {
   const state = useWorld();
@@ -183,7 +138,7 @@ function App() {
   const [notice, setNotice] = useState("");
   const [intent, setIntent] = useState("");
   const [activity, setActivity] = useState<Action>("idle");
-  const audio = useAmbient();
+  const audio = usePlanetMusic(state.planetId);
   const request = useRef<AbortController | null>(null);
   const generation = useRef(0);
   const end = useRef<HTMLDivElement>(null);
