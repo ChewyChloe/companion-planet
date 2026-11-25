@@ -1,0 +1,389 @@
+{
+  "cases": [
+    {
+      "id": "b612",
+      "mobile": false,
+      "maxTilt": 8,
+      "spawn": {
+        "inside": 0,
+        "ambiguous": 0,
+        "samples": 201,
+        "minY": 0.9032966780236004,
+        "maxY": 2.6966098432889076,
+        "points": [],
+        "details": [],
+        "rootY": 0.8297489613997969,
+        "footLift": "0.1398",
+        "clip": "AntennaSway"
+      },
+      "reading": {
+        "inside": 0,
+        "ambiguous": 0,
+        "samples": 201,
+        "minY": 0.5532980521488695,
+        "maxY": 2.371847347707039,
+        "points": [],
+        "details": [],
+        "rootY": 0.4989999999999997,
+        "footLift": "0.1100",
+        "clip": "AntennaSway"
+      },
+      "walking": {
+        "inside": 0,
+        "ambiguous": 6,
+        "samples": 201,
+        "minY": 0.7446688894907568,
+        "maxY": 2.5290776305662335,
+        "points": [],
+        "details": [
+          {
+            "index": 17472,
+            "point": [
+              -1.018626522214523,
+              0.8931794691361198,
+              1.011463845456879
+            ],
+            "rawY": 0.044586241245269775,
+            "votes": 1,
+            "floor": null
+          },
+          {
+            "index": 22022,
+            "point": [
+              -0.8344222496045808,
+              0.8845549939168315,
+              1.125925688832845
+            ],
+            "rawY": 0.00018313895270694047,
+            "votes": 1,
+            "floor": null
+          },
+          {
+            "index": 22568,
+            "point": [
+              -0.9193966049267321,
+              0.8852647129188942,
+              1.128034518485428
+            ],
+            "rawY": 0.04157057777047157,
+            "votes": 1,
+            "floor": null
+          },
+          {
+            "index": 25662,
+            "point": [
+              -0.8669270400040808,
+              0.8902512907994489,
+              1.108976339845855
+            ],
+            "rawY": 0.0012207339750602841,
+            "votes": 1,
+            "floor": null
+          },
+          {
+            "index": 25844,
+            "point": [
+              -0.9993952785193232,
+              0.8165622603066163,
+              1.1842723653831255
+            ],
+            "rawY": 0.013302389532327652,
+            "votes": 1,
+            "floor": null
+          },
+          {
+            "index": 28938,
+            "point": [
+              -0.8339870878891399,
+              0.8337732345099651,
+              1.3272528154026284
+            ],
+            "rawY": 0.058479998260736465,
+            "votes": 1,
+            "floor": null
+          }
+        ],
+        "rootY": 0.8058292582445179,
+        "footLift": "0.0000",
+        "clip": "AntennaSway"
+      }
+    },
+    {
+      "id": "moon",
+      "mobile": false,
+      "maxTilt": 7.959,
+      "spawn": {
+        "inside": 0,
+        "ambiguous": 0,
+        "samples": 201,
+        "minY": 0.49255983159088645,
+        "maxY": 2.3142871413120054,
+        "points": [],
+        "details": [],
+        "rootY": 0.42195248211299036,
+        "footLift": "0.1092",
+        "clip": "AntennaSway"
+      },
+      "reading": {
+        "inside": 0,
+        "ambiguous": 0,
+        "samples": 201,
+        "minY": 0.5742980521488701,
+        "maxY": 2.3928473477070393,
+        "points": [],
+        "details": [],
+        "rootY": 0.5200000000000001,
+        "footLift": "0.1100",
+        "clip": "AntennaSway"
+      },
+      "walking": {
+        "inside": 0,
+        "ambiguous": 0,
+        "samples": 201,
+        "minY": 0.44973096469256446,
+        "maxY": 2.2460197197547984,
+        "points": [],
+        "details": [],
+        "rootY": 0.527718786070267,
+        "footLift": "0.0000",
+        "clip": "AntennaSway"
+      }
+    },
+    {
+      "id": "rose",
+      "mobile": false,
+      "maxTilt": 6.982,
+      "spawn": {
+        "inside": 0,
+        "ambiguous": 4,
+        "samples": 201,
+        "minY": 0.39824990804230076,
+        "maxY": 2.198301628731042,
+        "points": [],
+        "details": [
+          {
+            "index": 15470,
+            "point": [
+              -0.8515517912019762,
+              0.6997951939921189,
+              -0.19543363699518623
+            ],
+            "rawY": 0.11407431215047836,
+            "votes": 1,
+            "floor": null
+          },
+          {
+            "index": 20384,
+            "point": [
+              -0.8578637192035771,
+              0.9656307051151178,
+              -0.3097272605463568
+            ],
+            "rawY": 0.2642458975315094,
+            "votes": 1,
+            "floor": null
+          },
+          {
+            "index": 21112,
+            "point": [
+              -0.7438653383213837,
+              0.787392779890307,
+              -0.2886325970794178
+            ],
+            "rawY": 0.1665026992559433,
+            "votes": 1,
+            "floor": null
+          },
+          {
+            "index": 28574,
+            "point": [
+              -0.4373902105843468,
+              0.8663537601872339,
+              -0.2706997510292526
+            ],
+            "rawY": 0.22674566507339478,
+            "votes": 1,
+            "floor": null
+          }
+        ],
+        "rootY": 0.3372390314445426,
+        "footLift": "0.1368",
+        "clip": "AntennaSway"
+      },
+      "reading": {
+        "inside": 0,
+        "ambiguous": 0,
+        "samples": 201,
+        "minY": 0.8055680521488702,
+        "maxY": 2.62411734770704,
+        "points": [],
+        "details": [],
+        "rootY": 0.7512700000000001,
+        "footLift": "0.1100",
+        "clip": "AntennaSway"
+      },
+      "walking": {
+        "inside": 0,
+        "ambiguous": 0,
+        "samples": 201,
+        "minY": 0.14384529688416337,
+        "maxY": 1.9733746453502756,
+        "points": [],
+        "details": [],
+        "rootY": 0.17969047082913128,
+        "footLift": "0.0000",
+        "clip": "Walk"
+      }
+    },
+    {
+      "id": "forest",
+      "mobile": false,
+      "maxTilt": 6.235,
+      "spawn": {
+        "inside": 0,
+        "ambiguous": 0,
+        "samples": 201,
+        "minY": 1.1869574515853225,
+        "maxY": 2.98237263869533,
+        "points": [],
+        "details": [],
+        "rootY": 1.1349616806186011,
+        "footLift": "0.1316",
+        "clip": "AntennaSway"
+      },
+      "reading": {
+        "inside": 0,
+        "ambiguous": 0,
+        "samples": 201,
+        "minY": 0.5742980521488701,
+        "maxY": 2.3928473477070393,
+        "points": [],
+        "details": [],
+        "rootY": 0.5200000000000001,
+        "footLift": "0.1100",
+        "clip": "AntennaSway"
+      },
+      "walking": {
+        "inside": 0,
+        "ambiguous": 0,
+        "samples": 201,
+        "minY": 0.5395825984972414,
+        "maxY": 2.358131893444575,
+        "points": [],
+        "details": [],
+        "rootY": 0.320466741769944,
+        "footLift": "0.2723",
+        "clip": "Walk"
+      }
+    },
+    {
+      "id": "b612",
+      "mobile": true,
+      "maxTilt": 8,
+      "spawn": {
+        "inside": 0,
+        "ambiguous": 0,
+        "samples": 201,
+        "minY": 1.1925158886961649,
+        "maxY": 2.996171893106967,
+        "points": [],
+        "details": [],
+        "rootY": 0.8095023628032614,
+        "footLift": "0.4577",
+        "clip": "AntennaSway"
+      },
+      "reading": {
+        "inside": 0,
+        "ambiguous": 0,
+        "samples": 201,
+        "minY": 0.5532980521488695,
+        "maxY": 2.371847347707039,
+        "points": [],
+        "details": [],
+        "rootY": 0.4989999999999998,
+        "footLift": "0.1100",
+        "clip": "AntennaSway"
+      },
+      "walking": {
+        "inside": 0,
+        "ambiguous": 6,
+        "samples": 201,
+        "minY": 0.7470633544977249,
+        "maxY": 2.5314088013320135,
+        "points": [],
+        "details": [
+          {
+            "index": 17472,
+            "point": [
+              -1.0245394179336123,
+              0.895393819016814,
+              1.0126862686639155
+            ],
+            "rawY": 0.044586241245269775,
+            "votes": 1,
+            "floor": null
+          },
+          {
+            "index": 22022,
+            "point": [
+              -0.8399966290516122,
+              0.8868238049887598,
+              1.1266056398911255
+            ],
+            "rawY": 0.00018313895270694047,
+            "votes": 1,
+            "floor": null
+          },
+          {
+            "index": 22568,
+            "point": [
+              -0.9249641838250029,
+              0.8875520449373592,
+              1.128967053536299
+            ],
+            "rawY": 0.04157057777047157,
+            "votes": 1,
+            "floor": null
+          },
+          {
+            "index": 25662,
+            "point": [
+              -0.8725506575813138,
+              0.8925130722502523,
+              1.1097486801211132
+            ],
+            "rawY": 0.0012207339750602841,
+            "votes": 1,
+            "floor": null
+          },
+          {
+            "index": 25844,
+            "point": [
+              -1.0048084025993542,
+              0.8189101719144071,
+              1.1854976130304866
+            ],
+            "rawY": 0.013302389532327652,
+            "votes": 1,
+            "floor": null
+          },
+          {
+            "index": 28938,
+            "point": [
+              -0.8389715834815106,
+              0.8362019913308429,
+              1.3279709040520116
+            ],
+            "rawY": 0.058479998260736465,
+            "votes": 1,
+            "floor": null
+          }
+        ],
+        "rootY": 0.8080080880137401,
+        "footLift": "0.0000",
+        "clip": "AntennaSway"
+      }
+    }
+  ],
+  "errors": []
+}

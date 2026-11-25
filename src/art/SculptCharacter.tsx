@@ -1,3 +1,4 @@
+import { SuppliedNebula } from "./SuppliedNebula";
 import { faceVisibleFrom } from "./locomotion";
 import { residentModelPath } from "./resident-assets";
 import { ResidentInterior } from "./ResidentInterior";
@@ -45,7 +46,7 @@ interface Control {
   z: THREE.Vector3;
   parentUp: THREE.Vector3;
 }
-export default function SculptCharacter({
+function LegacyCharacter({
   action,
   companionId,
   held,
@@ -357,4 +358,12 @@ export default function SculptCharacter({
 
     </group>
   );
+}
+
+export default function SculptCharacter(props: Parameters<typeof LegacyCharacter>[0]) {
+  const selected = useWorld(s => s.companionId);
+  const id = props.companionId || selected;
+  if (id === "nebula" && !getNebulaMaterialVariant() && !props.modelUrl)
+    return <SuppliedNebula action={props.action} held={props.held} still={props.still} pet={props.pet} seatBlend={props.seatBlend} />;
+  return <LegacyCharacter {...props} />;
 }

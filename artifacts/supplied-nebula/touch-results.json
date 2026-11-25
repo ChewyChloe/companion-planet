@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "input": "CDP actual touchStart / touchMove / touchEnd",
+  "resident": "supplied-nebula",
+  "before": "-0.750,0.000,0.150",
+  "after": "-0.631,0.000,3.339",
+  "cameraUnchanged": true,
+  "errors": []
+}

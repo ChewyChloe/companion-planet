@@ -1,3 +1,4 @@
+import { registerWorldCollision } from "./world-collision";
 import { suppliedLamp,suppliedFlower } from "./supplied-world-config";
 import { useEffect, useMemo } from "react";
 import { useFrame, useLoader, useThree } from "@react-three/fiber";
@@ -24,7 +25,7 @@ export function PlanetArchitecture({id}:{id:PlanetId}) {
    node.material=Array.isArray(node.material)?node.material.map(replace):replace(node.material);
   });return {scene,materials,triangles,uniforms};
  },[gltf.scene,id]);
- useEffect(()=>{gl.domElement.dataset.planetModel=`user-world-${id}`;gl.domElement.dataset.planetTriangles=String(asset.triangles);gl.domElement.dataset.planetFinish=asset.materials.every(m=>m.name==="StorybookPaint"&&m.roughnessMap&&m.metalnessMap&&m.aoMap)?"storybook-pbr-1":"gray";return()=>{delete gl.domElement.dataset.planetModel;asset.materials.forEach(m=>m.dispose());};},[asset,gl,id]);
+ useEffect(()=>{registerWorldCollision(id,asset.scene);gl.domElement.dataset.planetModel=`user-world-${id}`;gl.domElement.dataset.planetTriangles=String(asset.triangles);gl.domElement.dataset.planetFinish=asset.materials.every(m=>m.name==="StorybookPaint"&&m.roughnessMap&&m.metalnessMap&&m.aoMap)?"storybook-pbr-1":"gray";return()=>{delete gl.domElement.dataset.planetModel;asset.materials.forEach(m=>m.dispose());};},[asset,gl,id]);
  useFrame((_,dt)=>{const state=useWorld.getState();for(const material of asset.materials)material.emissiveIntensity=state.night?1.1:.23;asset.uniforms.uLampPower.value=THREE.MathUtils.damp(asset.uniforms.uLampPower.value,state.lampOn&&(id==='b612'||id==='rose')?1:0,5,Math.min(dt,.1));asset.uniforms.uFlowerPower.value=THREE.MathUtils.damp(asset.uniforms.uFlowerPower.value,state.flowersBloom?1:0,4,Math.min(dt,.1));});
  return <primitive object={asset.scene} name={`UserIsland-${id}`} onClick={(e:any)=>{if(e.delta<6){e.stopPropagation();useWorld.getState().goTo(e.point.x,e.point.z);}}} />;
 }

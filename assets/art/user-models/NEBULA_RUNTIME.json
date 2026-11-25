@@ -1,0 +1,72 @@
+{
+  "meshes": [
+    {
+      "name": "tripo_node_736fcb92-1cee-410e-a185-6166b",
+      "beforeFaces": 1965432,
+      "afterFaces": 49135,
+      "vertices": 36444
+    }
+  ],
+  "sourceSha256": "3b386023a61e4a10655cae808312bf67b05adc6b16c2322f3ec8d49a9af3018c",
+  "animationRepairs": [
+    {
+      "clip": "AntennaSway",
+      "node": "Body",
+      "invalidQuaternionKeys": 1
+    },
+    {
+      "clip": "AntennaSway",
+      "node": "Antenna.L",
+      "invalidQuaternionKeys": 6
+    },
+    {
+      "clip": "AntennaSway",
+      "node": "Antenna.R",
+      "invalidQuaternionKeys": 6
+    },
+    {
+      "clip": "Bounce",
+      "node": "Body",
+      "invalidQuaternionKeys": 1
+    },
+    {
+      "clip": "Walk",
+      "node": "Body",
+      "invalidQuaternionKeys": 61
+    },
+    {
+      "clip": "Walk",
+      "node": "Hand.R",
+      "invalidQuaternionKeys": 29
+    },
+    {
+      "clip": "Walk",
+      "node": "Hand.L",
+      "invalidQuaternionKeys": 1
+    },
+    {
+      "clip": "Wave",
+      "node": "Body",
+      "invalidQuaternionKeys": 1
+    }
+  ],
+  "boundsBlender": [
+    [
+      -0.4286131262779236,
+      -0.3453863859176636,
+      3.18233942380175e-05
+    ],
+    [
+      0.4286884069442749,
+      0.3453782796859741,
+      1.0337097644805908
+    ]
+  ],
+  "actions": [
+    "AntennaSway_JellyRig",
+    "Bounce_JellyRig",
+    "Walk_JellyRig",
+    "Wave_JellyRig"
+  ],
+  "bytes": 4798404
+}

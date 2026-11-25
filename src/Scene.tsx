@@ -1,3 +1,4 @@
+import { resolveBodyContact, collisionRevision } from "./art/world-collision";
 import { suppliedLamp,suppliedView } from "./art/supplied-world-config";
 import { userHome } from "./art/user-world-ground";
 import { headingFromStep, turnToward } from "./art/locomotion";
@@ -55,6 +56,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
   const walking = useRef(false);
   const arrivalAction = useRef<Action>("idle");
   const command = useRef(0);
+  const worldRevision = useRef(-1);
   const reactionCommand = useRef(0);
   const phase = useRef(useWorld.getState().timer.phase);
   const drag = useRef<{
@@ -156,15 +158,22 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
   const normal = useMemo(() => new THREE.Vector3(), []);
   const screen = useMemo(() => new THREE.Vector3(), []);
   const up = useMemo(() => new THREE.Vector3(0, 1, 0), []);
+  const supportRotation = useMemo(() => new THREE.Quaternion(), []);
   const frames = useRef(0);
   const next = useMemo(() => new THREE.Vector3(), []);
   useFrame((_state, delta) => {
     const state = useWorld.getState();
+    if (!pet && worldRevision.current !== collisionRevision()) {
+      worldRevision.current = collisionRevision();
+      const [x,z]=safeDrop(position.current.x,position.current.z);
+      position.current.set(x,0,z);target.current.copy(position.current);
+      behavior.current={...behavior.current,target:[x,z],home:[x,z]};
+    }
     const reaction = state.reaction
       ? allowedAction(state.reaction, state.timer.phase)
       : null;
     const dt = Math.min(delta, 0.25);
-    const motionDt = Math.min(delta, 0.25);
+    const motionDt = Math.min(delta, 0.05);
     clock.current += state.reduced ? dt * 0.18 : dt;
     if (phase.current !== state.timer.phase) {
       phase.current = state.timer.phase;
@@ -236,7 +245,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
         ? 0
         : position.current.distanceTo(target.current);
     const beforeX = position.current.x, beforeZ = position.current.z;
-    waypoint(position.current, target.current, next);
+    waypoint(position.current, target.current, next, action.current === "read");
     if ((!manual || walking.current) && !held.current)
       position.current.lerp(next, Math.min(1, .82 * motionDt / Math.max(.001,position.current.distanceTo(next))));
     gaitClock.current += Math.hypot(position.current.x-beforeX, position.current.z-beforeZ) / .48 * (Math.PI*2/7.1);
@@ -264,7 +273,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
         root.current.quaternion.identity();
       } else {
         const surface = height(position.current.x, position.current.z);
-        const seating = action.current === "read" || arrivalAction.current === "read";
+        const seating = action.current === "read";
         seatBlend.current = seating ?
           1 -
           smoothstep(
@@ -277,16 +286,21 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
           ) : 0;
         const climb = seating ? 1 - smoothstep(.12,1.45,Math.hypot(position.current.x-CHAIR.x,position.current.z-CHAIR.z)) : 0;
         const seatDistance=Math.hypot(position.current.x-CHAIR.x,position.current.z-CHAIR.z);
-        const clearanceArc=seating ? .85*smoothstep(.12,.35,seatDistance)*(1-smoothstep(1.15,1.6,seatDistance)) : 0;
-        const supportY = surface + (held.current ? .28 : 0) + CHAIR.seatedRootOffset*climb + clearanceArc + (actual === "rest" ? .065 : 0);
+        const clearanceArc=seating ? .85*smoothstep(.12,.35,seatDistance)*(1-smoothstep(1.6,1.9,seatDistance)) : 0;
+        const supportY = .10*(1-climb) + surface + (held.current ? .28 : 0) + CHAIR.seatedRootOffset*climb + clearanceArc + (actual === "rest" ? .065 : 0);
         root.current.position.set(
           position.current.x,
-          Math.max(supportY, THREE.MathUtils.damp(root.current.position.y,supportY,5,motionDt)),
+          Math.max(surface+.04, THREE.MathUtils.damp(root.current.position.y,supportY,8,motionDt)),
           position.current.z,
         );
+        if (!seating || seatDistance>1.8) resolveBodyContact(state.planetId,root.current.position);
+        position.current.x=root.current.position.x;
+        position.current.z=root.current.position.z;
         groundNormal(position.current.x, position.current.z, normal);
         normal.lerp(up, seatBlend.current).normalize();
-        root.current.quaternion.setFromUnitVectors(up, normal);
+        supportRotation.setFromUnitVectors(up, normal);
+        root.current.quaternion.slerp(supportRotation, 1-Math.exp(-8*motionDt));
+        gl.domElement.dataset.supportTilt = THREE.MathUtils.radToDeg(root.current.quaternion.angleTo(new THREE.Quaternion())).toFixed(3);
       }
     }
     if (model.current) {

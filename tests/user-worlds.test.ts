@@ -18,7 +18,7 @@ it('provides actual-model landing heights and collision-safe routes to the readi
   for(const [a,b] of [[home,[CHAIR.x,CHAIR.z]],[[CHAIR.x,CHAIR.z],home],...destinations.map(d=>[home,d])]){
    const from=new Vector3(a[0],0,a[1]),goal=new Vector3(b[0],0,b[1]),next=new Vector3();
    for(let frame=0;frame<800&&from.distanceTo(goal)>.05;frame++){
-    waypoint(from,goal,next);from.lerp(next,.12);expect(inNavigationObstacle(from.x,from.z,.28),id).toBe(false);
+    waypoint(from,goal,next);from.lerp(next,.12);expect(inNavigationObstacle(from.x,from.z,.28),`${id} ${JSON.stringify({a,b,from:from.toArray(),next:next.toArray()})}`).toBe(false);
    }expect(from.distanceTo(goal),`${id} ${JSON.stringify({a,b,end:from.toArray()})}`).toBeLessThan(.06);
   }
  }}finally{configureLandmarkNavigation('b612');}

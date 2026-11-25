@@ -120,3 +120,15 @@ Use `scripts/check-user-world-integration.mjs` for actual desktop/touch-sized R3
 The user explicitly requires finished color plus rendering for all four user GLBs. Runtime copies now carry baked semantic albedo, packed real Cycles AO / roughness / metalness, original normal maps and localized emissive maps. Preserve the exact geometry hashes in `assets/art/world-color/geometry-baseline.json`; original user GLBs and resident assets remain unchanged. `StorybookPaint` materials must retain roughness=1 and metalness=1 factors so packed texture channels work; do not restore the old global metalness=0 override. The URL version query prevents cached gray GLBs being reused.
 
 Asset pipeline: `prepare-user-worlds.py`, `bake-world-ao.py` in Blender, `measure-world-thickness.py` with trimesh/embreex, recorded source/live brush seeds, then `paint-user-worlds.py`. Painting regenerates all four derivatives; it is a full batch. The shape classifier constrains leaf painting, while hand strokes preserve flowers and architecture. Production only needs prebuilt GLBs, not Blender or Python. Capture current day/phone/night scenes with `capture-colored-worlds.mjs`. Browser suites remain sequential. Latest user authorization is test and push, superseding their temporary request to skip testing during the outage.
+
+### Supplied Nebula and real mesh contacts (latest)
+
+The user requests the uploaded Nebula instead of the generated version. Normal
+Nebula scenes now load `public/models/user-residents/nebula.glb` via SuppliedNebula;
+explicit old material-comparison routes retain their existing approved model.
+Generate the derivative in Blender with `prepare-supplied-nebula.py`, repairing
+non-finite source quaternion keys before import. Preserve the uploaded ZIPs.
+The supplied GLB has four clips; do not claim authored read/rest/face clips exist.
+Seat heights in RUNTIME_TRANSFORMS are floor-relative: do not subtract .14 again.
+World collision uses supplied-triangle Octrees, bounded lean and sampled animated
+foot support. See SUPPLIED_NEBULA_QA.md and artifacts/supplied-nebula/results.json.

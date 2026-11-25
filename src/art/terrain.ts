@@ -1,3 +1,4 @@
+import { solidBodyBlocked, collisionRevision } from "./world-collision";
 import transforms from "../../assets/art/user-models/RUNTIME_TRANSFORMS.json";
 import * as THREE from "three";
 import {userGround,userWalkable,userHome} from "./user-world-ground";
@@ -13,7 +14,7 @@ export const CHAIR = {
   deskZ: transforms.b612.deskDistance,
   rearLegZ: -0.50,
   frontLegZ: 0.44,
-  seatedRootOffset: transforms.b612.seatHeight-.14,
+  seatedRootOffset: transforms.b612.seatHeight,
 };
 export const APPROACH: [number, number] = userHome("b612");
 export const HOME: [number, number] = userHome("b612");
@@ -92,14 +93,23 @@ export function walkingHeight(x: number, z: number) {
   return groundHeight(x,z);
 }
 export function groundNormal(x: number, z: number, out = new THREE.Vector3()) {
-  const h = 0.015;
-  return out
+  const h = 0.20;
+  out
     .set(
-      -(groundHeight(x + h, z) - groundHeight(x - h, z)) / (2 * h),
+      -(walkingHeight(x + h, z) - walkingHeight(x - h, z)) / (2 * h),
       1,
-      -(groundHeight(x, z + h) - groundHeight(x, z - h)) / (2 * h),
+      -(walkingHeight(x, z + h) - walkingHeight(x, z - h)) / (2 * h),
     )
     .normalize();
+  // A resident keeps balance on its feet; terrain derivatives must not roll the
+  // whole creature onto a cliff, a chair seam, or a missing heightfield cell.
+  const maxSlope = Math.tan(8 * Math.PI / 180);
+  const slope = Math.hypot(out.x, out.z) / Math.max(out.y, 1e-6);
+  if (slope > maxSlope) {
+    out.x *= maxSlope / slope;
+    out.z *= maxSlope / slope;
+  }
+  return out.normalize();
 }
 export function inDeskObstacle(x: number, z: number, margin = 0) {
   return (
@@ -117,24 +127,26 @@ export const LANDMARK_FOOTPRINTS: Record<string,readonly (readonly [number,numbe
  forest:[[-2,-1.35,1.1],[1.8,-1.9,1.25],[2.8,-.1,.75]],
 };
 let navigationPlanet='b612';
+let boarding=false;
 export function configureLandmarkNavigation(id:string) {
  const fitted=transforms[id as keyof typeof transforms];
- CHAIR.deskZ=fitted.deskDistance;CHAIR.seatHeight=fitted.seatHeight;CHAIR.seatedRootOffset=fitted.seatHeight-.14;
+ CHAIR.deskZ=fitted.deskDistance;CHAIR.seatHeight=fitted.seatHeight;CHAIR.seatedRootOffset=fitted.seatHeight;
  if(id===navigationPlanet)return;navigationPlanet=id;grid=null;route=[];HOME.splice(0,2,...userHome(id));APPROACH.splice(0,2,...userHome(id));
 }
 export function inNavigationObstacle(x:number,z:number,margin=0) {
  // Reading chair must remain reachable by the planner, while manual drops reserve it.
- const station = Math.abs(x-CHAIR.x)<.72 && z>CHAIR.z-1.05 && z<CHAIR.z+.45;
- return inDeskObstacle(x,z,margin) || (!station && !userWalkable(navigationPlanet,x,z,Math.max(0,margin-.30)));
+ const station = Math.abs(x-CHAIR.x)<.26 && z>CHAIR.z-.12 && z<CHAIR.z+.85;
+ const chairBack = Math.abs(x-CHAIR.x)<.80+margin*.25 && z>CHAIR.z-.95-margin*.25 && z<CHAIR.z-.23+margin*.25;
+ return chairBack || (!station && !(boarding && Math.hypot(x-CHAIR.x,z-CHAIR.z)<1.8) && solidBodyBlocked(navigationPlanet,x,groundHeight(x,z),z)) || inDeskObstacle(x,z,margin) || (!station && !userWalkable(navigationPlanet,x,z,Math.max(0,margin-.30)));
 
 }
 const NAV_STEP=.20,NAV_MARGIN=.42;
 const navClear=(a:THREE.Vector3,b:THREE.Vector3)=>{
- const steps=Math.max(2,Math.ceil(a.distanceTo(b)/.07));
+ const steps=Math.max(2,Math.ceil(a.distanceTo(b)/.025));
  let previous=groundHeight(a.x,a.z);
  for(let i=1;i<=steps;i++){
   const x=a.x+(b.x-a.x)*i/steps,z=a.z+(b.z-a.z)*i/steps,h=groundHeight(x,z);
-  if(inNavigationObstacle(x,z,NAV_MARGIN)||Math.abs(h-previous)>.35)return false;
+  if(inNavigationObstacle(x,z,NAV_MARGIN)||Math.abs(h-previous)>.09 + .75*a.distanceTo(b)/steps)return false;
   previous=h;
  }
  return true;
@@ -142,7 +154,9 @@ const navClear=(a:THREE.Vector3,b:THREE.Vector3)=>{
 const routeTarget=new THREE.Vector3(Infinity,0,Infinity),routeFrom=new THREE.Vector3(Infinity,0,Infinity);
 let route:THREE.Vector3[]=[];
 let grid: {point:THREE.Vector3; edges:number[];reachable:boolean}[] | null=null;
+let gridRevision=-1,gridBoarding=false;
 function navGrid() {
+ if(gridRevision!==collisionRevision() || gridBoarding!==boarding){grid=null;route=[];gridRevision=collisionRevision();gridBoarding=boarding;}
  if(grid)return grid;
  const nodes: {point:THREE.Vector3; edges:number[];reachable:boolean}[]=[],lookup=new Map<string,number>();
  const extent=Math.ceil(WALK_RADIUS/NAV_STEP);
@@ -155,7 +169,7 @@ function navGrid() {
   if(!dx&&!dz)continue;const j=lookup.get(`${x+dx},${z+dz}`);if(j!==undefined&&navClear(nodes[i].point,nodes[j].point))nodes[i].edges.push(j);
  }}
  // Connectivity uses the same clearance and step-height rules as actual movement.
- const start=nodes.map((n,i)=>({i,d:(n.point.x-HOME[0])**2+(n.point.z-HOME[1])**2})).sort((a,b)=>a.d-b.d)[0]?.i;
+ const start=nodes.map((n,i)=>({i,d:(n.point.x-CHAIR.x)**2+(n.point.z-CHAIR.z)**2})).sort((a,b)=>a.d-b.d)[0]?.i;
  const seen=new Set<number>(),queue=start===undefined?[]:[start];
  while(queue.length){const i=queue.pop()!;if(seen.has(i))continue;seen.add(i);queue.push(...nodes[i].edges.filter(j=>!seen.has(j)));}
  nodes.forEach((n,i)=>n.reachable=seen.has(i));
@@ -184,13 +198,16 @@ function planRoute(from:THREE.Vector3,target:THREE.Vector3) {
  const path=[target.clone()];let at=goal;while(at!==start){path.unshift(nodes[at].point.clone());at=previous[at];if(at<0)return [];}
  path.unshift(nodes[start].point.clone());return path;
 }
-export function waypoint(from:THREE.Vector3,target:THREE.Vector3,out:THREE.Vector3) {
+export function waypoint(from:THREE.Vector3,target:THREE.Vector3,out:THREE.Vector3, boardChair=false) {
+ boarding=boardChair;
+ try {
  if(navClear(from,target)){route=[];return out.copy(target);}
  if(routeTarget.distanceToSquared(target)>.0001||routeFrom.distanceTo(from)>.8||!route.length){route=planRoute(from,target);routeTarget.copy(target);}
  routeFrom.copy(from);
- while(route.length&&from.distanceTo(route[0])<.16)route.shift();
+ while(route.length&&from.distanceTo(route[0])<.025)route.shift();
  for(let i=route.length-1;i>0;i--)if(navClear(from,route[i])){route.splice(0,i);break;}
  return out.copy(route[0]||from);
+ } finally {boarding=false;}
 }
 
 const craters = [
