@@ -61,6 +61,7 @@ export function SearchOverlay({ state, trigger, dialog }: {
         }
       }}
     >
+      {phase === "opening" && <span className="search-planet-status" role="status">正在開啟搜尋星球…</span>}
       <div className="search-planet-controls" inert={!controlsVisible}>
         <button className="search-planet-close" type="button" aria-label="關閉搜尋星球" onClick={close}>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>

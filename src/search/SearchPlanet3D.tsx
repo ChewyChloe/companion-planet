@@ -1,4 +1,6 @@
-import { useMemo, useRef, type RefObject } from "react";
+import { usesMobileSafariRendering } from "../art/mobile-safari";
+import { SceneBoundary } from "../SceneBoundary";
+import { Suspense, useMemo, useRef, type RefObject } from "react";
 import { createPortal, useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import { Box3, Group, Vector3, MathUtils, Scene, OrthographicCamera, MeshBasicMaterial } from "three";
@@ -15,7 +17,7 @@ export function SearchPlanet3D({ state, reduced, paused, onReady, overlay }: {
   onReady: () => void;
   overlay: RefObject<HTMLDivElement | null>;
 }) {
-  const { scene } = useGLTF(`${import.meta.env.BASE_URL}models/search/planet.glb`);
+  const { scene } = useGLTF(`${import.meta.env.BASE_URL}models/search/planet${usesMobileSafariRendering() ? "-mobile" : ""}.glb`);
   const { model, center, upper, lower } = useMemo(() => {
     const model = scene.clone();
     return {
@@ -35,11 +37,12 @@ export function SearchPlanet3D({ state, reduced, paused, onReady, overlay }: {
   const veilMaterial = useRef<MeshBasicMaterial>(null);
   const progress = useRef(0);
   const ready = useRef(false);
+  const barError = useRef<Group>(null);
 
   useFrame(({ gl, size, clock }, delta) => {
     const planet = root.current;
     const searchBar = bar.current;
-    if (paused || !planet || !searchBar || !veilMaterial.current) return;
+    if (paused || !planet || !veilMaterial.current) return;
     const { width, height } = size;
     const { camera, anchor } = foreground;
     if (camera.right !== width / 2 || camera.top !== height / 2) {
@@ -54,9 +57,10 @@ export function SearchPlanet3D({ state, reduced, paused, onReady, overlay }: {
       onReady();
     }
     const { phase } = state;
+    if (phase === "opening" && barError.current) state.close();
     const target = phase === "closed" || phase === "closing" ? 0 : 1;
     const duration = reduced ? .28 : 1.32;
-    progress.current = MathUtils.clamp(progress.current + (target ? 1 : -1) * Math.min(delta, .12) / duration, 0, 1);
+    progress.current = MathUtils.clamp(progress.current + (target ? 1 : -1) * Math.min(delta, .12) / duration, 0, searchBar ? 1 : .59);
     const { travel, shell, bar: deploy, veil } = searchMotion(progress.current);
     const viewport = window.visualViewport;
     const visibleHeight = Math.min(height, viewport?.height ?? height);
@@ -76,26 +80,28 @@ export function SearchPlanet3D({ state, reduced, paused, onReady, overlay }: {
     if (lower) lower.position.y = shell * -.12;
 
     const panelWidth = Math.min(470, width * .86, visibleHeight * 1.08);
-    searchBar.visible = deploy > 0;
-    searchBar.position.set(0, MathUtils.lerp(planetY, panelY, deploy), 300);
-    searchBar.scale.setScalar(Math.max(.001, panelWidth * deploy));
-    searchBar.rotation.set(MathUtils.lerp(-.36, -.12, deploy), MathUtils.lerp(-.26, -.08, deploy), -.025);
-    const controls = overlay.current;
-    if (controls && phase === "open") {
-      searchBar.updateMatrixWorld(true);
-      const form = controls.querySelector<HTMLFormElement>("form");
-      anchor.set(.085, 0, .16);
-      searchBar.localToWorld(anchor);
-      if (form) {
-        form.style.left = `${width / 2 + anchor.x}px`;
-        form.style.top = `${height / 2 - anchor.y}px`;
-        form.style.width = `${panelWidth * .54}px`;
-        form.style.height = `${panelWidth * .135}px`;
-      }
-      const close = controls.querySelector<HTMLButtonElement>(".search-planet-close");
-      if (close) {
-        close.style.left = `${width / 2 + panelWidth * .41}px`;
-        close.style.top = `${height / 2 - panelY - panelWidth * .21}px`;
+    if (searchBar) {
+      searchBar.visible = deploy > 0;
+      searchBar.position.set(0, MathUtils.lerp(planetY, panelY, deploy), 300);
+      searchBar.scale.setScalar(Math.max(.001, panelWidth * deploy));
+      searchBar.rotation.set(MathUtils.lerp(-.36, -.12, deploy), MathUtils.lerp(-.26, -.08, deploy), -.025);
+      const controls = overlay.current;
+      if (controls && phase === "open") {
+        searchBar.updateMatrixWorld(true);
+        const form = controls.querySelector<HTMLFormElement>("form");
+        anchor.set(.085, 0, .16);
+        searchBar.localToWorld(anchor);
+        if (form) {
+          form.style.left = `${width / 2 + anchor.x}px`;
+          form.style.top = `${height / 2 - anchor.y}px`;
+          form.style.width = `${panelWidth * .54}px`;
+          form.style.height = `${panelWidth * .135}px`;
+        }
+        const close = controls.querySelector<HTMLButtonElement>(".search-planet-close");
+        if (close) {
+          close.style.left = `${width / 2 + panelWidth * .41}px`;
+          close.style.top = `${height / 2 - panelY - panelWidth * .21}px`;
+        }
       }
     }
 
@@ -123,7 +129,13 @@ export function SearchPlanet3D({ state, reduced, paused, onReady, overlay }: {
       <group ref={root}>
         <group position={center}><primitive object={model} /></group>
       </group>
-      <SearchBar3D ref={bar} />
+      {state.phase !== "closed" && (
+        <SceneBoundary fallback={<group ref={barError} />}>
+          <Suspense fallback={null}>
+            <SearchBar3D ref={bar} />
+          </Suspense>
+        </SceneBoundary>
+      )}
     </>,
     foreground.scene,
   );

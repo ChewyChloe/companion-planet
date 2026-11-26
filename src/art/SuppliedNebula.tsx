@@ -1,3 +1,4 @@
+import { usesMobileSafariRendering } from "./mobile-safari";
 import { attachNebulaFace, chooseExpression, expressionPresets, faceUniforms, type Expression, type Face } from "./nebula-expressions";
 import { CHAIR, groundHeight } from "./terrain";
 import { contactFloor } from "./world-collision";
@@ -13,7 +14,8 @@ export const SUPPLIED_NEBULA_URL = "models/user-residents/nebula.glb?v=modular-f
 export function SuppliedNebula({ action, still, held, seatBlend, gaitTime, face, pet = false }: {
   action: Action; face?: Face; still?: boolean; held?: React.RefObject<boolean>; seatBlend?: React.RefObject<number>; gaitTime?: React.RefObject<number>; pet?: boolean;
 }) {
-  const gltf = useLoader(GLTFLoader, import.meta.env.BASE_URL + SUPPLIED_NEBULA_URL);
+  const modelPath = usesMobileSafariRendering() ? "models/user-residents/nebula-mobile.glb" : SUPPLIED_NEBULA_URL;
+  const gltf = useLoader(GLTFLoader, import.meta.env.BASE_URL + modelPath);
   const { gl } = useThree();
   const current = useRef<THREE.AnimationAction | null>(null);
   const root = useRef<THREE.Group>(null);
@@ -181,7 +183,7 @@ export function SuppliedNebula({ action, still, held, seatBlend, gaitTime, face,
     gl.domElement.dataset.face = targetFace.join(",");
     gl.domElement.dataset.faceBlend = uniforms.faceMix.value.toFixed(2);
     gl.domElement.dataset.modelReady = "user-nebula";
-    gl.domElement.dataset.modelPath = SUPPLIED_NEBULA_URL;
+    gl.domElement.dataset.modelPath = modelPath;
     gl.domElement.dataset.companion = "nebula";
     gl.domElement.dataset.suppliedClip = current.current?.getClip().name || "none";
   });

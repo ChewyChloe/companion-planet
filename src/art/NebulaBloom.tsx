@@ -36,3 +36,10 @@ export function NebulaBloom({ paused = false }: { paused?: boolean } = {}) {
   },1);
   return null;
 }
+
+export function DirectSceneRender({ paused }: { paused: boolean }) {
+  useFrame(({ gl, scene, camera }) => {
+    if (!paused) gl.render(scene, camera);
+  }, 1);
+  return null;
+}

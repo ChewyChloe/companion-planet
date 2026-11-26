@@ -93,3 +93,15 @@
 @media (prefers-reduced-motion: reduce) {
   .search-planet-controls { transition: none; }
 }
+.search-planet-status {
+  position: absolute;
+  left: 50%;
+  bottom: 17%;
+  transform: translateX(-50%);
+  color: #fff4fa;
+  background: #302745ed;
+  border-radius: 2rem;
+  padding: .45rem .9rem;
+  white-space: nowrap;
+  pointer-events: none;
+}

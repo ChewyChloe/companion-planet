@@ -1,3 +1,5 @@
+import { usesMobileSafariRendering } from "./art/mobile-safari";
+import { SceneBoundary } from "./SceneBoundary";
 import { SearchPlanet3D, searchPlanetSlot } from "./search/SearchPlanet3D";
 import { SearchOverlay } from "./search/SearchOverlay";
 import { useSearchPlanetState } from "./search/useSearchPlanetState";
@@ -6,7 +8,7 @@ import { suppliedFlower,suppliedLamp,suppliedView } from "./art/supplied-world-c
 import { userHome } from "./art/user-world-ground";
 import { headingFromStep, turnToward } from "./art/locomotion";
 import { RESIDENT_SCALE, residentFocusHeight } from "./art/resident-assets";
-import { NebulaBloom } from "./art/NebulaBloom";
+import { DirectSceneRender, NebulaBloom } from "./art/NebulaBloom";
 import { JourneyCamera } from "./art/JourneyCamera";
 import { CanvasGestures } from "./art/CanvasGestures";
 import { Atmosphere } from "./art/Atmosphere";
@@ -15,12 +17,10 @@ import { planets } from "./planets";
 import { safeDrop } from "./art/placement";
 import { Cosmos, destinationPositions } from "./art/Cosmos";
 import {
-  Component,
   Suspense,
   useEffect,
   useMemo,
   useRef,
-  type ReactNode,
 } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Stats } from "@react-three/drei";
@@ -458,24 +458,6 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
   );
 }
 import { useState as ReactUseState } from "react";
-class SceneBoundary extends Component<
-  { children: ReactNode; fallback?: ReactNode },
-  { error: boolean }
-> {
-  state = { error: false };
-  static getDerivedStateFromError() {
-    return { error: true };
-  }
-  render() {
-    return this.state.error ? (
-      this.props.fallback !== undefined ? this.props.fallback : <div className="scene-error" role="alert">
-        3D 畫面無法啟動。請開啟硬體加速並重新整理；計時與聊天仍可使用。
-      </div>
-    ) : (
-      this.props.children
-    );
-  }
-}
 function RendererHealth({ onLost }: { onLost: (lost: boolean) => void }) {
   const { gl } = useThree();
   useEffect(() => {
@@ -541,6 +523,7 @@ export default function Scene({
   const [searchReady, setSearchReady] = ReactUseState(false);
   const searchTrigger = useRef<HTMLButtonElement>(null);
   const searchOverlay = useRef<HTMLDivElement>(null);
+  const mobileSafari = usesMobileSafariRendering();
   const searchActive = !pet && search.phase !== "closed";
   const planetId = useWorld((s) => s.planetId);
   const hoveredPlanet = useWorld((s) => s.hoveredPlanet);
@@ -554,7 +537,7 @@ export default function Scene({
         }
         key={pet ? "pet" : "planet"}
         shadows
-        dpr={[1, 1.5]}
+        dpr={mobileSafari ? 1 : [1, 1.5]}
         camera={{
           position: pet ? [0, 0.45, 3.5] : [6, 3.6, 10],
           fov: pet ? 30 : 42,
@@ -571,7 +554,9 @@ export default function Scene({
           );
         }}
       >
-        {!pet && <NebulaBloom paused={pickerOpen} />}
+        {!pet && (mobileSafari
+          ? <DirectSceneRender paused={pickerOpen} />
+          : <NebulaBloom paused={pickerOpen} />)}
         <CanvasGestures />
         <CameraFraming pet={pet} />
         <RenderQuality />
