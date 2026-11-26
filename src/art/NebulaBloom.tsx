@@ -5,7 +5,7 @@ import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
-export function NebulaBloom({ paused = false }: { paused?: boolean } = {}) {
+export function NebulaBloom() {
   const { gl, scene, camera, size } = useThree();
   const pipeline = useMemo(() => {
     const composer = new EffectComposer(gl);
@@ -23,7 +23,8 @@ export function NebulaBloom({ paused = false }: { paused?: boolean } = {}) {
     return () => {delete scene.userData.renderMaterialPreview;pipeline.bloom.dispose();pipeline.output.dispose();pipeline.composer.dispose();};
   },[pipeline,scene]);
   useFrame(() => {
-    if (paused) return;
+    // The browser can discard the WebGL drawing buffer between composites.
+    // Keep repainting the sky while the character picker is visible.
     // Match the renderer's adaptive DPR: a full-size offscreen buffer negates
     // RenderQuality's fill-rate reduction on phones and software WebGL.
     const ratio = Math.min(1, gl.getPixelRatio());
@@ -37,9 +38,9 @@ export function NebulaBloom({ paused = false }: { paused?: boolean } = {}) {
   return null;
 }
 
-export function DirectSceneRender({ paused }: { paused: boolean }) {
+export function DirectSceneRender() {
   useFrame(({ gl, scene, camera }) => {
-    if (!paused) gl.render(scene, camera);
+    gl.render(scene, camera);
   }, 1);
   return null;
 }

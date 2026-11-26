@@ -564,8 +564,8 @@ export default function Scene({
         }}
       >
         {!pet && (mobileSafari
-          ? <DirectSceneRender paused={pickerOpen} />
-          : <NebulaBloom paused={pickerOpen} />)}
+          ? <DirectSceneRender />
+          : <NebulaBloom />)}
         <CanvasGestures />
         <CameraFraming pet={pet} />
         <RenderQuality sharpSearch={searchActive && !mobileSafari && window.matchMedia("(pointer: fine)").matches} />
