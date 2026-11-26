@@ -1201,17 +1201,40 @@ button.chat-launch.control-tooltip {
   top: calc(100% + 9px);
   left: 0;
   width: min(428px, calc(100vw - 44px));
-  max-height: max(145px, calc(100dvh - 235px));
-  overflow: auto;
-  overscroll-behavior: contain;
-  padding: 17px 20px 16px;
+  --clock-max-height: max(145px, calc(100dvh - 235px));
+  overflow: hidden;
   border: 1px solid #fff;
   border-radius: 27px;
   background: #faf9fc;
   color: var(--clock-ink);
   box-shadow: 0 14px 42px #32245438, 0 2px 8px #32245412;
-  scrollbar-width: thin;
   font-size: 14px;
+}
+.clock-scroll {
+  max-height: var(--clock-max-height);
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 17px 20px 16px;
+}
+:where(.clock-scroll, .messages, .companion-picker) {
+  scrollbar-width: thin;
+  scrollbar-color: #a699b8 transparent;
+}
+:where(.clock-scroll, .messages, .companion-picker)::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+:where(.clock-scroll, .messages, .companion-picker)::-webkit-scrollbar-track {
+  background: transparent;
+}
+:where(.clock-scroll, .messages, .companion-picker)::-webkit-scrollbar-thumb {
+  border-radius: 99px;
+  background: #a699b8;
+}
+:where(.clock-scroll, .messages, .companion-picker)::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
 }
 .pomodoro-heading,
 .pomodoro-heading h2,
@@ -1475,7 +1498,8 @@ button.chat-launch.control-tooltip {
 .pomodoro-records ul { margin: 7px 0 0; padding: 0; }
 .pomodoro-records li { justify-content: space-between; gap: 8px; padding: 3px 0; }
 @media (max-width: 460px) {
-  .pomodoro-settings { padding-inline: 12px; width: min(400px, calc(100vw - 36px)); }
+  .pomodoro-settings { width: min(400px, calc(100vw - 36px)); }
+  .clock-scroll { padding-inline: 12px; }
   .pomodoro-heading { gap: 4px; }
   .pomodoro-heading h2 { font-size: 15px; }
 }
@@ -1490,7 +1514,7 @@ button.chat-launch.control-tooltip {
 .pet .timer-stage { left: 8px; bottom: 7px; font-size: 10px; color: #443c54; text-shadow: none; }
 .pet .timer-buttons { flex-direction: row; gap: 5px; }
 .pet .timer-buttons .round-control { width: 38px; min-width: 38px; height: 38px; min-height: 38px; background: #f4f1e8; color: #443c54; }
-.pet .pomodoro-settings { max-height: calc(100dvh - 162px); width: calc(100vw - 24px); }
+.pet .pomodoro-settings { --clock-max-height: calc(100dvh - 162px); width: calc(100vw - 24px); }
 .pet .timer-reset { min-height: 23px; width: 25px; }
 .pet .notice { top: 115px; max-width: calc(100% - 16px); }
 @media (max-width: 700px) {

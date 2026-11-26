@@ -105,75 +105,77 @@ export function PomodoroHud({ onCommand, previewSound }: {
               closeSettings();
             }
           }}>
-          <div className="pomodoro-heading">
-            <h2><span className="clock-emblem"><Icon name="orbit" /></span>星球鐘設定</h2>
-            <button className="clock-pill" type="button" onClick={() => { onCommand("skip"); closeSettings(); }}>
-              <Icon name="skip" />跳過階段
-            </button>
-            <button className="clock-close" type="button" aria-label="關閉星球鐘設定" onClick={closeSettings}>
-              <Icon name="close" />
-            </button>
-          </div>
-          <div className="pomodoro-durations">
-            {durationFields.map(([key, name, icon, theme]) => (
-              <label key={key} className={`clock-duration clock-duration-${theme}`}>
-                <span className="clock-duration-icon"><Icon name={icon} /></span>
-                <span className="clock-duration-name">{name}</span>
-                <span className="clock-duration-value">
-                  <input key={settings[key]} aria-label={`${name}（分鐘）`} type="number" min={.02}
-                    max={99.98} step="any" defaultValue={Number(settings[key].toFixed(2))} inputMode="decimal"
-                    onKeyDown={event => { if (event.key === "Enter") event.currentTarget.blur(); }}
-                    onBlur={event => {
-                      const value = event.currentTarget.valueAsNumber;
-                      if (Number.isFinite(value) && value > 0 && value !== Number(settings[key].toFixed(2)))
-                        state.updateTimerSettings({ [key]: value });
-                      else event.currentTarget.value = String(Number(settings[key].toFixed(2)));
-                    }} />
-                  <span>分</span>
-                </span>
-              </label>
-            ))}
-          </div>
-          <div className="clock-interval">
-            <Icon name="reset" />
-            <span>幾顆星球後長休息</span>
-            <div className="clock-stepper" role="group" aria-label="長休息間隔">
-              <button type="button" aria-label="減少長休息間隔" disabled={settings.longEvery <= 1}
-                onClick={() => state.updateTimerSettings({ longEvery: settings.longEvery - 1 })}><Icon name="minus" /></button>
-              <output aria-label="長休息間隔輪數">{settings.longEvery}</output>
-              <button type="button" aria-label="增加長休息間隔" disabled={settings.longEvery >= 12}
-                onClick={() => state.updateTimerSettings({ longEvery: settings.longEvery + 1 })}><Icon name="plus" /></button>
+          <div className="clock-scroll">
+            <div className="pomodoro-heading">
+              <h2><span className="clock-emblem"><Icon name="orbit" /></span>星球鐘設定</h2>
+              <button className="clock-pill" type="button" onClick={() => { onCommand("skip"); closeSettings(); }}>
+                <Icon name="skip" />跳過階段
+              </button>
+              <button className="clock-close" type="button" aria-label="關閉星球鐘設定" onClick={closeSettings}>
+                <Icon name="close" />
+              </button>
             </div>
-          </div>
-          <TimerSwitch label="自動開始下一階段" icon="bolt" checked={settings.autoStart}
-            onChange={autoStart => state.updateTimerSettings({ autoStart })} />
-          <div className="pomodoro-sound">
-            <TimerSwitch label="提示音" icon="bell" checked={settings.sound}
-              onChange={sound => state.updateTimerSettings({ sound })} />
-            <button type="button" className="clock-pill" onClick={previewSound}><Icon name="play" />試聽</button>
-          </div>
-          <label className="pomodoro-volume">
-            <span>提示音量</span>
-            <input type="range" min="0" max="100" value={Math.round(settings.volume * 100)}
-              style={{ "--volume-progress": `${settings.volume * 100}%` } as CSSProperties}
-              onChange={event => state.updateTimerSettings({ volume: Number(event.currentTarget.value) / 100 })} />
-            <span>{Math.round(settings.volume * 100)}%</span>
-          </label>
-          <TimerSwitch label="桌面通知" icon="monitor" checked={settings.desktopNotifications}
-            onChange={enabled => void toggleDesktop(enabled)} />
-          {notificationFeedback && <p className="clock-feedback" aria-live="polite">{notificationFeedback}</p>}
-          <div className="pomodoro-records">
-            <div className="clock-record-today">
-              <span className="clock-record-icon"><Icon name="star" /></span>
-              <p>今日 <strong>{today.count}</strong> 顆星球 · <strong>{Number(today.minutes.toFixed(1))}</strong> 分鐘</p>
+            <div className="pomodoro-durations">
+              {durationFields.map(([key, name, icon, theme]) => (
+                <label key={key} className={`clock-duration clock-duration-${theme}`}>
+                  <span className="clock-duration-icon"><Icon name={icon} /></span>
+                  <span className="clock-duration-name">{name}</span>
+                  <span className="clock-duration-value">
+                    <input key={settings[key]} aria-label={`${name}（分鐘）`} type="number" min={.02}
+                      max={99.98} step="any" defaultValue={Number(settings[key].toFixed(2))} inputMode="decimal"
+                      onKeyDown={event => { if (event.key === "Enter") event.currentTarget.blur(); }}
+                      onBlur={event => {
+                        const value = event.currentTarget.valueAsNumber;
+                        if (Number.isFinite(value) && value > 0 && value !== Number(settings[key].toFixed(2)))
+                          state.updateTimerSettings({ [key]: value });
+                        else event.currentTarget.value = String(Number(settings[key].toFixed(2)));
+                      }} />
+                    <span>分</span>
+                  </span>
+                </label>
+              ))}
             </div>
-            <p className="clock-record-total">累積專注 {Number(totalMinutes.toFixed(1))} 分鐘</p>
-            <details>
-              <summary>每日專注紀錄</summary>
-              {days.size ? <ul>{[...days].sort(([a], [b]) => b.localeCompare(a)).map(([day, stats]) => (
-                <li key={day}><span>{day}</span><span>{stats.count} 顆星球 · {Number(stats.minutes.toFixed(1))} 分鐘</span></li>
-              ))}</ul> : <p>完成第一段專注後，紀錄會出現在這裡</p>}
-            </details>
+            <div className="clock-interval">
+              <Icon name="reset" />
+              <span>幾顆星球後長休息</span>
+              <div className="clock-stepper" role="group" aria-label="長休息間隔">
+                <button type="button" aria-label="減少長休息間隔" disabled={settings.longEvery <= 1}
+                  onClick={() => state.updateTimerSettings({ longEvery: settings.longEvery - 1 })}><Icon name="minus" /></button>
+                <output aria-label="長休息間隔輪數">{settings.longEvery}</output>
+                <button type="button" aria-label="增加長休息間隔" disabled={settings.longEvery >= 12}
+                  onClick={() => state.updateTimerSettings({ longEvery: settings.longEvery + 1 })}><Icon name="plus" /></button>
+              </div>
+            </div>
+            <TimerSwitch label="自動開始下一階段" icon="bolt" checked={settings.autoStart}
+              onChange={autoStart => state.updateTimerSettings({ autoStart })} />
+            <div className="pomodoro-sound">
+              <TimerSwitch label="提示音" icon="bell" checked={settings.sound}
+                onChange={sound => state.updateTimerSettings({ sound })} />
+              <button type="button" className="clock-pill" onClick={previewSound}><Icon name="play" />試聽</button>
+            </div>
+            <label className="pomodoro-volume">
+              <span>提示音量</span>
+              <input type="range" min="0" max="100" value={Math.round(settings.volume * 100)}
+                style={{ "--volume-progress": `${settings.volume * 100}%` } as CSSProperties}
+                onChange={event => state.updateTimerSettings({ volume: Number(event.currentTarget.value) / 100 })} />
+              <span>{Math.round(settings.volume * 100)}%</span>
+            </label>
+            <TimerSwitch label="桌面通知" icon="monitor" checked={settings.desktopNotifications}
+              onChange={enabled => void toggleDesktop(enabled)} />
+            {notificationFeedback && <p className="clock-feedback" aria-live="polite">{notificationFeedback}</p>}
+            <div className="pomodoro-records">
+              <div className="clock-record-today">
+                <span className="clock-record-icon"><Icon name="star" /></span>
+                <p>今日 <strong>{today.count}</strong> 顆星球 · <strong>{Number(today.minutes.toFixed(1))}</strong> 分鐘</p>
+              </div>
+              <p className="clock-record-total">累積專注 {Number(totalMinutes.toFixed(1))} 分鐘</p>
+              <details>
+                <summary>每日專注紀錄</summary>
+                {days.size ? <ul>{[...days].sort(([a], [b]) => b.localeCompare(a)).map(([day, stats]) => (
+                  <li key={day}><span>{day}</span><span>{stats.count} 顆星球 · {Number(stats.minutes.toFixed(1))} 分鐘</span></li>
+                ))}</ul> : <p>完成第一段專注後，紀錄會出現在這裡</p>}
+              </details>
+            </div>
           </div>
         </section>
       )}
