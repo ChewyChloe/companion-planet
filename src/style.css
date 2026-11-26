@@ -896,6 +896,10 @@ select {
   letter-spacing: 1px;
   text-shadow: 0 1px 2px #6b648440;
 }
+.app[data-time-of-day="day"] .distant-planet span {
+  color: #30283f;
+  text-shadow: 0 1px 2px #fffbf680;
+}
 .distant-planet:hover {
   outline: 1px solid #fff8e69c;
 }
