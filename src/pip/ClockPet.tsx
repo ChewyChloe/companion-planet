@@ -1,4 +1,4 @@
-import { Suspense, useLayoutEffect, useMemo, useRef, type RefObject } from "react";
+import { Suspense, useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrthographicCamera, Vector3 } from "three";
 import { Icon } from "../Icon";
@@ -58,14 +58,14 @@ function ClockCamera({ face, surface }: { face: RefObject<HTMLDivElement | null>
     if (!(camera instanceof OrthographicCamera) || !surface.current) return;
     const { width, height } = surface.current.getBoundingClientRect();
     if (!width || !height) return;
-    const framing = Math.max(1.28, 1.10 * height / width);
+    const framing = Math.max(1.54, 1.35 * height / width);
     // Set the frustum directly from the visible PiP viewport, independently of R3F's auto-fit.
     camera.left = -framing * width / height / 2;
     camera.right = -camera.left;
     camera.top = framing / 2;
     camera.bottom = -camera.top;
     camera.zoom = 1;
-    camera.lookAt(0, .48, 0);
+    camera.lookAt(0, .385, 0);
     camera.updateMatrixWorld();
     camera.updateProjectionMatrix();
     gl.setViewport(0, 0, width, height);
@@ -85,6 +85,8 @@ export function ClockPet({ host, face, celebration, onCommand, onReturn }: {
   onReturn: () => void;
 }) {
   const surface = useRef<HTMLElement>(null);
+  const bubble = useRef<HTMLDivElement>(null);
+  const [speech, setSpeech] = useState("");
   const timer = useWorld(state => state.timer);
   const night = useWorld(state => state.night);
   const seconds = Math.ceil(timer.remaining / 1000);
@@ -104,7 +106,7 @@ export function ClockPet({ host, face, celebration, onCommand, onReturn }: {
           <directionalLight position={[2, 1, -1]} intensity={.8} color="#d1dfff" />
           <Suspense fallback={null}>
             <ClockPlanet />
-            <ClockResident celebration={celebration} />
+            <ClockResident celebration={celebration} bubble={bubble} onSay={setSpeech} />
           </Suspense>
         </Canvas>
       </SceneBoundary>
@@ -112,6 +114,7 @@ export function ClockPet({ host, face, celebration, onCommand, onReturn }: {
         <span>{stage}</span>
         <output role="timer" aria-label="浮動剩餘時間">{display}</output>
       </div>
+      <div className="clock-pet-speech" ref={bubble} role="status" hidden={!speech}>{speech}</div>
       <div className="clock-pet-controls">
         <button type="button" onClick={() => onCommand(timer.running ? "pause" : "start")}>
           <Icon name={timer.running ? "pause" : "play"} />

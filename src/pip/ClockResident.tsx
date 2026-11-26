@@ -1,60 +1,109 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState, type RefObject } from "react";
 import { useFrame } from "@react-three/fiber";
-import { Group, MathUtils } from "three";
+import { Group, Matrix4, MathUtils, Quaternion, Vector3 } from "three";
 import SculptCharacter from "../art/SculptCharacter";
-import { turnToward } from "../art/locomotion";
 import type { Action } from "../domain";
 import { useWorld } from "../store";
-import { clockPath } from "./clock-path";
+import { clockPath, fullClockLap } from "./clock-path";
 
-export function ClockResident({ celebration }: { celebration: number }) {
+const startAngle = -.16;
+const messages = [
+  "繞完一圈啦，你也休息一下嗎？",
+  "我在這裡陪你～",
+  "剛才從下面看，星星亮了一點",
+  "我看見你啦！",
+];
+
+export function ClockResident({ celebration, bubble, onSay }: {
+  celebration: number;
+  bubble: RefObject<HTMLDivElement | null>;
+  onSay: (line: string) => void;
+}) {
   const resident = useRef<Group>(null);
   const time = useRef(0);
   const gait = useRef(0);
-  const angle = useRef(1.15);
+  const orbit = useRef({ angle: startAngle, nextStop: startAngle + fullClockLap, pause: 0, laps: 0 });
   const seat = useRef(0);
   const cheer = useRef({ event: celebration, remaining: 0 });
   const [pose, setPose] = useState<Action>("idle");
   const poseRef = useRef<Action>("idle");
+  const activeLine = useRef("");
+  const scratch = useMemo(() => ({
+    up: new Vector3(), forward: new Vector3(), right: new Vector3(), marker: new Vector3(),
+    basis: new Matrix4(), facing: new Quaternion(),
+  }), []);
 
-  useFrame(({ gl }, delta) => {
-    if (!resident.current) return;
-    const dt = Math.min(delta, .065);
+  useFrame(({ camera, gl }, delta) => {
+    const actor = resident.current;
+    if (!actor) return;
+    const dt = Math.min(delta, .08);
     const { timer, reduced, silent } = useWorld.getState();
     time.current += dt;
     const focus = timer.running && timer.phase === "focus";
     const resting = timer.phase === "break";
-    const cycle = time.current % (focus ? 27 : 20);
-    let target: Action = cycle < (focus ? 6 : 9) ? "walk" : cycle < 11 ? "idle" : "read";
-    if (resting && cycle >= 14) target = "rest";
-    if (!focus && !silent && !reduced && cycle > 10 && cycle < 11.5) target = "stretch";
-    if (cheer.current.event !== celebration) {
-      cheer.current = { event: celebration, remaining: 1.6 };
-    }
+    const loop = orbit.current;
+    if (cheer.current.event !== celebration) cheer.current = { event: celebration, remaining: 1.6 };
+
+    const before = clockPath(loop.angle);
+    let target: Action = "walk";
     if (cheer.current.remaining > 0) {
-      if (!reduced) target = "happy";
       cheer.current.remaining -= dt;
+      target = reduced ? "idle" : "happy";
+    } else if (loop.angle >= loop.nextStop) {
+      loop.pause += dt;
+      target = loop.pause < 2.8 ? "idle" : resting ? "rest" : "read";
+      if (loop.pause >= (focus ? 11 : 5.5)) {
+        loop.laps++;
+        loop.nextStop += fullClockLap;
+        loop.pause = 0;
+        target = "walk";
+      }
+    }
+    if (target === "walk") {
+      loop.angle = Math.min(loop.nextStop, loop.angle + dt * (focus || reduced ? .58 : .89));
     }
     if (target !== poseRef.current) {
       poseRef.current = target;
       setPose(target);
     }
-    const before = clockPath(angle.current);
-    if (target === "walk") angle.current += dt * (focus || reduced ? .55 : resting ? .82 : .93);
-    const point = clockPath(angle.current);
-    const travelled = Math.hypot(point.x - before.x, point.z - before.z);
-    gait.current += travelled / .115 * (Math.PI * 2 / 7.1);
+    const point = clockPath(loop.angle);
+    const travelled = Math.hypot(point.x - before.x, point.y - before.y, point.z - before.z);
+    gait.current += travelled / .115 * (fullClockLap / 7.1);
     seat.current = MathUtils.damp(seat.current, target === "read" ? 1 : 0, 8, dt);
-    const support = point.y + .004;
-    resident.current.position.set(point.x, support, point.z);
-    const heading = target === "walk" ? Math.atan2(point.tangentX, point.tangentZ) : 0;
-    resident.current.rotation.y = turnToward(resident.current.rotation.y, heading, dt);
+
+    const { up, forward, right, marker, basis, facing } = scratch;
+    up.set(point.upX, point.upY, .24).normalize();
+    actor.position.set(point.x + up.x * .005, point.y + up.y * .005, point.z + .006);
+    if (target === "walk") {
+      const next = clockPath(loop.angle + .02);
+      forward.set(next.x - point.x, next.y - point.y, next.z - point.z);
+    } else {
+      camera.getWorldDirection(forward).negate();
+    }
+    right.crossVectors(up, forward).normalize();
+    forward.crossVectors(right, up).normalize();
+    facing.setFromRotationMatrix(basis.makeBasis(right, up, forward));
+    actor.quaternion.slerp(facing, 1 - Math.exp(-dt * 13));
+
+    const line = !silent && !focus && target === "idle" && loop.pause > .45 && loop.laps % 2 === 0
+      ? messages[(loop.laps / 2) % messages.length] : "";
+    if (line !== activeLine.current) {
+      activeLine.current = line;
+      onSay(line);
+    }
+    if (line && bubble.current) {
+      marker.copy(actor.position).addScaledVector(up, .245).project(camera);
+      bubble.current.style.left = `${MathUtils.clamp((marker.x + 1) * 50, 20, 80)}%`;
+      bubble.current.style.top = `${MathUtils.clamp((1 - marker.y) * 50, 6, 30)}%`;
+    }
     gl.domElement.dataset.clockPose = target;
-    gl.domElement.dataset.clockPosition = [point.x, support, point.z].map(value => value.toFixed(3)).join(",");
+    gl.domElement.dataset.clockSpeaking = String(Boolean(line));
+    gl.domElement.dataset.clockPosition = actor.position.toArray().map(value => value.toFixed(3)).join(",");
   });
 
+  const start = clockPath(startAngle);
   return (
-    <group ref={resident} scale={.207} name="ClockResident" position={[.088, .8, .106]}>
+    <group ref={resident} scale={.17} name="ClockResident" position={[start.x, start.y, start.z]}>
       <SculptCharacter action={pose} time={time} gaitTime={gait} seatBlend={seat} floatingStage />
     </group>
   );

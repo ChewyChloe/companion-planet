@@ -1,22 +1,25 @@
-// Raycast down onto clock-planet.glb at evenly spaced points on the crown.
-// This ellipse stays inside the planet's ring and behind the clock button.
-const heights = [
-  .7723,.7700,.7751,.7770,.7772,.7805,.7833,.7854,.7876,.7892,.7912,.7932,.7947,.7965,.7982,.7998,
-  .7995,.7977,.7963,.7958,.7947,.7938,.7923,.7904,.7881,.7860,.7838,.7813,.7781,.7780,.7759,.7716,
-  .7732,.7732,.7708,.7735,.7748,.7759,.7770,.7788,.7805,.7823,.7838,.7854,.7868,.7881,.7890,.7894,
-  .7896,.7893,.7886,.7878,.7865,.7850,.7833,.7816,.7798,.7777,.7761,.7746,.7734,.7725,.7697,.7719,
+// Radial samples on the clock shell, excluding the detached decorative ring.
+export const clockCenterY = .414;
+const radii = [
+  .3879,.3845,.3817,.3787,.3738,.3691,.3657,.3630,.3614,.3590,.3588,.3596,.3600,.3605,.3606,.3609,
+  .3606,.3605,.3601,.3595,.3592,.3586,.3572,.3565,.3560,.3550,.3537,.3524,.3516,.3504,.3488,.3484,
+  .3483,.3483,.3488,.3492,.3504,.3512,.3522,.3530,.3543,.3551,.3566,.3564,.3572,.3578,.3587,.3584,
+  .3593,.3594,.3594,.3590,.3581,.3579,.3572,.3577,.3591,.3617,.3651,.3684,.3727,.3776,.3833,.3864,
 ];
+export const fullClockLap = Math.PI * 2;
 
 export function clockPath(angle: number) {
-  const turn = Math.PI * 2;
-  const sample = ((angle % turn + turn) % turn) / turn * heights.length;
-  const index = Math.floor(sample) % heights.length;
-  const blend = sample - Math.floor(sample);
+  const sample = ((angle % fullClockLap + fullClockLap) % fullClockLap) / fullClockLap * radii.length;
+  const index = Math.floor(sample);
+  const blend = sample - index;
+  const radius = radii[index] + (radii[(index + 1) % radii.length] - radii[index]) * blend;
+  const upX = -Math.sin(angle);
+  const upY = Math.cos(angle);
   return {
-    x: .215 * Math.cos(angle),
-    y: heights[index] + (heights[(index + 1) % heights.length] - heights[index]) * blend,
-    z: -.035 + .155 * Math.sin(angle),
-    tangentX: -.215 * Math.sin(angle),
-    tangentZ: .155 * Math.cos(angle),
+    x: radius * upX,
+    y: clockCenterY + radius * upY,
+    z: .175 - .06 * Math.max(0, upY) ** 8,
+    upX,
+    upY,
   };
 }

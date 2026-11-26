@@ -110,3 +110,21 @@
   width: 100% !important;
   height: 100% !important;
 }
+
+.clock-pet-speech {
+  position: absolute;
+  left: 50%;
+  top: 7%;
+  transform: translateX(-50%);
+  max-width: min(68%, 210px);
+  width: max-content;
+  padding: 6px 10px;
+  border-radius: 12px;
+  background: #fff7f5f4;
+  color: #4b385d;
+  box-shadow: 0 3px 10px #32274b31;
+  font-size: 12px;
+  line-height: 1.35;
+  text-align: center;
+  pointer-events: none;
+}
