@@ -66,8 +66,8 @@ export const companions = [
   },
 ] as const;
 export type CompanionId = (typeof companions)[number]["id"];
-export function companionAvailable(id: unknown): id is "nebula" | "fern" | "sprout" {
-  return id === "nebula" || id === "fern" || id === "sprout";
+export function companionAvailable(id: unknown): id is "nebula" | "fern" | "sprout" | "mushroom" {
+  return id === "nebula" || id === "fern" || id === "sprout" || id === "mushroom";
 }
 export function companionFor(id: unknown) {
   return companions.find((c) => c.id === id) || companions[0];

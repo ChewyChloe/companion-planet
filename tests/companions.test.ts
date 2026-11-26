@@ -7,7 +7,8 @@ it("has nine distinct silhouettes and validates saved selections", () => {
   expect(companionFor("fern").name).toBe("蕨蕨子");
   expect(companions.slice(0, 3).map(companion => companion.id)).toEqual(["nebula", "fern", "sprout"]);
   expect(companionAvailable("sprout")).toBe(true);
-  expect(companionAvailable("mushroom")).toBe(false);
+  expect(companionAvailable("mushroom")).toBe(true);
+  expect(companionAvailable("aurora")).toBe(false);
   expect(companionFor("<script>")).toBe(companions[0]);
 });
 it("manual greetings vary without repeating and honor quiet/focus policy", () => {

@@ -1,3 +1,4 @@
+import { SuppliedMushroom } from "./SuppliedMushroom";
 import { SuppliedPlant } from "./SuppliedPlant";
 import { SuppliedNebula } from "./SuppliedNebula";
 import { faceVisibleFrom } from "./locomotion";
@@ -371,6 +372,8 @@ function LegacyCharacter({
 export default function SculptCharacter(props: Parameters<typeof LegacyCharacter>[0]) {
   const selected = useWorld(s => s.companionId);
   const id = props.companionId || selected;
+  if (id === "mushroom" && !props.modelUrl)
+    return <SuppliedMushroom {...props} />;
   if ((id === "fern" || id === "sprout") && !props.modelUrl && !getNebulaMaterialVariant())
     return <SuppliedPlant key={id} {...props} id={id} />;
   if (id === "nebula" && !getNebulaMaterialVariant() && !props.modelUrl)
