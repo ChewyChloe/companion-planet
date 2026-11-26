@@ -6,9 +6,9 @@ window.addEventListener("message", ({ origin, source, data }) => {
     || data.type !== "request" || typeof data.id !== "string"
     || typeof data.query !== "string" || data.query.length > 200 || !data.query.trim()) return;
 
-  const reply = (type, opened) => window.postMessage({ channel, id: data.id, type, opened }, location.origin);
+  const reply = (type, opened, reason) => window.postMessage({ channel, id: data.id, type, opened, reason }, location.origin);
   reply("received");
   chrome.runtime.sendMessage({ channel, query: data.query })
-    .then((response) => reply("result", response?.opened === true))
+    .then((response) => reply("result", response?.opened === true, response?.reason))
     .catch(() => reply("result", false));
 });

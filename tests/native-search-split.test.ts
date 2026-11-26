@@ -54,7 +54,7 @@ it("opens the right-hand native pane and reuses it on the next search", async ()
 it("leaves an unrelated split alone and cleans up a failed split attempt", async () => {
   const { left, tabs, send } = setup();
   left.splitViewId = 20;
-  expect(await send()).toEqual({ opened: false });
+  expect(await send()).toEqual({ opened: false, reason: "occupied" });
   expect(tabs.create).not.toHaveBeenCalled();
   left.splitViewId = -1;
   tabs.createSplit.mockRejectedValueOnce(new Error("unavailable"));

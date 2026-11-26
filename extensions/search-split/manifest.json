@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "同頻星球 Google 分割搜尋",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "在桌機 Chrome 的右側分割畫面開啟同頻星球的 Google 搜尋結果",
   "minimum_chrome_version": "156",
   "permissions": ["storage"],

@@ -5,7 +5,7 @@ const pending = new Set();
 const isSplit = (tab) => Number.isInteger(tab.splitViewId) && tab.splitViewId >= 0;
 
 async function openSearch(leftId, query) {
-  if (typeof chrome.tabs.createSplit !== "function") return false;
+  if (typeof chrome.tabs.createSplit !== "function") return { opened: false, reason: "unsupported" };
 
   const url = new URL("https://www.google.com/search");
   url.searchParams.set("q", query.trim());
@@ -13,11 +13,11 @@ async function openSearch(leftId, query) {
   const left = await chrome.tabs.get(leftId);
   if (isSplit(left)) {
     const { [key]: rightId } = await chrome.storage.session.get(key);
-    if (!Number.isInteger(rightId)) return false;
+    if (!Number.isInteger(rightId)) return { opened: false, reason: "occupied" };
     const right = await chrome.tabs.get(rightId);
-    if (right.windowId !== left.windowId || right.splitViewId !== left.splitViewId || right.index !== left.index + 1) return false;
+    if (right.windowId !== left.windowId || right.splitViewId !== left.splitViewId || right.index !== left.index + 1) return { opened: false, reason: "occupied" };
     await chrome.tabs.update(rightId, { url: url.href });
-    return true;
+    return { opened: true };
   }
 
   const right = await chrome.tabs.create({
@@ -40,11 +40,11 @@ async function openSearch(leftId, query) {
     }
     await chrome.storage.session.set({ [key]: right.id });
     await chrome.tabs.update(right.id, { url: url.href });
-    return true;
+    return { opened: true };
   } catch {
     await chrome.tabs.remove(right.id).catch(() => {});
     await chrome.storage.session.remove(key).catch(() => {});
-    return false;
+    return { opened: false };
   }
 }
 
@@ -60,10 +60,10 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
   }
   pending.add(tabId);
   void openSearch(tabId, message.query)
-    .catch(() => false)
-    .then((opened) => {
+    .catch(() => ({ opened: false }))
+    .then((result) => {
       pending.delete(tabId);
-      reply({ opened });
+      reply(result);
     });
   return true;
 });

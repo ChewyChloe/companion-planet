@@ -1,7 +1,14 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 import type { SearchPlanetState } from "./useSearchPlanetState";
-import { openNativeSearchSplit } from "./native-split";
+import { openNativeSearchSplit, type NativeSplitResult } from "./native-split";
 import "./search.css";
+
+const splitHelp = {
+  "extension-unavailable": "搜尋擴充套件未連線",
+  unsupported: "此瀏覽器版本未開放自動分割",
+  occupied: "目前的分割畫面已在使用中",
+  failed: "瀏覽器無法開啟分割畫面",
+} satisfies Record<Exclude<NativeSplitResult, "opened">, string>;
 
 export function SearchOverlay({ state, trigger, dialog }: {
   state: SearchPlanetState;
@@ -10,18 +17,10 @@ export function SearchOverlay({ state, trigger, dialog }: {
 }) {
   const { phase, close } = state;
   const [query, setQuery] = useState("");
-  const [submitted, setSubmitted] = useState("");
+  const [fallback, setFallback] = useState<{ query: string; reason: Exclude<NativeSplitResult, "opened"> } | null>(null);
   const [openingSplit, setOpeningSplit] = useState(false);
   const pendingSplit = useRef(false);
-  const resultLink = useRef<HTMLAnchorElement>(null);
-  const canUseSidebar = () => window.matchMedia("(pointer: fine)").matches || Boolean(window.desktop);
-  const dismissSidebar = () => {
-    setSubmitted("");
-    input.current?.focus({ preventScroll: true });
-  };
-  useEffect(() => {
-    if (submitted) resultLink.current?.focus({ preventScroll: true });
-  }, [submitted]);
+  const useDesktopSearch = () => window.matchMedia("(pointer: fine)").matches || Boolean(window.desktop);
   const input = useRef<HTMLInputElement>(null);
   const composing = useRef(false);
   const involved = useRef(false);
@@ -39,7 +38,7 @@ export function SearchOverlay({ state, trigger, dialog }: {
     if (phase === "closed" && involved.current) {
       involved.current = false;
       setQuery("");
-      setSubmitted("");
+      setFallback(null);
       trigger.current?.focus({ preventScroll: true });
     }
   }, [phase, trigger, dialog]);
@@ -47,15 +46,16 @@ export function SearchOverlay({ state, trigger, dialog }: {
   async function submitDesktop(value: string) {
     if (pendingSplit.current) return;
     if (window.desktop) {
-      setSubmitted(value);
+      setFallback({ query: value, reason: "unsupported" });
       return;
     }
     pendingSplit.current = true;
     setOpeningSplit(true);
+    setFallback(null);
     try {
-      const opened = await openNativeSearchSplit(value).catch(() => false);
+      const result = await openNativeSearchSplit(value).catch(() => "failed" as const);
       if (dialog.current?.dataset.phase !== "open") return;
-      setSubmitted(opened ? "" : value);
+      if (result !== "opened") setFallback({ query: value, reason: result });
     } finally {
       pendingSplit.current = false;
       setOpeningSplit(false);
@@ -67,7 +67,6 @@ export function SearchOverlay({ state, trigger, dialog }: {
     <div
       className="search-planet-overlay"
       data-phase={phase}
-      data-sidebar={controlsVisible && !!submitted}
       role="dialog"
       aria-modal="true"
       aria-label="搜尋星球"
@@ -77,8 +76,7 @@ export function SearchOverlay({ state, trigger, dialog }: {
       onKeyDown={(event) => {
         if (event.key === "Escape" && !event.nativeEvent.isComposing) {
           event.stopPropagation();
-          if (submitted && controlsVisible) dismissSidebar();
-          else close();
+          close();
         }
         if (event.key !== "Tab") return;
         const items = [...event.currentTarget.querySelectorAll<HTMLElement>("button:not(:disabled), input:not(:disabled), a, [tabindex='0']")];
@@ -104,7 +102,7 @@ export function SearchOverlay({ state, trigger, dialog }: {
           target="_blank" rel="noopener noreferrer" onSubmit={(event) => {
             if (composing.current || !query.trim()) {
               event.preventDefault();
-            } else if (canUseSidebar()) {
+            } else if (useDesktopSearch()) {
               event.preventDefault();
               void submitDesktop(query.trim());
             }
@@ -118,24 +116,16 @@ export function SearchOverlay({ state, trigger, dialog }: {
           <button type="submit" aria-label="搜尋 Google" disabled={!query.trim() || openingSplit} />
         </form>
         {openingSplit && <span className="search-planet-status" role="status">正在開啟右側分割搜尋…</span>}
-        {submitted && (
-          <aside className="search-planet-sidebar" aria-labelledby="search-planet-sidebar-heading">
-            <header>
-              <h2 id="search-planet-sidebar-heading">Google 搜尋</h2>
-              <button className="search-planet-sidebar-dismiss" type="button" aria-label="關閉搜尋側欄" onClick={dismissSidebar}>
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
-              </button>
-            </header>
-            <p className="search-planet-submitted">{submitted}</p>
-            {!window.desktop && <p>若要自動在右側開啟，可安裝支援的 Chrome 擴充套件。</p>}
-            <a ref={resultLink} href={`https://www.google.com/search?${new URLSearchParams({ q: submitted })}`}
+        {fallback && (
+          <div className="search-split-fallback">
+            <span role="status">{splitHelp[fallback.reason]}</span>
+            <a href={`https://www.google.com/search?${new URLSearchParams({ q: fallback.query })}`}
               target="_blank" rel="noopener noreferrer" onClick={(event) => {
-                if (window.desktop?.searchGoogle) {
-                  event.preventDefault();
-                  window.desktop.searchGoogle(submitted);
-                }
-              }}>在 Google 查看結果 <span aria-hidden="true">↗</span></a>
-          </aside>
+                if (!window.desktop) return;
+                event.preventDefault();
+                window.desktop.searchGoogle(fallback.query);
+              }}>在 Google 查看「{fallback.query}」</a>
+          </div>
         )}
       </div>
     </div>

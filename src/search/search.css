@@ -107,53 +107,21 @@
   pointer-events: none;
 }
 
-.search-planet-sidebar {
+.search-split-fallback {
   position: absolute;
-  inset: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) auto;
-  width: min(300px, calc(100% - 32px));
-  overflow: auto;
-  padding: 20px;
-  border: 1px solid #fff7ffb0;
-  border-radius: 22px;
-  background: #f5edf9f5;
-  color: #483955;
-  box-shadow: 0 16px 50px #16112873;
-  animation: search-sidebar-in .24s ease-out both;
-}
-.search-planet-sidebar header {
+  top: 78%;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 14px;
+  width: max-content;
+  max-width: calc(100% - 32px);
+  padding: .5rem .9rem;
+  border-radius: 16px;
+  background: #302745f5;
+  color: #fff4fa;
+  font-size: .9rem;
 }
-.search-planet-sidebar h2 { margin: 0; font-size: 1.1rem; }
-.search-planet-sidebar-dismiss {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border-radius: 50%;
-  background: #eee3f5;
-  color: #51396a;
-}
-.search-planet-sidebar-dismiss svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; }
-.search-planet-submitted { margin: 18px 0; padding: 12px; background: #fff9ff; border-radius: 10px; overflow-wrap: anywhere; }
-.search-planet-sidebar a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  gap: 10px;
-  padding: 6px 14px;
-  border-radius: 22px;
-  background: #644c80;
-  color: #fff7ff;
-  text-decoration: none;
-}
-.search-planet-sidebar a:hover { background: #52386f; }
-@keyframes search-sidebar-in {
-  from { transform: translateX(20px); opacity: 0; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .search-planet-sidebar { animation: none; }
-}
+.search-split-fallback a { color: #f2daf9; overflow-wrap: anywhere; }

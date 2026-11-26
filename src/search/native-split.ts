@@ -1,22 +1,25 @@
 const channel = "companion-planet:search-split:v1";
 
-export function openNativeSearchSplit(query: string): Promise<boolean> {
+export type NativeSplitResult = "opened" | "extension-unavailable" | "unsupported" | "occupied" | "failed";
+
+export function openNativeSearchSplit(query: string): Promise<NativeSplitResult> {
   return new Promise((resolve) => {
     const origin = window.location.origin;
     const id = crypto.randomUUID();
-    const finish = (opened: boolean) => {
+    const finish = (result: NativeSplitResult) => {
       window.clearTimeout(timeout);
       window.removeEventListener("message", receive);
-      resolve(opened);
+      resolve(result);
     };
-    let timeout = window.setTimeout(() => finish(false), 250);
+    let timeout = window.setTimeout(() => finish("extension-unavailable"), 250);
     function receive({ source, origin: senderOrigin, data }: MessageEvent) {
       if (source !== window || senderOrigin !== origin || data?.channel !== channel || data.id !== id) return;
       if (data.type === "received") {
         window.clearTimeout(timeout);
-        timeout = window.setTimeout(() => finish(false), 5000);
+        timeout = window.setTimeout(() => finish("failed"), 5000);
       } else if (data.type === "result") {
-        finish(data.opened === true);
+        const reason = data.reason;
+        finish(data.opened === true ? "opened" : reason === "unsupported" || reason === "occupied" ? reason : "failed");
       }
     }
     window.addEventListener("message", receive);
