@@ -29,6 +29,7 @@ export function PomodoroHud({ onCommand, previewSound }: {
     : resting ? "開始休息" : "開始專注";
   const days = dailyFocus(state.focusRecords);
   const today = days.get(localDay(Date.now())) ?? { count: 0, minutes: 0 };
+  const totalMinutes = [...days.values()].reduce((total, day) => total + day.minutes, 0);
 
   const toggleDesktop = async (enabled: boolean) => {
     if (!enabled) {
@@ -113,6 +114,7 @@ export function PomodoroHud({ onCommand, previewSound }: {
           {notificationFeedback && <p aria-live="polite">{notificationFeedback}</p>}
           <div className="pomodoro-records">
             <p>今日 {today.count} 顆番茄 · {Number(today.minutes.toFixed(1))} 分鐘</p>
+            <p>累積專注 {Number(totalMinutes.toFixed(1))} 分鐘</p>
             <details>
               <summary>每日專注紀錄</summary>
               {days.size ? <ul>{[...days].sort(([a], [b]) => b.localeCompare(a)).map(([day, stats]) => (
