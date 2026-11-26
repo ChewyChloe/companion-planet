@@ -172,17 +172,22 @@ export function inNavigationObstacle(x:number,z:number,margin=0) {
 }
 const NAV_STEP=.20,NAV_MARGIN=.42;
 const navClear=(a:THREE.Vector3,b:THREE.Vector3)=>{
- const steps=Math.max(2,Math.ceil(a.distanceTo(b)/.025));
+ const distance=a.distanceTo(b);
+ const steps=Math.max(2,Math.ceil(distance/.025));
  let previous=groundHeight(a.x,a.z);
  for(let i=1;i<=steps;i++){
   const x=a.x+(b.x-a.x)*i/steps,z=a.z+(b.z-a.z)*i/steps,h=groundHeight(x,z);
-  if(inNavigationObstacle(x,z,NAV_MARGIN)||Math.abs(h-previous)>.09 + .75*a.distanceTo(b)/steps)return false;
+  if(inNavigationObstacle(x,z,NAV_MARGIN)||Math.abs(h-previous)>.09 + .75*distance/steps)return false;
   previous=h;
  }
  return true;
 };
 const routeTarget=new THREE.Vector3(Infinity,0,Infinity),routeFrom=new THREE.Vector3(Infinity,0,Infinity);
 let route:THREE.Vector3[]=[];
+let missedRoute: {
+ from:THREE.Vector3; target:THREE.Vector3; retryAt:number;
+ boarding:boolean; revision:number; planet:string;
+} | null=null;
 let grid: {point:THREE.Vector3; edges:number[];reachable:boolean}[] | null=null;
 let gridRevision=-1,gridBoarding=false;
 function navGrid() {
@@ -231,8 +236,22 @@ function planRoute(from:THREE.Vector3,target:THREE.Vector3) {
 export function waypoint(from:THREE.Vector3,target:THREE.Vector3,out:THREE.Vector3, boardChair=false) {
  boarding=boardChair;
  try {
- if(navClear(from,target)){route=[];return out.copy(target);}
- if(routeTarget.distanceToSquared(target)>.0001||routeFrom.distanceTo(from)>.8||!route.length){route=planRoute(from,target);routeTarget.copy(target);}
+ if(navClear(from,target)){route=[];missedRoute=null;return out.copy(target);}
+ if(routeTarget.distanceToSquared(target)>.0001||routeFrom.distanceTo(from)>.8||!route.length){
+  const now=performance.now();
+  const revision=collisionRevision();
+  if(missedRoute && now<missedRoute.retryAt && missedRoute.revision===revision &&
+    missedRoute.planet===navigationPlanet && missedRoute.boarding===boardChair &&
+    missedRoute.target.distanceToSquared(target)<.0001 && missedRoute.from.distanceToSquared(from)<.0016){
+   return out.copy(from);
+  }
+  route=planRoute(from,target);
+  routeTarget.copy(target);
+  missedRoute=route.length ? null : {
+   from:from.clone(), target:target.clone(), retryAt:performance.now()+250,
+   boarding:boardChair, revision, planet:navigationPlanet,
+  };
+ }
  routeFrom.copy(from);
  while(route.length&&from.distanceTo(route[0])<.025)route.shift();
  for(let i=route.length-1;i>0;i--)if(navClear(from,route[i])){route.splice(0,i);break;}

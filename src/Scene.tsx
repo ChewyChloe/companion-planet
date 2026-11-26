@@ -6,7 +6,7 @@ import { useSearchPlanetState } from "./search/useSearchPlanetState";
 import { resolveBodyContact, collisionRevision } from "./art/world-collision";
 import { suppliedFlower,suppliedLamp,suppliedView } from "./art/supplied-world-config";
 import { userHome } from "./art/user-world-ground";
-import { headingFromStep, turnToward } from "./art/locomotion";
+import { advanceWalkingSpeed, headingFromStep, turnToward } from "./art/locomotion";
 import { RESIDENT_SCALE, residentFocusHeight } from "./art/resident-assets";
 import { DirectSceneRender, NebulaBloom } from "./art/NebulaBloom";
 import { JourneyCamera } from "./art/JourneyCamera";
@@ -45,6 +45,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
   const model = useRef<THREE.Group>(null);
   const clock = useRef(0);
   const gaitClock = useRef(0);
+  const groundSpeed = useRef(0);
   const seatBlend = useRef(0);
   const action = useRef<Action>("idle");
   const spawn = userHome(useWorld.getState().planetId);
@@ -164,6 +165,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
   const screen = useMemo(() => new THREE.Vector3(), []);
   const up = useMemo(() => new THREE.Vector3(0, 1, 0), []);
   const supportRotation = useMemo(() => new THREE.Quaternion(), []);
+  const levelRotation = useMemo(() => new THREE.Quaternion(), []);
   const frames = useRef(0);
   const travelProgress = useRef({ x: Infinity, z: Infinity, best: Infinity, stalled: 0 });
   const next = useMemo(() => new THREE.Vector3(), []);
@@ -173,13 +175,14 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
       worldRevision.current = collisionRevision();
       const [x,z]=safeDrop(position.current.x,position.current.z);
       position.current.set(x,0,z);target.current.copy(position.current);
+      groundSpeed.current = 0;
       behavior.current={...behavior.current,target:[x,z],home:[x,z]};
     }
     const reaction = state.reaction
       ? allowedAction(state.reaction, state.timer.phase)
       : null;
     const dt = Math.min(delta, 0.25);
-    const motionDt = Math.min(delta, 0.05);
+    const motionDt = Math.min(delta, 0.10);
     clock.current += state.reduced ? dt * 0.18 : dt;
     if (phase.current !== state.timer.phase) {
       phase.current = state.timer.phase;
@@ -256,9 +259,14 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
     const beforeX = position.current.x, beforeZ = position.current.z;
     if (!pet && !held.current && distance > (strolling ? .07 : .001)) {
       waypoint(position.current, target.current, next, action.current === "read" || seatBlend.current > .02);
-      const speed = strolling ? .42 : .82;
-      position.current.lerp(next, Math.min(1, speed * motionDt / Math.max(.001, position.current.distanceTo(next))));
-    } else if (strolling) {
+      const previousSpeed = groundSpeed.current;
+      groundSpeed.current = advanceWalkingSpeed(previousSpeed, strolling ? .42 : .82, distance, motionDt);
+      const step = (previousSpeed + groundSpeed.current) * .5 * motionDt;
+      position.current.lerp(next, Math.min(1, step / Math.max(.001, position.current.distanceTo(next))));
+    } else {
+      groundSpeed.current = 0;
+    }
+    if (strolling && distance <= .07) {
       behavior.current = {
         ...behavior.current,
         action: "idle",
@@ -268,25 +276,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
     }
     const plannedX = position.current.x - beforeX;
     const plannedZ = position.current.z - beforeZ;
-    gaitClock.current += Math.hypot(position.current.x-beforeX, position.current.z-beforeZ) / .48 * (Math.PI*2/7.1);
-    const actual =
-      distance > 0.07 && !pet && Math.hypot(plannedX, plannedZ) > .0001
-        ? action.current === "approach"
-          ? "approach"
-          : action.current === "return"
-            ? "return"
-            : "walk"
-        : action.current === "walk" || action.current === "return"
-          ? "idle"
-          : action.current;
-    // Timer gestures are presentation-only. They leave the current route and seat target intact.
-    const gesture = state.timerGesture;
-    const animation = gesture && Date.now() < gesture.until && !poseLocked && !held.current && !focusFreedom.current
-      ? gesture.action : actual;
-    if (animation !== rendered.current) {
-      rendered.current = animation;
-      setVisual(animation);
-    }
+    const plannedDistance = Math.hypot(plannedX, plannedZ);
     if (root.current) {
       if (pet) {
         root.current.position.set(
@@ -311,7 +301,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
         const climb = seating ? 1 - smoothstep(.12,1.45,Math.hypot(position.current.x-CHAIR.x,position.current.z-CHAIR.z)) : 0;
         const seatDistance=Math.hypot(position.current.x-CHAIR.x,position.current.z-CHAIR.z);
         const clearanceArc=seating ? .85*smoothstep(.12,.35,seatDistance)*(1-smoothstep(1.6,1.9,seatDistance)) : 0;
-        const supportY = .10*(1-climb) + surface + (held.current ? .28 : 0) + CHAIR.seatedRootOffset*climb + clearanceArc + (actual === "rest" ? .065 : 0);
+        const supportY = .10*(1-climb) + surface + (held.current ? .28 : 0) + CHAIR.seatedRootOffset*climb + clearanceArc + (action.current === "rest" && plannedDistance < .001 ? .065 : 0);
         root.current.position.set(
           position.current.x,
           Math.max(surface+.04, THREE.MathUtils.damp(root.current.position.y,supportY,8,motionDt)),
@@ -324,8 +314,25 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
         normal.lerp(up, seatBlend.current).normalize();
         supportRotation.setFromUnitVectors(up, normal);
         root.current.quaternion.slerp(supportRotation, 1-Math.exp(-8*motionDt));
-        gl.domElement.dataset.supportTilt = THREE.MathUtils.radToDeg(root.current.quaternion.angleTo(new THREE.Quaternion())).toFixed(3);
+        gl.domElement.dataset.supportTilt = THREE.MathUtils.radToDeg(root.current.quaternion.angleTo(levelRotation)).toFixed(3);
       }
+    }
+    const movedX = position.current.x - beforeX;
+    const movedZ = position.current.z - beforeZ;
+    const forwardDistance = plannedDistance > 0 ? (plannedX * movedX + plannedZ * movedZ) / plannedDistance : 0;
+    const onFoot = !pet && !held.current && forwardDistance > motionDt * .009;
+    if (onFoot) gaitClock.current += Math.hypot(movedX, movedZ) / .48 * (Math.PI * 2 / 7.1);
+    const current = action.current;
+    const actual = onFoot
+      ? current === "approach" || current === "return" ? current : "walk"
+      : current === "walk" || current === "return" ? "idle" : current;
+    // Timer gestures are presentation-only. They leave the current route and seat target intact.
+    const gesture = state.timerGesture;
+    const animation = gesture && Date.now() < gesture.until && !poseLocked && !held.current && !focusFreedom.current
+      ? gesture.action : actual;
+    if (animation !== rendered.current) {
+      rendered.current = animation;
+      setVisual(animation);
     }
     const progress = travelProgress.current;
     if (progress.x !== target.current.x || progress.z !== target.current.z || held.current) {
@@ -348,14 +355,13 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
     if (model.current) {
       if (pet) heading.current = 0;
       else if (!held.current) {
-        const movedX = position.current.x - beforeX, movedZ = position.current.z - beforeZ;
-        if (plannedX * movedX + plannedZ * movedZ > .35 * (plannedX ** 2 + plannedZ ** 2))
-          heading.current = headingFromStep(heading.current, plannedX, plannedZ);
+        if (onFoot && forwardDistance > .35 * plannedDistance)
+          heading.current = headingFromStep(heading.current, movedX, movedZ);
         if (distance < .08 && (actual === "read" || seatBlend.current > .9)) heading.current = 0;
       }
       model.current.rotation.y = turnToward(model.current.rotation.y, heading.current, motionDt);
       gl.domElement.dataset.heading = model.current.rotation.y.toFixed(5);
-      gl.domElement.dataset.step = `${position.current.x-beforeX},${position.current.z-beforeZ}`;
+      gl.domElement.dataset.step = `${movedX},${movedZ}`;
     }
 
     if (root.current) {

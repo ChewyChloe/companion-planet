@@ -1,5 +1,5 @@
 import {expect,it} from "vitest";
-import {headingFromStep,turnToward,faceVisibleFrom} from "../src/art/locomotion";
+import {advanceWalkingSpeed,headingFromStep,turnToward,faceVisibleFrom} from "../src/art/locomotion";
 import {poseFor} from "../src/art/character-animation";
 it("faces actual travel in every cardinal direction and keeps its heading when stopped",()=>{
  for(const [x,z] of [[0,-1],[0,1],[-1,0],[1,0]]){
@@ -22,4 +22,16 @@ it("actions have distinguishable facial controls",()=>{
  expect(poseFor("stretch",1).mouthOpen).toBeGreaterThan(.5);
  expect(poseFor("rest",1).eyeOpen).toBeLessThan(.2);
  expect(poseFor("listen",1).smile).toBeGreaterThan(poseFor("idle",1).smile);
+});
+
+it("ramps up a ground walk and slows near the destination", () => {
+  const fastFrame = advanceWalkingSpeed(0, .82, 3, 1 / 60);
+  expect(fastFrame).toBeGreaterThan(0);
+  expect(fastFrame).toBeLessThan(.1);
+  let regular = 0;
+  for (let frame = 0; frame < 18; frame++) regular = advanceWalkingSpeed(regular, .82, 3, 1 / 60);
+  let slower = 0;
+  for (let frame = 0; frame < 6; frame++) slower = advanceWalkingSpeed(slower, .82, 3, .05);
+  expect(regular).toBeCloseTo(slower);
+  expect(advanceWalkingSpeed(.82, .82, .08, .05)).toBeLessThan(.82);
 });
