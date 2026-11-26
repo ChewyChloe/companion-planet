@@ -138,3 +138,9 @@
   .search-planet-results, .search-planet-loading { animation: none; }
   .search-planet-controls { transition: none; }
 }
+
+@media (max-width: 560px) {
+  .app:has(.search-planet-overlay) .focus-hud {
+    visibility: hidden;
+  }
+}
