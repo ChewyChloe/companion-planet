@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, type RefObject } from "react";
 import { useFrame, useLoader } from "@react-three/fiber";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { Box3, Group, MathUtils, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, SRGBColorSpace, TextureLoader, Vector3 } from "three";
+import { Bone, Box3, BufferAttribute, Group, MathUtils, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, Skeleton, SkinnedMesh, SRGBColorSpace, TextureLoader, Vector3 } from "three";
 import type { Action } from "../domain";
 import { useWorld } from "../store";
 import { blendPose, neutralPose, poseFor } from "./character-animation";
@@ -9,7 +9,7 @@ import { blendPose, neutralPose, poseFor } from "./character-animation";
 const directory = `${import.meta.env.BASE_URL}models/user-residents/`;
 const path = "water.glb";
 const expressionPaths = [`${directory}water-blink.jpg`, `${directory}water-smile.jpg`];
-const armJoints = [[3, -.302, .386, .025], [5, .293, .382, .092]] as const;
+const armJoints = [[3, -.307, .417, .048], [5, .298, .431, .093]] as const;
 const footJoints = [[2, -.150, .098, 0], [4, .154, .097, 0]] as const;
 
 export function SuppliedWater({ action, time, gaitTime, still, held, seatBlend, pet, poseTime, floatingStage }: {
@@ -40,7 +40,37 @@ export function SuppliedWater({ action, time, gaitTime, still, held, seatBlend, 
       if (item) joint.attach(item);
       return joint;
     };
-    const arms = armJoints.map(([part, x, y, z], i) => pivot(`WaterArm${i}`, part, x, y, z));
+    const arms = armJoints.map(([part, x, y, z], i) => {
+      const source = model.getObjectByName(`tripo_part_${part}`);
+      const joint = new Bone();
+      joint.name = `WaterArm${i}`;
+      joint.position.set(x, y, z);
+      if (!(source instanceof Mesh) || !source.parent) return { joint };
+      const geometry = source.geometry.clone();
+      const positions = geometry.getAttribute("position");
+      const indices = new Uint16Array(positions.count * 4);
+      const weights = new Float32Array(positions.count * 4);
+      for (let vertex = 0; vertex < positions.count; vertex++) {
+        // Keep the cut at the shoulder seated and let the outer fin bend.
+        const movable = MathUtils.smoothstep(positions.getX(vertex) * Math.sign(x), .321, .376);
+        const slot = vertex * 4;
+        indices[slot + 1] = 1;
+        weights[slot] = 1 - movable;
+        weights[slot + 1] = movable;
+      }
+      geometry.setAttribute("skinIndex", new BufferAttribute(indices, 4));
+      geometry.setAttribute("skinWeight", new BufferAttribute(weights, 4));
+      const arm = new SkinnedMesh(geometry, source.material);
+      arm.name = source.name;
+      const shoulder = new Bone();
+      shoulder.add(joint);
+      arm.add(shoulder);
+      const skeleton = new Skeleton([shoulder, joint]);
+      arm.bind(skeleton);
+      source.parent.add(arm);
+      source.removeFromParent();
+      return { joint, geometry, skeleton };
+    });
     const feet = footJoints.map(([part, x, y, z], i) => pivot(`WaterFoot${i}`, part, x, y, z));
     const drop = pivot("WaterDrop", 1, .031, .71, .012);
     const blink = { value: 0 }, smile = { value: 0 };
@@ -82,7 +112,13 @@ export function SuppliedWater({ action, time, gaitTime, still, held, seatBlend, 
     });
     return { model, arms, feet, drop, blink, smile, materials, center: bounds.getCenter(new Vector3()), floor: bounds.min.y };
   }, [scene, blinkMap, smileMap]);
-  useEffect(() => () => asset.materials.forEach(material => material.dispose()), [asset]);
+  useEffect(() => () => {
+    asset.materials.forEach(material => material.dispose());
+    asset.arms.forEach(arm => {
+      arm.geometry?.dispose();
+      arm.skeleton?.dispose();
+    });
+  }, [asset]);
 
   useFrame(({ gl }, delta) => {
     const dt = Math.min(delta, .08);
@@ -108,7 +144,7 @@ export function SuppliedWater({ action, time, gaitTime, still, held, seatBlend, 
       const side = i === 0 ? 1 : -1;
       const armSwing = i === 0 ? p.leftArmSwing : p.rightArmSwing;
       const wave = floatingStage && i === 1 && movement === "stretch" ? Math.sin(t * 16) * .16 : 0;
-      asset.arms[i].rotation.set(armSwing * .72 - p.armForward, side * armSwing * .12, side * (1.42 - p.armRaise * 1.28 + wave));
+      asset.arms[i].joint.rotation.set(armSwing * .72 - p.armForward, side * armSwing * .12, side * (1.42 - p.armRaise * 1.28 + wave));
       const stride = i === 0 ? p.leftLeg : p.rightLeg;
       const lift = i === 0 ? p.leftFootLift : p.rightFootLift;
       asset.feet[i].rotation.x = stride * .52 * (1 - seated) - .24 * seated;
