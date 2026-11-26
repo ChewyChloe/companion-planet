@@ -128,7 +128,7 @@ export function SuppliedPlant({ id, action, still, held, time, gaitTime, seatBle
         // The uploaded bind pose already has arm_neg raised. Relax that
         // shoulder between greetings and restore its authored pose briefly.
         const relaxed = arm === "arm_neg" ? 1 - raised : 0;
-        turn(arm, .56 * relaxed, 0, swing * .30 + p.armForward * .28 + .055 * sit);
+        turn(arm, 0, 0, swing * .30 + p.armForward * .28 + .055 * sit);
         if (arm === "arm_neg") move(arm, 0, -.042 * relaxed);
       } else {
         turn(arm, sign * (p.armRaise * .58 + .06 * sit), 0, swing * 1.10 + p.armForward * .55 + .13 * sit);
