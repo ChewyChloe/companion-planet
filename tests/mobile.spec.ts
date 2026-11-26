@@ -103,7 +103,7 @@ test("touch rotation, character tap, timer and mobile keyboard chat work", async
   const send = page.getByRole("button", { name: "送出訊息" });
   await expect(send).toBeInViewport();
   await send.tap();
-  await expect(page.locator(".message.assistant")).toContainText("安靜陪你");
+  await expect(page.locator(".message.assistant")).toHaveText(/\S/);
   await page.screenshot({ path: `artifacts/${info.project.name}-chat.png` });
   await page.getByRole("button", { name: "收合聊天" }).tap();
   expect(errors).toEqual([]);

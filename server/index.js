@@ -44,7 +44,7 @@ export async function startServer({
       hour < 0 ||
       hour > 23 ||
       !Array.isArray(history) ||
-      history.length > 6 ||
+      history.length > 10 ||
       history.some(
         (x) =>
           !x ||

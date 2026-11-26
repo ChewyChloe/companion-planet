@@ -59,7 +59,7 @@ test("immersive lakeside keeps corner controls, open center and local Huninn", a
   await page.getByRole("button", { name: "和星雲仔說說話" }).click();
   await page.getByLabel("想對星雲仔說的話").fill("今天好累");
   await page.getByRole("button", { name: "送出訊息" }).click();
-  await expect(page.locator(".message.assistant")).toContainText("辛苦");
+  await expect(page.locator(".message.assistant")).toHaveText(/\S/);
   await expect(page.getByRole("button", { name: "送出訊息" })).toBeInViewport();
   await page.screenshot({
     path: `artifacts/layout/${info.project.name}-chat.png`,

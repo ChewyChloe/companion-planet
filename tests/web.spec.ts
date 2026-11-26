@@ -62,7 +62,7 @@ test("planet renders, camera rotates, character responds, timer and conversation
   await page.getByRole("button", { name: "和星雲仔說說話" }).click();
   await page.getByLabel("想對星雲仔說的話").fill("今天好累");
   await page.getByRole("button", { name: "送出訊息" }).click();
-  await expect(page.locator(".message.assistant")).toContainText("安靜陪你");
+  await expect(page.locator(".message.assistant")).toHaveText(/\S/);
   await expect(page.locator("main")).toHaveAttribute("data-phase", "focus");
   await page.getByRole("button", { name: "收合聊天" }).click();
   await page.clock.setFixedTime(Date.now() + 61000);
@@ -105,7 +105,7 @@ test("offline fallback remains operable while mini companion entry is hidden", a
   await page.getByRole("button", { name: "和星雲仔說說話" }).click();
   await page.getByLabel("想對星雲仔說的話").fill("我好累");
   await page.getByRole("button", { name: "送出訊息" }).click();
-  await expect(page.locator(".message.assistant")).toContainText("辛苦");
+  await expect(page.locator(".message.assistant")).toHaveText(/\S/);
   await page.getByRole("button", { name: "收合聊天" }).click();
   await expect(page.getByRole("button", { name: "體驗迷你陪伴" })).toHaveCount(0);
   await expect(page.getByRole("heading")).toBeVisible();

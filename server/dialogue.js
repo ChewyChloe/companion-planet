@@ -86,9 +86,9 @@ export async function getReply(
     timeout = 8000,
   } = {},
 ) {
-  const backup = fallback(message, phase, hour);
-  if (urgent(message)) return { ...backup, provider: "safety" };
-  if (!apiKey) return { ...backup, provider: "mock" };
+  const backup = () => fallback(message, phase, hour, { history, companionId });
+  if (urgent(message)) return { ...backup(), provider: "safety" };
+  if (!apiKey) return { ...backup(), provider: "mock" };
   try {
     const endpoint = new URL(baseUrl);
     endpoint.pathname = `${endpoint.pathname.replace(/\/$/, "")}/chat/completions`;
@@ -111,7 +111,7 @@ export async function getReply(
               role: "system",
               content: `你是同頻星球的${companionName(companionId)}，非真人。用溫柔繁體中文簡短回應，不診斷心理狀態，不索取個資。當前狀態 ${phase}，本地時間 ${hour} 點。專注中最多一句，不延伸提問。不能操作計時器或系統。只輸出 JSON：reply_text(240字以內), user_intent(${intents.join("|")}), emotion(neutral|caring|happy|calm), suggested_action(${actions.join("|")})。`,
             },
-            ...history.slice(-6),
+            ...history.slice(-10).map(({ role, content }) => ({ role, content })),
             { role: "user", content: message },
           ],
         }),
@@ -126,7 +126,7 @@ export async function getReply(
         status: response.status,
         ...diagnostic,
       })}`);
-      return { ...backup, provider: "fallback" };
+      return { ...backup(), provider: "fallback" };
     }
     const data = await response.json();
     const result = validateReply(
@@ -142,6 +142,6 @@ export async function getReply(
     const reason = error?.name === "TimeoutError" || error?.name === "AbortError"
       ? "timeout" : error instanceof SyntaxError ? "invalid_json" : "request_or_response_failed";
     console.warn(`[LLM] ${reason}`);
-    return { ...backup, provider: "fallback" };
+    return { ...backup(), provider: "fallback" };
   }
 }

@@ -4,7 +4,7 @@ import { getNebulaMaterialVariant, nebulaMaterialVariants } from "./art/nebula-m
 import { planetFor } from "./planets";
 import { CompanionPicker } from "./CompanionPicker";
 import { companionFor } from "./companions";
-import { dialogueActions, dialogueMood, focusCompleteLine, lateNightLine, tapDialogue } from "./tap-dialogue";
+import { dialogueActions, dialogueMood, type TapMood, focusCompleteLine, lateNightLine, tapDialogue } from "./tap-dialogue";
 import { Icon } from "./Icon";
 import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
@@ -21,7 +21,7 @@ import {
   allowedAction,
   type Action,
 } from "./domain";
-import { fallback, validateReply } from "../shared/dialogue.js";
+import { fallback, urgent, validateReply } from "../shared/dialogue.js";
 import "./style.css";
 declare global {
   interface Window {
@@ -235,7 +235,7 @@ function App() {
     const text = input.trim();
     if (!text || busy) return;
     const id = ++generation.current;
-    const history = messages.slice(-6);
+    const history = messages.slice(-10);
     setMessages((m) => [...m, { role: "user", content: text }]);
     setInput("");
     setBusy(true);
@@ -261,8 +261,8 @@ function App() {
         result = { ...validateReply(data), provider: data.provider };
       } catch {
         result = {
-          ...fallback(text, state.timer.phase, new Date().getHours()),
-          provider: "offline",
+          ...fallback(text, state.timer.phase, new Date().getHours(), { history, companionId: state.companionId }),
+          provider: urgent(text) ? "safety" : "offline",
         };
       }
       if (id !== generation.current) return;
@@ -288,6 +288,7 @@ function App() {
             : result.suggested_action,
           latest.timer.phase,
         ),
+        latest.timer.phase === "focus" ? undefined : ((result.mood ?? undefined) as TapMood | undefined),
       );
     } finally {
       clearTimeout(deadline);

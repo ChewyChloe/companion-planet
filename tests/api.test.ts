@@ -1,4 +1,5 @@
 import { it, expect } from "vitest";
+import { fallbackLines } from "../shared/fallback-lines.js";
 import { startServer } from "../server/index.js";
 it("serves mock chat; rejects unsafe origin and invalid payloads", async () => {
   const server = await startServer({ port: 0 });
@@ -19,7 +20,15 @@ it("serves mock chat; rejects unsafe origin and invalid payloads", async () => {
     expect((await post(body, "https://evil.example")).status).toBe(403);
     const reply = await (await post(body)).json();
     expect(reply.user_intent).toBe("tired");
-    expect(reply.reply_text).toContain("辛苦");
+    expect(reply).toMatchObject({ intent: "tired", mood: "sleepy", suggested_action: "rest" });
+    expect(fallbackLines.find(line => line.id === reply.id)?.intent).toBe("tired");
+    const history = [{ role: "user", content: "明天考試" }, ...Array.from({ length: 4 }, () => [
+      { role: "assistant", content: "我在這裡" },
+      { role: "user", content: "嗯嗯" },
+    ]).flat(), { role: "assistant", content: "我聽著" }];
+    const next = { ...body, message: "可是我還沒讀完", history };
+    expect(await (await post(next)).json()).toMatchObject({ intent: "exam" });
+    expect((await post({ ...next, history: [...history, history[0]] })).status).toBe(400);
   } finally {
     await new Promise<void>((resolve) => server.close(() => resolve()));
   }
