@@ -65,10 +65,16 @@ function Destination({ id, index }: { id: PlanetId; index: number }) {
     if (!root.current) return;
     const [left, top] = destinationPositions[index];
     const x = left / 50 - 1, y = 1 - top / 50;
-    root.current.position.set(x, y, 0.98).unproject(camera);
     const aspect = (camera as THREE.PerspectiveCamera).aspect;
     const radius = Math.min([.096, .075, .113][index], .18 * aspect);
-    other.set(x, y + radius, 0.98).unproject(camera);
+    // Use a camera-facing plane behind the island even when the viewer zooms out.
+    // Both samples share its depth, so the projected diameter stays the same.
+    const depth = camera.position.length() + 28;
+    const center = root.current.position.set(x, y, 0).applyMatrix4(camera.projectionMatrixInverse);
+    const depthScale = depth / -center.z;
+    center.multiplyScalar(depthScale).applyMatrix4(camera.matrixWorld);
+    other.set(x, y + radius, 0).applyMatrix4(camera.projectionMatrixInverse)
+      .multiplyScalar(depthScale).applyMatrix4(camera.matrixWorld);
     const hovered = useWorld.getState().hoveredPlanet === id;
     const scale =
       other.distanceTo(root.current.position) * (hovered ? 1.15 : 1);
@@ -85,6 +91,7 @@ function Destination({ id, index }: { id: PlanetId; index: number }) {
       scale={0}
       name={`Destination-${id}`}
       onPointerOver={(e) => {
+        if (e.intersections[0]?.object !== e.object) return;
         e.stopPropagation();
         useWorld.getState().hoverPlanet(id);
         gl.domElement.style.cursor = "pointer";
@@ -94,14 +101,15 @@ function Destination({ id, index }: { id: PlanetId; index: number }) {
         gl.domElement.style.cursor = "auto";
       }}
       onClick={(e) => {
+        if (e.intersections[0]?.object !== e.object) return;
         e.stopPropagation();
         if (e.delta < 6) useWorld.getState().visit(id);
       }}
     >
       <mesh geometry={geometry}>
-        <meshStandardMaterial vertexColors roughness={0.83} />
+        <meshStandardMaterial vertexColors roughness={0.83} fog={false} />
       </mesh>
-      <mesh scale={1.32}>
+      <mesh scale={1.32} raycast={() => null}>
         <sphereGeometry args={[1, 32, 20]} />
         <shaderMaterial
           ref={halo}
