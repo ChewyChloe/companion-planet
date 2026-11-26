@@ -4,6 +4,7 @@ const {
   ipcMain,
   Tray,
   screen,
+  shell,
   Menu,
   nativeImage,
 } = require("electron");
@@ -64,6 +65,13 @@ else {
       );
       ipcMain.handle("world:mode", (event, next) => {
         if (event.sender === window.webContents) switchMode(next);
+      });
+      ipcMain.on("world:google-search", (event, query) => {
+        if (event.sender !== window.webContents || event.senderFrame !== window.webContents.mainFrame
+          || mode !== "planet" || typeof query !== "string" || query.length > 200 || !query.trim()) return;
+        const url = new URL("https://www.google.com/search");
+        url.searchParams.set("q", query.trim());
+        void shell.openExternal(url.href).catch(() => {});
       });
       ipcMain.on("world:grab", (event, action) => {
         if (event.sender !== window.webContents || mode !== "pet") return;

@@ -1,18 +1,18 @@
-import { useEffect, useRef, type RefObject } from "react";
-import { SearchResultsPanel } from "./SearchResultsPanel";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import type { SearchPlanetState } from "./useSearchPlanetState";
 import "./search.css";
 
-export function SearchOverlay({ state, trigger }: {
+export function SearchOverlay({ state, trigger, dialog }: {
   state: SearchPlanetState;
   trigger: RefObject<HTMLButtonElement | null>;
+  dialog: RefObject<HTMLDivElement | null>;
 }) {
-  const { phase, close, submit, query, setQuery, results, failed } = state;
-  const dialog = useRef<HTMLDivElement>(null);
+  const { phase, close } = state;
+  const [query, setQuery] = useState("");
   const input = useRef<HTMLInputElement>(null);
   const composing = useRef(false);
   const involved = useRef(false);
-  const controlsVisible = phase === "open" || phase === "searching" || phase === "results";
+  const controlsVisible = phase === "open";
   useEffect(() => {
     if (phase === "opening") {
       involved.current = true;
@@ -25,9 +25,10 @@ export function SearchOverlay({ state, trigger }: {
     }
     if (phase === "closed" && involved.current) {
       involved.current = false;
+      setQuery("");
       trigger.current?.focus({ preventScroll: true });
     }
-  }, [phase, trigger]);
+  }, [phase, trigger, dialog]);
 
   if (phase === "closed") return null;
   return (
@@ -64,22 +65,23 @@ export function SearchOverlay({ state, trigger }: {
         <button className="search-planet-close" type="button" aria-label="關閉搜尋星球" onClick={close}>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
         </button>
-        <form className="search-planet-form" onSubmit={(event) => {
-          event.preventDefault();
-          if (!composing.current) void submit();
-        }}>
-          <input ref={input} type="search" aria-label="搜尋關鍵字" placeholder="找找星球上的小事" value={query} maxLength={120}
-            autoComplete="off" onChange={(event) => setQuery(event.currentTarget.value)}
+        <form className="search-planet-form" action="https://www.google.com/search" method="get"
+          target="_blank" rel="noopener noreferrer" onSubmit={(event) => {
+            if (composing.current || !query.trim()) {
+              event.preventDefault();
+            } else if (window.desktop?.searchGoogle) {
+              event.preventDefault();
+              window.desktop.searchGoogle(query);
+            }
+          }}>
+          <input ref={input} type="search" name="q" aria-label="Google 搜尋關鍵字" placeholder="用 Google 搜尋"
+            value={query} maxLength={200} autoComplete="off" onChange={(event) => setQuery(event.currentTarget.value)}
             onCompositionStart={() => { composing.current = true; }}
             onCompositionEnd={() => { composing.current = false; }}
             onKeyDown={(event) => { if (event.key === "Enter" && event.nativeEvent.isComposing) event.preventDefault(); }}
           />
-          <button type="submit" aria-label="搜尋" disabled={!query.trim() || phase === "searching"}>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="5.8" /><path d="m15 15 4 4" /></svg>
-          </button>
+          <button type="submit" aria-label="在新分頁開啟 Google 搜尋" disabled={!query.trim()} />
         </form>
-        {phase === "searching" && <p className="search-planet-loading" role="status">正在找尋星球指南…</p>}
-        {phase === "results" && <SearchResultsPanel results={results} failed={failed} />}
       </div>
     </div>
   );

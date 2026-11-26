@@ -540,6 +540,7 @@ export default function Scene({
   const search = useSearchPlanetState();
   const [searchReady, setSearchReady] = ReactUseState(false);
   const searchTrigger = useRef<HTMLButtonElement>(null);
+  const searchOverlay = useRef<HTMLDivElement>(null);
   const searchActive = !pet && search.phase !== "closed";
   const planetId = useWorld((s) => s.planetId);
   const hoveredPlanet = useWorld((s) => s.hoveredPlanet);
@@ -583,7 +584,7 @@ export default function Scene({
             <Cosmos />
             <SceneBoundary fallback={null}>
               <Suspense fallback={null}>
-                <SearchPlanet3D state={search} reduced={reduced} onReady={() => setSearchReady(true)} />
+                <SearchPlanet3D state={search} reduced={reduced} paused={pickerOpen} overlay={searchOverlay} onReady={() => setSearchReady(true)} />
               </Suspense>
             </SceneBoundary>
             <JourneyCamera />
@@ -644,7 +645,7 @@ export default function Scene({
           )}
         </nav>
       )}
-      {!pet && <SearchOverlay state={search} trigger={searchTrigger} />}
+      {!pet && <SearchOverlay state={search} trigger={searchTrigger} dialog={searchOverlay} />}
       {speech && (
         <div className="scene-speech">
           <div className="character-speech" role="note" aria-live="polite">

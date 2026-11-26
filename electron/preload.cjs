@@ -1,5 +1,6 @@
 const { contextBridge, ipcRenderer } = require("electron");
 contextBridge.exposeInMainWorld("desktop", {
+  searchGoogle: (query) => ipcRenderer.send("world:google-search", query),
   beginGrab: () => ipcRenderer.send("world:grab", "begin"),
   moveGrab: () => ipcRenderer.send("world:grab", "move"),
   endGrab: () => ipcRenderer.send("world:grab", "end"),

@@ -29,118 +29,67 @@
 }
 .search-planet-overlay {
   position: absolute;
-  z-index: 9;
+  z-index: 15;
   inset: 0;
   outline: none;
 }
-.search-planet-controls {
-  opacity: 1;
-  transition: opacity .24s ease;
-}
+.search-planet-controls { opacity: 1; transition: opacity .18s ease; }
 .search-planet-controls[inert] { opacity: 0; pointer-events: none; }
-.search-planet-form,
-.search-planet-results,
-.search-planet-loading {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(340px, 76vw);
-}
 .search-planet-form {
-  top: min(calc(53% + 4px), calc(var(--visible-height, 100dvh) + var(--visible-top, 0px) - 58px));
-  left: calc(50% + min(39px, 6.5vw));
-  width: min(278px, 50vw);
-  transform: translate(-50%, -50%);
+  position: absolute;
+  transform: translate(-50%, -50%) rotate(1.4deg);
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding-inline: 5px 2px;
-  border-radius: 24px;
-  background: #fff8fc40;
+  padding-inline: min(2vw, 12px);
 }
-.search-planet-form:focus-within { background: #fff8fc75; }
 .search-planet-form input {
-  min-width: 0;
-  flex: 1;
-  padding: 5px 2px;
+  width: 100%;
+  padding: 0;
   font: inherit;
-  font-size: 16px;
-  color: #402e58;
+  font-size: clamp(16px, 2.2vw, 21px);
+  color: #423153;
   background: transparent;
   border: 0;
   appearance: none;
   outline: none;
 }
 .search-planet-form input:focus-visible { outline: none; }
-.search-planet-form input::placeholder { color: #5d4d71; }
+.search-planet-form input::placeholder { color: #625371; }
 .search-planet-form input::-webkit-search-cancel-button { display: none; }
-.search-planet-overlay button {
+.search-planet-form button {
+  position: absolute;
+  top: 50%;
+  left: -24%;
+  transform: translate(-50%, -50%);
+  width: 33%;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+.search-planet-form button:hover:not(:disabled),
+.search-planet-form button:focus-visible {
+  box-shadow: inset 0 0 0 2px #fff5c0c0, 0 0 15px #ffe5ab70;
+}
+.search-planet-form button:disabled { cursor: default; }
+.search-planet-close {
+  position: absolute;
+  transform: translate(-50%, -50%);
   display: grid;
   place-items: center;
-  flex: 0 0 auto;
   width: 36px;
   height: 36px;
   padding: 0;
-  border: 1px solid #e6d7f0;
+  border: 1px solid #ffffff76;
   border-radius: 50%;
-  color: #51366e;
-  background: #efe2f8;
+  color: #fff4fa;
+  background: #302745cc;
   cursor: pointer;
 }
-.search-planet-overlay button:hover:not(:disabled) { background: #e6d4f3; }
-.search-planet-overlay button:disabled { opacity: .58; cursor: default; }
-.search-planet-overlay .search-planet-form button {
-  width: 32px;
-  height: 32px;
-  border: 0;
-  background: #f9eff988;
-}
-.search-planet-overlay .search-planet-form button:hover:not(:disabled),
-.search-planet-overlay .search-planet-form button:focus-visible { background: #eee0f7; }
-.search-planet-overlay svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; }
-.search-planet-overlay .search-planet-close {
-  position: absolute;
-  top: 43%;
-  left: calc(50% + min(200px, 42vw));
-  transform: translate(-50%, -50%);
-  box-shadow: 0 3px 14px #32234732;
-}
-.search-planet-results,
-.search-planet-loading {
-  top: min(66%, calc(var(--visible-height, 100dvh) + var(--visible-top, 0px) - 105px));
-  max-height: min(28%, max(88px, calc(var(--visible-height, 100dvh) + var(--visible-top, 0px) - 66% - 12px)));
-  overflow: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #a791bc transparent;
-  padding: 13px 16px;
-  border-radius: 19px;
-  border: 1px solid #fff9fd;
-  background: #f5ebf9f5;
-  color: #544465;
-  box-shadow: 0 10px 30px #261b3230;
-  animation: search-results-in .26s ease both;
-}
-.search-planet-results h2 { margin: 0; font-size: .96rem; }
-.search-planet-results ul { margin: 0; padding: 0; list-style: none; }
-.search-planet-results li { padding-top: 8px; margin-top: 8px; border-top: 1px solid #bba8cc55; }
-.search-planet-results a { color: #624181; text-underline-offset: 3px; }
-.search-planet-results p { margin: 3px 0 0; font-size: .86rem; }
-@keyframes search-results-in { from { opacity: 0; transform: translate(-50%, 6px); } }
-@media (max-width: 560px) {
-  .search-planet-form { width: min(278px, 49vw); }
-  .search-planet-overlay .search-planet-form button { width: 29px; height: 29px; }
-  .search-planet-overlay .search-planet-close {
-    top: calc(53% - 55px);
-    left: calc(50% + 37vw);
-  }
-}
+.search-planet-close:hover { background: #584368; }
+.search-planet-close svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; }
+.app:has(.search-planet-overlay) :is(.focus-hud, .scene-tools, .scene-speech) { visibility: hidden; }
 @media (prefers-reduced-motion: reduce) {
-  .search-planet-results, .search-planet-loading { animation: none; }
   .search-planet-controls { transition: none; }
-}
-
-@media (max-width: 560px) {
-  .app:has(.search-planet-overlay) .focus-hud {
-    visibility: hidden;
-  }
 }

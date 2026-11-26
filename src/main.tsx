@@ -21,6 +21,7 @@ import "./style.css";
 declare global {
   interface Window {
     desktop?: {
+      searchGoogle: (query: string) => void;
       beginGrab: () => void;
       moveGrab: () => void;
       endGrab: () => void;
