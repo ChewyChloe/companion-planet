@@ -124,9 +124,9 @@ export function SuppliedWater({ action, time, gaitTime, still, held, seatBlend, 
             waterOval(rightEye - vec2(-.007,.010),vec2(.006,.009)));
           vec3 ink = mix(vec3(.006,.015,.027),vec3(.24,.42,.57),shine);
           vec2 lip = face - vec2(-.008,.448);
-          lip.y += .010 * pow(clamp(abs(lip.x / .048), 0.0, 1.0), 2.0);
-          float mouth = front * waterOval(lip,vec2(.047,mix(.020,.031,waterSmile)));
-          vec3 insideMouth = mix(vec3(.48,.044,.069),vec3(.19,.012,.027),smoothstep(-.014,.020,lip.y));
+          lip.y -= .008 * pow(clamp(abs(lip.x / .043), 0.0, 1.0), 2.0);
+          float mouth = front * waterOval(lip,vec2(.042,mix(.011,.022,waterSmile)));
+          vec3 insideMouth = mix(vec3(.22,.093,.120),vec3(.15,.055,.074),smoothstep(-.012,.015,lip.y));
           diffuseColor.rgb *= mix(mix(gel,ink,eyes),insideMouth,mouth);
         `);
       };
