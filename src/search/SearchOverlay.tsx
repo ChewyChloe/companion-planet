@@ -109,7 +109,7 @@ export function SearchOverlay({ state, trigger, dialog }: {
               void submitDesktop(query.trim());
             }
           }}>
-          <input ref={input} type="search" name="q" aria-label="Google 搜尋關鍵字" placeholder="用 Google 搜尋"
+          <input ref={input} type="search" name="q" aria-label="Google 搜尋關鍵字" placeholder="搜尋"
             value={query} maxLength={200} autoComplete="off" onChange={(event) => setQuery(event.currentTarget.value)}
             onCompositionStart={() => { composing.current = true; }}
             onCompositionEnd={() => { composing.current = false; }}
