@@ -559,7 +559,7 @@ export default function Scene({
           : <NebulaBloom paused={pickerOpen} />)}
         <CanvasGestures />
         <CameraFraming pet={pet} />
-        <RenderQuality />
+        <RenderQuality sharpSearch={searchActive && !mobileSafari && window.matchMedia("(pointer: fine)").matches} />
         <RendererHealth onLost={setLost} />
         <SoftEnvironment />
         <ArtLights pet={pet} />

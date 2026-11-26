@@ -1,10 +1,26 @@
-import { useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 /** Preserve the same geometry on slow devices; reduce fill rate after warm-up. */
-export function RenderQuality() {
-  const { gl, setDpr } = useThree();
+export function RenderQuality({ sharpSearch = false }: { sharpSearch?: boolean }) {
+  const { gl, setDpr, size } = useThree();
   const sample = useRef({ start: 0, frames: 0 });
+  useLayoutEffect(() => {
+    if (!sharpSearch) return;
+    const previous = gl.getPixelRatio();
+    const target = Math.min(2, Math.max(1.5, window.devicePixelRatio),
+      Math.sqrt(6_000_000 / Math.max(1, size.width * size.height)));
+    if (target <= previous) return;
+    setDpr(target);
+    return () => {
+      setDpr(previous);
+      sample.current = { start: 0, frames: 0 };
+    };
+  }, [gl, setDpr, sharpSearch, size.width, size.height]);
   useFrame((state) => {
+    if (sharpSearch) {
+      gl.domElement.dataset.qualityDpr = gl.getPixelRatio().toFixed(2);
+      return;
+    }
     const now = state.clock.elapsedTime;
     if (now < 3) return;
     if (!sample.current.start) sample.current.start = now;
