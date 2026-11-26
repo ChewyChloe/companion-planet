@@ -10,14 +10,16 @@ import * as THREE from "three";
 import type { Action } from "../domain";
 
 export const SUPPLIED_NEBULA_URL = "models/user-residents/nebula.glb?v=modular-face-4";
-export function SuppliedNebula({ action, still, held, seatBlend, face, pet = false }: {
-  action: Action; face?: Face; still?: boolean; held?: React.RefObject<boolean>; seatBlend?: React.RefObject<number>; pet?: boolean;
+export function SuppliedNebula({ action, still, held, seatBlend, gaitTime, face, pet = false }: {
+  action: Action; face?: Face; still?: boolean; held?: React.RefObject<boolean>; seatBlend?: React.RefObject<number>; gaitTime?: React.RefObject<number>; pet?: boolean;
 }) {
   const gltf = useLoader(GLTFLoader, import.meta.env.BASE_URL + SUPPLIED_NEBULA_URL);
   const { gl } = useThree();
   const current = useRef<THREE.AnimationAction | null>(null);
   const root = useRef<THREE.Group>(null);
   const lift = useRef(0);
+  const gaitBlend = useRef(0);
+  const swing = useMemo(() => new THREE.Quaternion(), []);
   const seat = useRef(0);
   const reactionStamp = useRef(0);
   const reactionExpression = useRef<Expression | null>(null);
@@ -65,13 +67,22 @@ export function SuppliedNebula({ action, still, held, seatBlend, face, pet = fal
           contacts.push({mesh:o,index:i,seat:v.y<bounds.min.y+.13*(bounds.max.y-bounds.min.y)});
       }
     });
-    const feet = ["Foot.L", "Foot.R"].flatMap(name => {
-      const bone = scene.getObjectByName(name);
-      return bone ? [{ bone, base: bone.position.clone(), rotation: bone.quaternion.clone() }] : [];
-    });
+    const limb = (name: string) => {
+      const bone = scene.getObjectByName(THREE.PropertyBinding.sanitizeNodeName(name));
+      if (!bone?.parent) return null;
+      const parentInverse = bone.parent.getWorldQuaternion(new THREE.Quaternion()).invert();
+      return {
+        bone, base: bone.position.clone(), rotation: bone.quaternion.clone(),
+        forward: new THREE.Vector3(0, 0, 1).applyQuaternion(parentInverse),
+        up: new THREE.Vector3(0, 1, 0).applyQuaternion(parentInverse),
+        sideways: new THREE.Vector3(1, 0, 0).applyQuaternion(parentInverse),
+      };
+    };
+    const feet = ["Foot.L", "Foot.R"].map(limb);
+    const hands = ["Hand.L", "Hand.R"].map(limb);
     const mixer = new THREE.AnimationMixer(scene);
     const clips = Object.fromEntries(gltf.animations.map(clip => [clip.name, mixer.clipAction(clip)]));
-    return { scene, scale, offset: [-center.x * scale, -bounds.min.y * scale, -center.z * scale] as [number, number, number], mixer, clips, materials, contacts, meshes, feet };
+    return { scene, scale, offset: [-center.x * scale, -bounds.min.y * scale, -center.z * scale] as [number, number, number], mixer, clips, materials, contacts, meshes, feet, hands };
   }, [gltf, pet, uniforms]);
   useEffect(() => () => {
     asset.mixer.stopAllAction();
@@ -92,16 +103,30 @@ export function SuppliedNebula({ action, still, held, seatBlend, face, pet = fal
     if (!still && !held?.current) asset.mixer.update(Math.min(dt, .05));
     const targetSeat = !pet && !held?.current && action === "read" ? (seatBlend?.current ?? 0) : 0;
     seat.current = THREE.MathUtils.damp(seat.current, targetSeat, 12, Math.min(dt,.05));
-    const walking = action === "walk" || action === "approach" || action === "return";
-    asset.feet.forEach(({bone, base, rotation}, index) => {
-      // +X is forward in this rig. Alternate a planted foot with a lifted
-      // swing foot, and blend both into the seated position.
-      const cycle = walking ? Math.sin(asset.mixer.time * 8 + index * Math.PI) : 0;
-      bone.position.copy(base);
-      bone.position.x += cycle * .027 * (1-seat.current);
-      bone.position.y += Math.max(0, cycle) * .017 * (1-seat.current);
-      bone.quaternion.copy(rotation);
-    });
+    const walking = !still && !held?.current && (action === "walk" || action === "approach" || action === "return");
+    gaitBlend.current = THREE.MathUtils.damp(gaitBlend.current, Number(walking), 18, Math.min(dt, .05));
+    const phase = (gaitTime ? gaitTime.current * 7.1 : asset.mixer.time * 8);
+    for (let index = 0; index < 2; index++) {
+      const cycle = Math.sin(phase + index * Math.PI);
+      const stride = gaitBlend.current * (1 - seat.current);
+      const foot = asset.feet[index];
+      const hand = asset.hands[index];
+      if (foot) {
+        foot.bone.position.copy(foot.base)
+          .addScaledVector(foot.forward, cycle * .081 * stride)
+          .addScaledVector(foot.up, Math.max(0, cycle) * .049 * stride);
+        foot.bone.quaternion.copy(foot.rotation)
+          .premultiply(swing.setFromAxisAngle(foot.sideways, cycle * .24 * stride));
+      }
+      if (hand && gaitBlend.current > .002) {
+        // Small, textured hands need displacement as well as rotation to read at island scale.
+        const weight = gaitBlend.current;
+        hand.bone.position.lerp(vertex.copy(hand.base)
+          .addScaledVector(hand.forward, -cycle * .088)
+          .addScaledVector(hand.up, Math.abs(cycle) * .024), weight);
+        hand.bone.quaternion.slerp(swing.setFromAxisAngle(hand.sideways, -cycle * .44).multiply(hand.rotation), weight);
+      }
+    }
     if(root.current && !pet){
       root.current.scale.set(asset.scale*(1+.075*seat.current),asset.scale*(1-.16*seat.current),asset.scale);
       gl.domElement.dataset.seatedPose = seat.current.toFixed(3);

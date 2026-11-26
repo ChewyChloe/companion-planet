@@ -367,6 +367,6 @@ export default function SculptCharacter(props: Parameters<typeof LegacyCharacter
   if (id === "fern" && !props.modelUrl && !getNebulaMaterialVariant())
     return <SuppliedFern {...props} />;
   if (id === "nebula" && !getNebulaMaterialVariant() && !props.modelUrl)
-    return <SuppliedNebula action={props.action} held={props.held} still={props.still} pet={props.pet} seatBlend={props.seatBlend} />;
+    return <SuppliedNebula action={props.action} held={props.held} still={props.still} pet={props.pet} seatBlend={props.seatBlend} gaitTime={props.gaitTime} />;
   return <LegacyCharacter {...props} />;
 }

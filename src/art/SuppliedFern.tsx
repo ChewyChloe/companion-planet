@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, type RefObject } from "react";
 import { useFrame, useLoader, useThree } from "@react-three/fiber";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { clone } from "three/addons/utils/SkeletonUtils.js";
-import { Bone, Box3, Euler, Material, MathUtils, MeshStandardMaterial, Quaternion, SkinnedMesh, Vector3 } from "three";
+import { Bone, Box3, Euler, Material, MathUtils, MeshStandardMaterial, PropertyBinding, Quaternion, SkinnedMesh, Vector3 } from "three";
 import { useWorld } from "../store";
 import type { Action } from "../domain";
 import { blendPose, neutralPose, poseFor } from "./character-animation";
@@ -37,7 +37,7 @@ export function SuppliedFern({ action, still, held, time, gaitTime, seatBlend, p
     const joints = new Map<string, { bone: Bone; position: Vector3; rotation: Quaternion; scale: Vector3 }>();
     scene.traverse((object) => {
       if (object instanceof Bone) {
-        joints.set(object.name, {
+        joints.set(PropertyBinding.sanitizeNodeName(object.name), {
           bone: object,
           position: object.position.clone(),
           rotation: object.quaternion.clone(),
@@ -83,13 +83,13 @@ export function SuppliedFern({ action, still, held, time, gaitTime, seatBlend, p
     const sit = seated.current;
 
     const turn = (name: string, x: number, y: number, z: number) => {
-      const joint = asset.joints.get(name);
+      const joint = asset.joints.get(PropertyBinding.sanitizeNodeName(name));
       if (!joint) return;
       scratch.rotation.setFromEuler(scratch.euler.set(x, y, z));
       joint.bone.quaternion.copy(joint.rotation).premultiply(scratch.rotation);
     };
     const move = (name: string, x: number, y: number) => {
-      const joint = asset.joints.get(name);
+      const joint = asset.joints.get(PropertyBinding.sanitizeNodeName(name));
       if (!joint) return;
       joint.bone.position.copy(joint.position);
       joint.bone.position.x += x;
@@ -104,9 +104,10 @@ export function SuppliedFern({ action, still, held, time, gaitTime, seatBlend, p
       const swing = index === 0 ? p.leftArmSwing : p.rightArmSwing;
       const leg = index === 0 ? p.leftLeg : p.rightLeg;
       const lift = index === 0 ? p.leftFootLift : p.rightFootLift;
-      turn(`arm.${side}`, sign * (p.armRaise * .58 + .06 * sit), 0, swing * .48 + p.armForward * .55 + .13 * sit);
-      move(`foot.${side}`, leg * .095 * (1 - sit) + .066 * sit, lift * .62 * (1 - sit));
-      turn(`foot.${side}`, 0, 0, leg * .32 * (1 - sit) + .26 * sit);
+      turn(`arm.${side}`, sign * (p.armRaise * .58 + .06 * sit), 0, swing * 1.10 + p.armForward * .55 + .13 * sit);
+      move(`arm.${side}`, swing * .135, Math.abs(swing) * .035);
+      move(`foot.${side}`, leg * .17 * (1 - sit) + .066 * sit, lift * 1.35 * (1 - sit));
+      turn(`foot.${side}`, 0, 0, leg * .62 * (1 - sit) + .26 * sit);
     }
 
     const mood = !still && Date.now() < world.reactionUntil ? world.tapMood : null;
@@ -115,7 +116,7 @@ export function SuppliedFern({ action, still, held, time, gaitTime, seatBlend, p
     face.current.mouth = MathUtils.damp(face.current.mouth, 1 + p.mouthOpen * .55, 12, dt);
     face.current.width = MathUtils.damp(face.current.width, 1 + (p.smile - .15) * .14, 12, dt);
     for (const name of ["eye.L", "eye.R", "mouth"]) {
-      const joint = asset.joints.get(name);
+      const joint = asset.joints.get(PropertyBinding.sanitizeNodeName(name));
       if (!joint) continue;
       joint.bone.scale.copy(joint.scale);
       joint.bone.scale.z *= name === "mouth" ? face.current.mouth : face.current.eyes;
@@ -123,13 +124,13 @@ export function SuppliedFern({ action, still, held, time, gaitTime, seatBlend, p
     }
 
     // Tip sections follow each branch root with a slight phase lag.
-    if (!still) leafPhase.current += dt * (world.reduced ? .55 : 1.7);
-    const wind = still ? 0 : (world.reduced ? .45 : 1) * (1 + p.lift * 3);
+    if (!still) leafPhase.current += dt * (world.reduced ? .85 : 2.15);
+    const wind = still ? 0 : (world.reduced ? .53 : 1) * (1 + p.lift * 3);
     for (const [chain, names] of leafChains.entries()) {
       for (const [section, name] of names.entries()) {
         const phase = leafPhase.current + chain * 1.24 - section * .53;
-        const weight = wind * (.042 + section * .026);
-        turn(name, Math.sin(phase) * weight, Math.sin(phase * 1.21) * weight * .44,
+        const weight = wind * (.145 + section * .042);
+        turn(name, Math.sin(phase) * weight, Math.sin(phase * 1.21) * weight * .60,
           Math.cos(phase * .81) * weight + p.antenna * weight);
       }
     }
