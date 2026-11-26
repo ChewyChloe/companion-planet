@@ -51,9 +51,6 @@ test-results-design/
 /artifacts/TEST_REPORT.md
 /artifacts/motion-review/web-initial.log.txt
 /artifacts/nebula-arms/check-output.txt
-/artifacts/planet-rebuild/capability-v1/REFERENCE_ANALYSIS.md
-/artifacts/planet-rebuild/capability-v1/REVIEW.md
-/artifacts/planet-rebuild/capability-v2/REVIEW.md
 /artifacts/supplied-nebula/check-output.txt
 /artifacts/user-worlds/integration/check-output.txt
 /artifacts/user-worlds/integration/web-regression-output.txt
@@ -61,9 +58,6 @@ test-results-design/
 /artifacts/world-color/interaction-output.txt
 /assets/art/README.md
 /assets/art/clay-stage/REFERENCE_NOTES.md
-/assets/art/planet-rebuild/capability-v1/README.md
-/assets/art/planet-rebuild/capability-v2/README.md
-/assets/art/planet-rebuild/references/companion-planet/README.md
 /assets/art/user-models/README.md
 /assets/music/README.md
 /docs/API_CONNECTION_QA.md
@@ -71,3 +65,14 @@ test-results-design/
 /docs/archive/
 /artifacts/redesign/*.png
 /artifacts/layout/iterations/*.png
+
+# Local test reports and retired modeling reviews
+/artifacts/web-results.json
+/artifacts/electron-results.json
+/artifacts/mobile-results.json
+/artifacts/layout/design-results.json
+/artifacts/planet-rebuild/
+/assets/art/planet-rebuild/
+/scripts/modeling-trials/
+/scripts/modeling-trials-v2/
+/PLANET_REBUILD_PLAN.md
