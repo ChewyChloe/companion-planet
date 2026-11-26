@@ -1,3 +1,4 @@
+import { SuppliedWater } from "./SuppliedWater";
 import { SuppliedMushroom } from "./SuppliedMushroom";
 import { SuppliedPlant } from "./SuppliedPlant";
 import { SuppliedNebula } from "./SuppliedNebula";
@@ -372,6 +373,8 @@ function LegacyCharacter({
 export default function SculptCharacter(props: Parameters<typeof LegacyCharacter>[0] & { floatingStage?: boolean }) {
   const selected = useWorld(s => s.companionId);
   const id = props.companionId || selected;
+  if (id === "water" && !props.modelUrl)
+    return <SuppliedWater {...props} />;
   if (id === "mushroom" && !props.modelUrl)
     return <SuppliedMushroom {...props} />;
   if ((id === "fern" || id === "sprout") && !props.modelUrl && !getNebulaMaterialVariant())
