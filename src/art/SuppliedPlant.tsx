@@ -26,7 +26,7 @@ export function SuppliedPlant({ id, action, still, held, time, gaitTime, seatBle
   poseTime?: number;
 }) {
   const sprout = id === "sprout";
-  const path = `models/user-residents/${id}.glb`;
+  const path = `models/user-residents/${id}.glb${sprout ? "?v=2" : ""}`;
   const gltf = useLoader(GLTFLoader, import.meta.env.BASE_URL + path);
   const { gl } = useThree();
   const pose = useRef({ ...neutralPose });
@@ -112,8 +112,14 @@ export function SuppliedPlant({ id, action, still, held, time, gaitTime, seatBle
       const lift = index === 0 ? p.leftFootLift : p.rightFootLift;
       const arm = sprout ? index === 0 ? "arm_pos" : "arm_neg" : `arm.${side}`;
       const foot = sprout ? index === 0 ? "foot_pos" : "foot_neg" : `foot.${side}`;
-      turn(arm, sign * (p.armRaise * .58 + .06 * sit), 0, swing * 1.10 + p.armForward * .55 + .13 * sit);
-      move(arm, swing * .135, Math.abs(swing) * .035);
+      if (sprout) {
+        // These joints have weights on the torso. Keep the original arm
+        // silhouette and let the existing hands swing gently fore and aft.
+        turn(arm, 0, 0, swing * .30 + p.armForward * .28 + .055 * sit);
+      } else {
+        turn(arm, sign * (p.armRaise * .58 + .06 * sit), 0, swing * 1.10 + p.armForward * .55 + .13 * sit);
+        move(arm, swing * .135, Math.abs(swing) * .035);
+      }
       move(foot, leg * .17 * (1 - sit) + .066 * sit, lift * 1.35 * (1 - sit));
       turn(foot, 0, 0, leg * .62 * (1 - sit) + .26 * sit);
     }
