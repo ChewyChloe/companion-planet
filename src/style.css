@@ -337,10 +337,31 @@ select {
   min-height: 0;
   overflow: auto;
   scrollbar-width: thin;
+  scrollbar-color: #8e79a190 transparent;
   font-size: 14px;
   line-height: 1.9;
   padding: 6px 0 15px;
 }
+@supports selector(::-webkit-scrollbar) {
+  .messages {
+    /* Non-auto standard properties would override the arrow-free WebKit styles. */
+    scrollbar-width: auto;
+    scrollbar-color: auto;
+  }
+  .messages::-webkit-scrollbar { width: 6px; height: 6px; }
+  .messages::-webkit-scrollbar-track { background: transparent; }
+  .messages::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: #8e79a190;
+  }
+  .messages::-webkit-scrollbar-thumb:hover { background: #715b8bd1; }
+  .messages::-webkit-scrollbar-button {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+}
+
 .welcome {
   color: var(--muted);
   line-height: 2.2;
@@ -1216,22 +1237,22 @@ button.chat-launch.control-tooltip {
   overscroll-behavior: contain;
   padding: 17px 20px 16px;
 }
-:where(.clock-scroll, .messages, .companion-picker) {
+:where(.clock-scroll, .companion-picker) {
   scrollbar-width: thin;
   scrollbar-color: #a699b8 transparent;
 }
-:where(.clock-scroll, .messages, .companion-picker)::-webkit-scrollbar {
+:where(.clock-scroll, .companion-picker)::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
-:where(.clock-scroll, .messages, .companion-picker)::-webkit-scrollbar-track {
+:where(.clock-scroll, .companion-picker)::-webkit-scrollbar-track {
   background: transparent;
 }
-:where(.clock-scroll, .messages, .companion-picker)::-webkit-scrollbar-thumb {
+:where(.clock-scroll, .companion-picker)::-webkit-scrollbar-thumb {
   border-radius: 99px;
   background: #a699b8;
 }
-:where(.clock-scroll, .messages, .companion-picker)::-webkit-scrollbar-button {
+:where(.clock-scroll, .companion-picker)::-webkit-scrollbar-button {
   display: none;
   width: 0;
   height: 0;
