@@ -18,10 +18,7 @@ const descriptions: Record<CompanionId, string> = {
   water: "像一滴水，輕輕晃呀晃。",
   puff: "像一小朵雲，喜歡待在你身邊。",
 };
-const greetingActions: Record<CompanionId, Action> = {
-  nebula: "stretch", fern: "happy", sprout: "happy", mushroom: "listen",
-  aurora: "stretch", blossom: "happy", stardust: "listen", water: "happy", puff: "happy",
-};
+const greetingActions = { nebula: "stretch", fern: "happy" } satisfies Record<"nebula" | "fern", Action>;
 const count = companions.length;
 const wrap = (value: number) => MathUtils.euclideanModulo(value, count);
 const offsetFrom = (index: number, position: number) => wrap(index - position + count / 2) - count / 2;
@@ -50,6 +47,7 @@ function CharacterPreview({ index, motion, reduced }: {
   const previousAction = useRef<Action>("idle");
   const { viewport } = useThree();
   const { id } = companions[index];
+  const available = companionAvailable(id);
 
   useFrame((_, delta) => {
     if (!anchor.current || !figure.current) return;
@@ -79,9 +77,9 @@ function CharacterPreview({ index, motion, reduced }: {
     const difference = Math.atan2(Math.sin(desiredYaw - figure.current.rotation.y), Math.cos(desiredYaw - figure.current.rotation.y));
     figure.current.rotation.y += difference * (1 - Math.exp(-dt * 18));
     figure.current.scale.setScalar(scale);
-    figure.current.position.y = reduced ? 0 : .025 * Math.sin(time.current * 1.6) * prominence
+    figure.current.position.y = reduced ? 0 : (available ? .025 * Math.sin(time.current * 1.6) * prominence : 0)
       + (turning ? .11 * Math.sin(progress * Math.PI) : 0);
-    const nextAction = entering && current.entryTime >= turnTime ? greetingActions[id] : "idle";
+    const nextAction = available && entering && current.entryTime >= turnTime ? greetingActions[id] : "idle";
     if (nextAction !== previousAction.current) {
       previousAction.current = nextAction;
       setAction(nextAction);
@@ -99,7 +97,7 @@ function CharacterPreview({ index, motion, reduced }: {
       <group ref={figure}>
         {near && (
           <Suspense fallback={null}>
-            <SculptCharacter companionId={id} action={action} time={time} pet still={reduced && action === "idle"} />
+            <SculptCharacter companionId={id} action={action} time={time} pet faceOnly={!available} still={reduced && action === "idle"} />
             <ModelReady index={index} motion={motion} />
           </Suspense>
         )}
@@ -136,7 +134,8 @@ function CarouselScene({ motion, reduced, onCenter, onGreeting }: {
       state.entryTime = reduced ? turnTime : 0;
     if (state.entryTime >= 0) state.entryTime += dt;
     const show = !state.dragging && state.target === state.settled && state.entryTime >= turnTime
-      && state.entryTime < turnTime + greetTime;
+      && state.entryTime < turnTime + greetTime
+      && companionAvailable(companions[wrap(state.settled)].id);
     if (show !== greeting.current) {
       greeting.current = show;
       onGreeting(show);

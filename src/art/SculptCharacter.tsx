@@ -55,6 +55,7 @@ function LegacyCharacter({
   seatBlend,
   pet = false,
   still = false,
+  faceOnly = false,
   modelUrl,
   gaitTime,
   poseTime,
@@ -69,6 +70,7 @@ function LegacyCharacter({
   seatBlend?: React.RefObject<number>;
   pet?: boolean;
   still?: boolean;
+  faceOnly?: boolean;
 }) {
   const selected = useWorld((s) => s.companionId);
   const id = companionId || selected;
@@ -246,8 +248,13 @@ function LegacyCharacter({
   }, [asset, gl, id, materialVariant, materialPreview, previewModel]);
   useFrame((_state, delta) => {
     asset.skin.userData.clock.value = materialVariant || freezePose ? 0 : time.current;
-    const animationTime = poseTime ?? (freezePose ? 1 : time.current);
+    const animationTime = poseTime ?? (freezePose || faceOnly ? 1 : time.current);
     const desired = freezePose ? { ...neutralPose, armRaise: 0, eyeOpen: 1 } : poseFor(action, animationTime, gaitTime?.current ?? animationTime);
+    if (faceOnly && !freezePose) {
+      desired.scaleY = 1;
+      desired.eyeOpen = poseFor("idle", time.current).eyeOpen;
+      desired.smile = .22 + .12 * Math.sin(time.current * .85);
+    }
     if (id === "water") {
       desired.scaleY = 1 + (desired.scaleY - 1) * 1.6;
       desired.roll *= 1.25;
