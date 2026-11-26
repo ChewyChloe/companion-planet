@@ -93,6 +93,8 @@ test("desktop shares state, transparent topmost pet switches back and quits", as
     await next.click();
     await next.click();
     await expect(page.getByRole("heading", { name: "小星草" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "選擇小星草" })).toBeEnabled();
+    await next.click();
     await expect(page.getByRole("button", { name: "開發中" })).toBeDisabled();
     await page.getByRole("button", { name: "關閉角色選擇" }).click();
     await expect(page.locator("canvas")).toHaveAttribute(

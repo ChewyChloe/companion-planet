@@ -18,7 +18,7 @@ const descriptions: Record<CompanionId, string> = {
   water: "像一滴水，輕輕晃呀晃",
   puff: "像一小朵雲，喜歡待在你身邊",
 };
-const greetingActions = { nebula: "stretch", fern: "happy" } satisfies Record<"nebula" | "fern", Action>;
+const greetingActions = { nebula: "stretch", fern: "happy", sprout: "happy" } satisfies Record<"nebula" | "fern" | "sprout", Action>;
 const count = companions.length;
 const wrap = (value: number) => MathUtils.euclideanModulo(value, count);
 const offsetFrom = (index: number, position: number) => wrap(index - position + count / 2) - count / 2;

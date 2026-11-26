@@ -1,10 +1,13 @@
 import { expect, it } from "vitest";
-import { companions, companionFor, randomGreeting } from "../src/companions";
+import { companions, companionAvailable, companionFor, randomGreeting } from "../src/companions";
 import { safeDrop } from "../src/art/placement";
 import { inDeskObstacle, CHAIR, WALK_RADIUS } from "../src/art/terrain";
 it("has nine distinct silhouettes and validates saved selections", () => {
   expect(new Set(companions.map((c) => c.head)).size).toBe(9);
   expect(companionFor("fern").name).toBe("蕨蕨子");
+  expect(companions.slice(0, 3).map(companion => companion.id)).toEqual(["nebula", "fern", "sprout"]);
+  expect(companionAvailable("sprout")).toBe(true);
+  expect(companionAvailable("mushroom")).toBe(false);
   expect(companionFor("<script>")).toBe(companions[0]);
 });
 it("manual greetings vary without repeating and honor quiet/focus policy", () => {

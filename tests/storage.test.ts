@@ -18,6 +18,8 @@ it("persists pause and preferences immediately and clears user data", async () =
     );
     useWorld.getState().setCompanion("water");
     expect(useWorld.getState().companionId).toBe("fern");
+    useWorld.getState().setCompanion("sprout");
+    expect(JSON.parse(memory.get("companion-planet-v1")!).companionId).toBe("sprout");
     useWorld.getState().updateTimerSettings({ focusMinutes: 1 });
     expect(JSON.parse(memory.get("companion-planet-v1")!).timerSettings.focusMinutes).toBe(1);
     expect(JSON.parse(memory.get("companion-planet-v1")!).silent).toBe(true);
