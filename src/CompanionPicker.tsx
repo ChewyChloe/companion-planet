@@ -8,15 +8,15 @@ import { Icon } from "./Icon";
 import SculptCharacter from "./art/SculptCharacter";
 
 const descriptions: Record<CompanionId, string> = {
-  nebula: "會陪你讀書，也會數星星的星球夥伴。",
-  fern: "帶著一頭搖曳的嫩葉，陪你慢慢走。",
-  sprout: "把小小的星光頂在頭上。",
-  mushroom: "喜歡在樹影下歇一會兒。",
-  aurora: "把極光的顏色帶到你身旁。",
-  blossom: "頭頂一朵花，帶著花園的氣息。",
-  stardust: "喜歡在夜空中尋找星塵。",
-  water: "像一滴水，輕輕晃呀晃。",
-  puff: "像一小朵雲，喜歡待在你身邊。",
+  nebula: "會陪你讀書，也會數星星的星球夥伴",
+  fern: "帶著一頭搖曳的嫩葉，陪你慢慢走",
+  sprout: "把小小的星光頂在頭上",
+  mushroom: "喜歡在樹影下歇一會兒",
+  aurora: "把極光的顏色帶到你身旁",
+  blossom: "頭頂一朵花，帶著花園的氣息",
+  stardust: "喜歡在夜空中尋找星塵",
+  water: "像一滴水，輕輕晃呀晃",
+  puff: "像一小朵雲，喜歡待在你身邊",
 };
 const greetingActions = { nebula: "stretch", fern: "happy" } satisfies Record<"nebula" | "fern", Action>;
 const count = companions.length;
