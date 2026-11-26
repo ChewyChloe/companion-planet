@@ -58,7 +58,7 @@ function ClockCamera({ face, surface }: { face: RefObject<HTMLDivElement | null>
     if (!(camera instanceof OrthographicCamera) || !surface.current) return;
     const { width, height } = surface.current.getBoundingClientRect();
     if (!width || !height) return;
-    const framing = Math.max(1.54, 1.35 * height / width);
+    const framing = Math.max(1.64, 1.68 * height / width);
     // Set the frustum directly from the visible PiP viewport, independently of R3F's auto-fit.
     camera.left = -framing * width / height / 2;
     camera.right = -camera.left;

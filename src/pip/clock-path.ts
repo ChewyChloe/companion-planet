@@ -23,3 +23,14 @@ export function clockPath(angle: number) {
     upY,
   };
 }
+
+// The tilted decorative ring crosses the walking meridian twice.
+// Lead the step over it before the resident's body reaches the ring.
+export function clockRingLift(angle: number) {
+  const phase = ((angle % fullClockLap) + fullClockLap) % fullClockLap;
+  const crossing = (center: number, height: number) => {
+    const t = Math.max(0, Math.min(1, (Math.abs(phase - center) - .14) / .29));
+    return height * (1 - t * t * (3 - 2 * t));
+  };
+  return Math.max(crossing(2.012, .176), crossing(4.777, .158));
+}
