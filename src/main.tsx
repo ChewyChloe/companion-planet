@@ -316,6 +316,7 @@ function App() {
           onClick={interact}
           reduced={state.reduced}
           speech={speech}
+          pickerOpen={picker}
         />
       </section>
       {!pet && (

@@ -517,11 +517,13 @@ export default function Scene({
   onClick,
   reduced,
   speech = "",
+  pickerOpen = false,
 }: {
   pet: boolean;
   onClick: () => void;
   reduced: boolean;
   speech?: string;
+  pickerOpen?: boolean;
 }) {
   const [lost, setLost] = ReactUseState(false);
   const planetId = useWorld((s) => s.planetId);
@@ -553,7 +555,7 @@ export default function Scene({
           );
         }}
       >
-        {!pet && <NebulaBloom />}
+        {!pet && <NebulaBloom paused={pickerOpen} />}
         <CanvasGestures />
         <CameraFraming pet={pet} />
         <RenderQuality />
