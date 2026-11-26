@@ -6,3 +6,9 @@ export function usesMobileSafariRendering() {
   return appleMobile && /Safari\//u.test(userAgent)
     && !/CriOS|FxiOS|EdgiOS|OPiOS|DuckDuckGo|GSA/u.test(userAgent);
 }
+
+
+export function usesSafariStartup() {
+  return usesMobileSafariRendering()
+    || (/Version\/[\d.]+.*Safari\//u.test(navigator.userAgent) && !/Chrom(?:e|ium)|Android/u.test(navigator.userAgent));
+}

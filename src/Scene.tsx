@@ -1,4 +1,4 @@
-import { usesMobileSafariRendering } from "./art/mobile-safari";
+import { usesMobileSafariRendering, usesSafariStartup } from "./art/mobile-safari";
 import { ClockPlanet } from "./pip/ClockPlanet";
 import { SceneBoundary } from "./SceneBoundary";
 import { SearchPlanet3D, searchPlanetSlot } from "./search/SearchPlanet3D";
@@ -484,6 +484,32 @@ function RendererHealth({ onLost }: { onLost: (lost: boolean) => void }) {
   }, [gl, onLost]);
   return null;
 }
+// Safari decodes embedded GLB textures on the same limited startup budget.
+function SafariStartup({ stage, advance }: { stage: number; advance: (stage: number) => void }) {
+  const last = useRef({ stage, elapsed: 0, readyFrame: -1 });
+  useFrame(({ gl, clock }) => {
+    if (stage >= 2 || gl.getContext().isContextLost()) return;
+    if (last.current.stage !== stage) {
+      last.current = { stage, elapsed: clock.elapsedTime, readyFrame: -1 };
+    }
+    const visibleModel = stage === 0 ? gl.domElement.dataset.planetModel : gl.domElement.dataset.modelReady;
+    // Let the previous model draw before starting the next network request and decode.
+    if (visibleModel && last.current.readyFrame < 0) last.current.readyFrame = gl.info.render.frame;
+    if ((last.current.readyFrame >= 0 && gl.info.render.frame > last.current.readyFrame)
+      || clock.elapsedTime - last.current.elapsed >= 5) advance(stage + 1);
+  });
+  return null;
+}
+
+function SceneRetry({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div className="scene-error" role="alert">
+      <p>{message}</p>
+      <button type="button" onClick={onRetry}>重試 3D 畫面</button>
+    </div>
+  );
+}
+
 function CameraFraming({ pet }: { pet: boolean }) {
   const { camera, size } = useThree();
   const planetId=useWorld(s=>s.planetId);
@@ -528,22 +554,29 @@ export default function Scene({
   pickerOpen?: boolean;
 }) {
   const [lost, setLost] = ReactUseState(false);
+  const [canvasAttempt, setCanvasAttempt] = ReactUseState(0);
+  const [startupStage, setStartupStage] = ReactUseState(0);
   const search = useSearchPlanetState();
   const [searchReady, setSearchReady] = ReactUseState(false);
   const searchTrigger = useRef<HTMLButtonElement>(null);
   const searchOverlay = useRef<HTMLDivElement>(null);
   const mobileSafari = usesMobileSafariRendering();
+  const staggerStartup = !pet && usesSafariStartup();
   const searchActive = !pet && search.phase !== "closed";
   const planetId = useWorld((s) => s.planetId);
   const hoveredPlanet = useWorld((s) => s.hoveredPlanet);
+  const retry = () => {
+    search.reset();
+    setSearchReady(false);
+    setLost(false);
+    setStartupStage(0);
+    setCanvasAttempt(value => value + 1);
+  };
+  const unavailable = <SceneRetry message="3D 畫面無法啟動，計時與聊天仍可使用。" onRetry={retry} />;
   return (
-    <SceneBoundary>
+    <SceneBoundary key={canvasAttempt} fallback={unavailable}>
       <Canvas
-        fallback={
-          <div className="scene-error" role="alert">
-            裝置無法使用 WebGL，請開啟硬體加速或更換瀏覽器。
-          </div>
-        }
+        fallback={unavailable}
         key={pet ? "pet" : "planet"}
         shadows
         dpr={mobileSafari ? 1 : [1, 1.5]}
@@ -570,17 +603,18 @@ export default function Scene({
         <CameraFraming pet={pet} />
         <RenderQuality sharpSearch={searchActive && !mobileSafari && window.matchMedia("(pointer: fine)").matches} />
         <RendererHealth onLost={setLost} />
+        {staggerStartup && <SafariStartup stage={startupStage} advance={setStartupStage} />}
         <SoftEnvironment />
         <ArtLights pet={pet} />
         {!pet && (
           <>
             <Atmosphere reduced={reduced} />
             <Cosmos />
-            <SceneBoundary fallback={null}>
+            {(!staggerStartup || startupStage >= 2) && <SceneBoundary fallback={null}>
               <Suspense fallback={null}>
                 <SearchPlanet3D state={search} reduced={reduced} paused={pickerOpen} overlay={searchOverlay} onReady={() => setSearchReady(true)} />
               </Suspense>
-            </SceneBoundary>
+            </SceneBoundary>}
             <JourneyCamera />
             <World key={planetId} />
             <OrbitControls
@@ -605,9 +639,11 @@ export default function Scene({
             </Suspense>
           </SceneBoundary>
         )}
-        <Suspense fallback={null}>
-          <Character key={planetId} pet={pet} onClick={onClick} />
-        </Suspense>
+        {(!staggerStartup || startupStage >= 1) && (
+          <Suspense fallback={null}>
+            <Character key={planetId} pet={pet} onClick={onClick} />
+          </Suspense>
+        )}
         {import.meta.env.DEV &&
           new URLSearchParams(location.search).has("stats") && <Stats />}
       </Canvas>
@@ -662,11 +698,7 @@ export default function Scene({
           </div>
         </div>
       )}
-      {lost && (
-        <div className="scene-error" role="alert">
-          3D 顯示已中斷，請重新整理。計時與對話仍可使用。
-        </div>
-      )}
+      {lost && <SceneRetry message="3D 顯示已中斷，計時與對話仍可使用。" onRetry={retry} />}
     </SceneBoundary>
   );
 }

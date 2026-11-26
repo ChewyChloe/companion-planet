@@ -4,6 +4,7 @@ export function useSearchPlanetState() {
   const [phase, setPhase] = useState<"closed" | "opening" | "open" | "closing">("closed");
   return {
     phase,
+    reset: () => setPhase("closed"),
     open: () => setPhase((current) => current === "closed" ? "opening" : current),
     opened: () => setPhase((current) => current === "opening" ? "open" : current),
     close: () => setPhase((current) => current === "closed" ? current : "closing"),
