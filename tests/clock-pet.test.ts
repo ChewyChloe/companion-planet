@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
-import { BufferAttribute, BufferGeometry, DoubleSide, Mesh, MeshBasicMaterial, Raycaster, Vector3 } from "three";
+import { BufferAttribute, BufferGeometry, DoubleSide, Group, Mesh, MeshBasicMaterial, Raycaster, Vector3 } from "three";
 import { expect, it } from "vitest";
-import { clockPath, clockRingLift, clockCenterY, fullClockLap, nextClockStop } from "../src/pip/clock-path";
+import { clockHandTurns, clockPath, clockRingLift, clockCenterY, fullClockLap, nextClockStop } from "../src/pip/clock-path";
 
 it("keeps the floating resident's ring route supported by the supplied GLB", () => {
   const bytes = readFileSync("public/models/pip/clock-planet.glb");
@@ -9,15 +9,28 @@ it("keeps the floating resident's ring route supported by the supplied GLB", () 
   const gltf = JSON.parse(bytes.subarray(20, 20 + length).toString());
   const views = gltf.bufferViews.map(({ byteOffset, byteLength }: { byteOffset: number; byteLength: number }) =>
     bytes.subarray(28 + length + byteOffset, 28 + length + byteOffset + byteLength));
-  const data = gltf.meshes[0].primitives[0];
-  const positions = views[gltf.accessors[data.attributes.POSITION].bufferView];
-  const indices = views[gltf.accessors[data.indices].bufferView];
-  const geometry = new BufferGeometry();
-  geometry.setAttribute("position", new BufferAttribute(new Float32Array(positions.buffer, positions.byteOffset, positions.length / 4), 3));
-  geometry.setIndex(new BufferAttribute(new Uint32Array(indices.buffer, indices.byteOffset, indices.length / 4), 1));
-  const mesh = new Mesh(geometry, new MeshBasicMaterial({ side: DoubleSide }));
+  const faces = new Group();
+  const ring = new Group();
+  for (const node of gltf.nodes) {
+    if (node.mesh === undefined) continue;
+    const data = gltf.meshes[node.mesh].primitives[0];
+    const positionAccessor = gltf.accessors[data.attributes.POSITION];
+    const positions = views[positionAccessor.bufferView];
+    const indexAccessor = gltf.accessors[data.indices];
+    const indices = views[indexAccessor.bufferView];
+    const IndexArray = indexAccessor.componentType === 5123 ? Uint16Array : Uint32Array;
+    const geometry = new BufferGeometry();
+    geometry.setAttribute("position", new BufferAttribute(new Float32Array(positions.buffer, positions.byteOffset + (positionAccessor.byteOffset || 0), positionAccessor.count * 3), 3));
+    geometry.setIndex(new BufferAttribute(new IndexArray(indices.buffer, indices.byteOffset + (indexAccessor.byteOffset || 0), indexAccessor.count), 1));
+    const mesh = new Mesh(geometry, new MeshBasicMaterial({ side: DoubleSide }));
+    (node.name === "clock-ring" ? ring : faces).add(mesh);
+  }
   const ray = new Raycaster(new Vector3(), new Vector3(0, -1, 0));
-  expect(gltf.accessors[data.indices].count / 3).toBeLessThan(120_000);
+  expect(gltf.nodes.map((node: { name: string }) => node.name)).toEqual(
+    expect.arrayContaining(["clock-ring", "clock-hour", "clock-minute", "clock-pin"]),
+  );
+  expect(faces.children.length).toBeGreaterThan(2);
+  expect(ring.children).toHaveLength(1);
   for (let i = 0; i < 96; i++) {
     const angle = i / 96 * fullClockLap;
     const point = clockPath(angle);
@@ -25,11 +38,12 @@ it("keeps the floating resident's ring route supported by the supplied GLB", () 
     ray.ray.direction.set(-point.upX, -point.upY, 0);
     const support = new Vector3(point.x, point.y, point.z);
     // The detached ornamental ring lies in front of the shell on some rays.
-    const hits = ray.intersectObject(mesh);
+    const hits = ray.intersectObject(faces);
     const distances = hits.map(hit => hit.point.distanceTo(support));
     expect(Math.min(...distances), `clearance at point ${i}`).toBeLessThan(.008);
-    const ringHeight = .65 - hits[0].distance - Math.hypot(point.x, point.y - clockCenterY);
-    if (ringHeight > .016) {
+    const nearestRing = ray.intersectObject(ring)[0];
+    const ringHeight = nearestRing ? nearestRing.point.distanceTo(support) : 0;
+    if (nearestRing && nearestRing.distance < hits[0].distance && ringHeight > .016) {
       expect(clockRingLift(angle), `ring clearance at point ${i}`).toBeGreaterThan(ringHeight + .01);
     }
   }
@@ -48,4 +62,15 @@ it("varies the resident's walking distance while keeping stops away from the out
       expect(clockRingLift(stop)).toBe(0);
     }
   }
+});
+
+it("moves the hands from the shared deadline and preserves their angle on pause and resume", () => {
+  const timer = { running: true, deadline: 130_000, remaining: 120_000, duration: 120_000 };
+  expect(clockHandTurns(timer, 10_000)).toEqual({ minute: 0, hour: 0 });
+  const atPause = clockHandTurns(timer, 25_000);
+  expect(atPause).toEqual({ minute: .25, hour: 1 / 48 });
+  expect(clockHandTurns({ ...timer, running: false, remaining: 105_000, deadline: null }, 45_000))
+    .toEqual(atPause);
+  expect(clockHandTurns({ ...timer, deadline: 150_000 }, 45_000)).toEqual(atPause);
+  expect(clockHandTurns({ ...timer, deadline: 150_000 }, 60_000).minute).toBe(.5);
 });

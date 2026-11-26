@@ -376,7 +376,7 @@ function App() {
   const audioLabel = audio.on ? "關閉環境音" : "開啟環境音";
   return (
     <main
-      className={pet ? "app pet" : "app"}
+      className={pet ? window.desktop ? "app pet native-pet" : "app pet" : "app"}
       data-planet={state.planetId}
       data-time-of-day={state.night ? "night" : "day"}
       data-phase={state.timer.phase}
@@ -391,8 +391,10 @@ function App() {
           pickerOpen={picker}
         />
       </section>
-      <PomodoroHud onCommand={timerCommand} previewSound={previewTimerSound}
-        clockPet={!window.desktop && !pet ? clockPet : undefined} />
+      {(!pet || !window.desktop) && (
+        <PomodoroHud onCommand={timerCommand} previewSound={previewTimerSound}
+          clockPet={!window.desktop && !pet ? clockPet : undefined} />
+      )}
       {clockPet.host && createPortal(
         <ClockPet host={clockPet.host} face={clockFace} celebration={clockCelebration} onCommand={timerCommand} onReturn={clockPet.close} />,
         clockPet.host.document.body,
@@ -407,6 +409,18 @@ function App() {
         <>
           {window.desktop && <div className="window-drag" />}
           <nav className="scene-tools" aria-label="陪伴設定">
+            {window.desktop && (
+              <>
+                <button className="round-control control-tooltip" aria-label="召喚桌寵"
+                  data-tooltip="召喚桌寵" onClick={() => void mode()}>
+                  <Icon name="monitor" />
+                </button>
+                <button className="round-control control-tooltip" aria-label="關閉視窗"
+                  data-tooltip="關閉視窗" onClick={() => window.desktop?.hide()}>
+                  <Icon name="close" />
+                </button>
+              </>
+            )}
             <button
               className="round-control control-tooltip"
               aria-label={state.night ? "切換為白天" : "切換為夜晚"}
@@ -502,10 +516,18 @@ function App() {
       )}
       {pet && (
         <>
-          <div className="pet-handle" title="拖曳這裡移動桌寵">
-            <Icon name="move" /> {selected.name}
-          </div>
+          {!window.desktop && (
+            <div className="pet-handle" title="拖曳這裡移動桌寵">
+              <Icon name="move" /> {selected.name}
+            </div>
+          )}
           <div className="pet-controls">
+            {window.desktop && (
+              <button onClick={() => timerCommand(state.timer.running ? "pause" : "start")}
+                aria-label={state.timer.running ? "暫停星球鐘" : state.timer.started ? "繼續星球鐘" : "開始星球鐘"}>
+                <Icon name={state.timer.running ? "pause" : "play"} />
+              </button>
+            )}
             <button onClick={() => setPicker(!picker)} aria-label="更換角色">
               <Icon name="orbit" />
             </button>

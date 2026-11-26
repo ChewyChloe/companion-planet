@@ -681,6 +681,9 @@ select {
   position: absolute;
   inset: 32px 0 46px;
 }
+.native-pet .world {
+  inset: 0 0 50px;
+}
 .pet-handle {
   position: absolute;
   top: 5px;
@@ -718,6 +721,10 @@ select {
   min-width: 38px;
   padding: 7px;
   border-radius: 4px;
+}
+.native-pet .pet-controls button {
+  border-radius: 50%;
+  min-height: 38px;
 }
 .pet .chat-panel {
   position: absolute;
@@ -1167,6 +1174,19 @@ select {
   pointer-events: none;
   opacity: 0;
   transition: opacity .15s;
+}
+.timer-buttons .control-tooltip::after {
+  left: 50%;
+  top: auto;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%);
+}
+.timer-buttons .control-tooltip:first-child::after {
+  left: 0;
+  transform: none;
+}
+.control-tooltip:is(:hover, :focus-visible) {
+  z-index: 5;
 }
 .scene-tools .control-tooltip::after {
   right: calc(100% + 8px);

@@ -1,41 +1,39 @@
-# 同頻星球
+# 同頻星球 Companion Planet
 
-同頻星球是一個可以探索的 3D 專注空間。設定星球鐘，讓星雲仔在書桌旁陪你讀書。休息時可以切換星球、聽音樂，或和星雲仔聊幾句。
+同頻星球是可以探索的 3D 專注空間。用星球鐘安排專注和休息，讓星雲仔或其他角色陪你讀書，也可以探索不同的星球、聽環境音或聊幾句。
 
-**[開啟同頻星球](https://companion-planet.onrender.com)**
+## 安裝 Windows 桌面版
 
-![同頻星球夜景，中央是浮島，周圍有三顆可前往的星球](artifacts/night-sky.jpg)
+1. 取得 `Companion-Planet-Setup-0.1.0-x64.exe`。這是 Windows 10／11 64 位元的安裝程式。
+2. 開啟安裝檔，依精靈選擇安裝位置。此版本未做 Windows 程式碼簽章，SmartScreen 可能顯示未知發行者。請從你信任的來源取得檔案並核對發布時提供的 SHA-256。
+3. 從桌面捷徑或開始選單開啟 **同頻星球 Companion Planet**。安裝包已包含 Electron、本機服務及遊戲資源，開啟時可離線使用，也無須另外安裝 Node.js。
+4. 如需移除，在 Windows「設定 → 應用程式 → 已安裝的應用程式」選擇解除安裝。
 
-## 體驗方式
+## 使用桌寵與星球鐘
 
-| 功能 | 操作 |
-| --- | --- |
-| 探索四座星球 | 拖曳旋轉視角，以滾輪或雙指縮放。點選外圍星球，前往同頻星球、月光書原、玫瑰花園或微風森林。 |
-| 專注計時 | 在左上角輸入分鐘和秒鐘，再按播放。計時期間可暫停、繼續或重新開始。 |
-| 與星雲仔互動 | 點星雲仔看短句和表情，或用右下角的聊天按鈕開啟對話。下方也能請他讀書或休息。 |
-| 切換氣氛 | 右上角可切換日夜與環境音。各星球有自己的背景音樂，桌燈可獨立開關。 |
+- 按 **Alt + Win + P** 召喚透明、置頂的桌寵。若快捷鍵被占用，可按星球畫面上的「召喚桌寵」，或從系統匣的同頻星球圖示選擇「召喚桌寵」。圖示也可能位於 Windows 的隱藏圖示區。
+- 拖曳角色可移動視窗。桌寵平常只顯示角色、鬧鐘星球與操作按鈕。鬧鐘外環會緩慢轉動，指針跟隨星球鐘，暫停時會停在當前位置。點擊角色可互動，也能從下方按鈕聊天、切換角色或返回星球。兩種模式共用星球鐘與角色狀態。
+- 關閉視窗會收進系統匣。若系統匣不可用，視窗會最小化。要結束程式，請從系統匣選擇「退出」或在桌寵模式按「退出應用程式」。
+- 星球鐘設定、專注紀錄與角色偏好保存在目前 Windows 帳號的本機資料中。
+- 離線可使用星球場景、桌寵、星球鐘、環境音與內建陪伴聊天。搜尋需要網路，桌面版會用系統預設瀏覽器開啟 Google 結果。正式安裝包使用內建聊天，不含 AI 服務金鑰。
 
-## 作品展示
+## 網頁體驗
 
-- [四座星球場景總覽](artifacts/user-worlds/integration/four-worlds.jpg)
-- [手機畫面](artifacts/user-worlds/integration/phone-worlds.jpg)
-- [星雲仔的 12 種表情](artifacts/nebula-expressions/12-expressions.png)
+**[開啟同頻星球網頁版](https://companion-planet.onrender.com)**
 
-網站使用 React、TypeScript、Three.js 與 React Three Fiber 即時渲染，並以 Express 提供聊天 API。四座浮島以 GLB 載入，具備各自的材質、地形和配樂。星球旅行與場景互動可在桌面和手機瀏覽器操作。
+拖曳可旋轉視角，滾輪或雙指可縮放。點選外圍星球可前往不同場景。左上角是星球鐘，右上角可切換日夜與環境音，右下角可更換角色或聊天。
 
-## 本機執行
+## 開發與打包
 
-需 Node.js 24 與 npm。
+開發環境使用 Node.js 24 與 npm。Windows 安裝程式會帶自己的執行環境。
 
 ```sh
 npm ci
-npm run dev
+npm run check
+npm run desktop
+npm run package:win
 ```
 
-開啟 `http://localhost:5173`。正式建置可執行 `npm run build`，再用 `npm start` 啟動。
+安裝檔輸出到 `release/`。建置 Windows 安裝程式需先下載 Electron 與 NSIS 工具。Linux 跨平台打包另需 Wine，electron-builder 可下載設定的 Wine 工具鏈。Windows 原生驗收應確認安裝與解除安裝、兩種捷徑、系統匣、跨程式快捷鍵、置頂透明效果，以及重新開啟後的偏好與專注紀錄。
 
-聊天支援相容 OpenAI Chat Completions 的服務。在本機專案的 `.env` 或 Render 的 **Environment** 設定 `LLM_API_KEY`、`LLM_BASE_URL` 和 `LLM_MODEL`。金鑰只由後端讀取。未設定金鑰或模型服務失敗時，聊天會使用本機備援台詞。
-
-## Google 搜尋
-
-在桌機上開啟搜尋星球，按 Enter 或點放大鏡即可開啟 Google 結果。網站會請求使用獨立視窗，並放在螢幕右側。實際位置和是否另開視窗由瀏覽器決定。若彈出視窗被阻擋，可使用搜尋框下方的 Google 連結。手機版直接開啟 Google 搜尋頁面。
+使用 `npm run dev` 啟動本機網站，再開啟 `http://localhost:5173`。正式網站可用 `npm run build` 和 `npm start` 啟動。網站或桌面開發環境可在後端設定 `LLM_API_KEY`、`LLM_BASE_URL` 和 `LLM_MODEL`。模型服務失敗時會使用本機備援台詞。

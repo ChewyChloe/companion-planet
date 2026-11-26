@@ -1,4 +1,5 @@
 import { usesMobileSafariRendering } from "./art/mobile-safari";
+import { ClockPlanet } from "./pip/ClockPlanet";
 import { SceneBoundary } from "./SceneBoundary";
 import { SearchPlanet3D, searchPlanetSlot } from "./search/SearchPlanet3D";
 import { SearchOverlay } from "./search/SearchOverlay";
@@ -39,6 +40,8 @@ import {
   smoothstep,
 } from "./art/terrain";
 function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
+  const nativePet = pet && !!window.desktop;
+  const petFloor = nativePet ? .19 : -.55;
   const poseLocked = new URLSearchParams(location.search).has("still");
   const heading = useRef(useWorld.getState().planetId === "forest" ? 2.6 : .35);
   const root = useRef<THREE.Group>(null);
@@ -281,7 +284,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
       if (pet) {
         root.current.position.set(
           petOffset.current.x,
-          -0.55 + petOffset.current.y + (held.current ? 0.18 : 0),
+          petFloor + petOffset.current.y + (held.current ? 0.18 : 0),
           0,
         );
         root.current.quaternion.identity();
@@ -419,7 +422,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
         const origin = pet
           ? new THREE.Vector3(
               petOffset.current.x,
-              -0.55 + petOffset.current.y,
+              petFloor + petOffset.current.y,
               0,
             )
           : position.current;
@@ -448,7 +451,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
         <sphereGeometry args={[1, 16, 12]} />
         <meshBasicMaterial visible={false} />
       </mesh>
-      <group name="CharacterFacing" ref={model} scale={pet ? 1 : RESIDENT_SCALE}>
+      <group name="CharacterFacing" ref={model} scale={nativePet ? .64 : pet ? 1 : RESIDENT_SCALE}>
         <SculptCharacter
           pet={pet}
           still={poseLocked}
@@ -545,7 +548,7 @@ export default function Scene({
         shadows
         dpr={mobileSafari ? 1 : [1, 1.5]}
         camera={{
-          position: pet ? [0, 0.45, 3.5] : [6, 3.6, 10],
+          position: pet ? [0, 0.45, window.desktop ? 4.25 : 3.5] : [6, 3.6, 10],
           fov: pet ? 30 : 42,
         }}
         gl={{ alpha: true, antialias: true, powerPreference: "low-power" }}
@@ -592,6 +595,15 @@ export default function Scene({
               enableDamping={!reduced}
             />
           </>
+        )}
+        {pet && window.desktop && (
+          <SceneBoundary fallback={null}>
+            <Suspense fallback={null}>
+              <group name="DesktopClockPlanet" position={[0, -.96, 0]} scale={1.38}>
+                <ClockPlanet />
+              </group>
+            </Suspense>
+          </SceneBoundary>
         )}
         <Suspense fallback={null}>
           <Character key={planetId} pet={pet} onClick={onClick} />

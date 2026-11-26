@@ -9,10 +9,23 @@ export async function startServer({
   host = "127.0.0.1",
   staticFiles = false,
   allowedHosts = loopbackHosts,
+  desktopToken = "",
+  enableProvider = true,
   allowedOrigins = /** @type {string[]} */ ([]),
 } = {}) {
   const app = express();
   app.disable("x-powered-by");
+  if (desktopToken) {
+    app.use((req, res, next) => {
+      const host = `127.0.0.1:${req.socket.localPort}`;
+      if (req.headers.host !== host ||
+        req.headers["x-companion-desktop"] !== desktopToken ||
+        (req.headers.origin && req.headers.origin !== `http://${host}`)) {
+        return res.sendStatus(403);
+      }
+      next();
+    });
+  }
   app.use("/api", (req, res, next) => {
     if (!allowedHosts.includes(req.hostname))
       return res.status(403).json({ error: "Host rejected" });
@@ -31,7 +44,7 @@ export async function startServer({
   }, 60_000);
   sweep.unref();
   app.get("/api/health", (_req, res) =>
-    res.json({ ok: true, provider: process.env.LLM_API_KEY ? "llm" : "mock" }),
+    res.json({ ok: true, provider: enableProvider && process.env.LLM_API_KEY ? "llm" : "mock" }),
   );
   app.post("/api/chat", async (req, res) => {
     const { message, phase, hour, history = [], companionId } = req.body || {};
@@ -70,7 +83,7 @@ export async function startServer({
         hour,
         history,
         companionId,
-      }),
+      }, enableProvider ? undefined : { apiKey: "" }),
     );
   });
   if (staticFiles) {
@@ -97,7 +110,7 @@ export async function startServer({
   const server = createServer(app);
   await new Promise((resolve, reject) => {
     server.once("error", reject);
-    server.listen(port, host, resolve);
+    server.listen({ port, host, exclusive: true }, resolve);
   });
   server.on("close", () => clearInterval(sweep));
   return server;

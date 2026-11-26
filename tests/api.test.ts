@@ -49,3 +49,27 @@ it("allows embedded GLB texture fetches without allowing remote connections", as
     await new Promise<void>((resolve) => server.close(() => resolve()));
   }
 });
+
+it("restricts the desktop loopback service and supports offline chat", async () => {
+  const token = "desktop-session-test";
+  const server = await startServer({ port: 0, desktopToken: token, enableProvider: false });
+  const { port } = server.address() as { port: number };
+  const root = `http://127.0.0.1:${port}`;
+  const desktop = { "X-Companion-Desktop": token };
+  try {
+    expect((await fetch(root + "/api/health")).status).toBe(403);
+    expect((await fetch(root + "/api/health", { headers: { ...desktop, Origin: "https://example.com" } })).status).toBe(403);
+    expect((await fetch(`http://localhost:${port}/api/health`, { headers: desktop })).status).toBe(403);
+    expect(await (await fetch(root + "/api/health", { headers: desktop })).json()).toEqual({
+      ok: true, provider: "mock",
+    });
+    const reply = await fetch(root + "/api/chat", {
+      method: "POST",
+      headers: { ...desktop, "Content-Type": "application/json" },
+      body: JSON.stringify({ message: "今天好累", phase: "idle", hour: 12 }),
+    });
+    expect(await reply.json()).toMatchObject({ provider: "mock", intent: "tired" });
+  } finally {
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+  }
+});

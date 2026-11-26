@@ -18,7 +18,7 @@ export function SearchPlanet3D({ state, reduced, paused, onReady, overlay }: {
   onReady: () => void;
   overlay: RefObject<HTMLDivElement | null>;
 }) {
-  const { scene } = useGLTF(`${import.meta.env.BASE_URL}models/search/planet${usesMobileSafariRendering() ? "-mobile" : ""}.glb`);
+  const { scene } = useGLTF(`${import.meta.env.BASE_URL}models/search/planet${usesMobileSafariRendering() ? "-mobile" : ""}.glb`, false, false);
   useSearchTextureQuality(scene);
   const { model, center, upper, lower } = useMemo(() => {
     const model = scene.clone();

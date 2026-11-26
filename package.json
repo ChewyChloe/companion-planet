@@ -24,7 +24,7 @@
   },
   "build": {
     "appId": "tw.companionplanet.app",
-    "productName": "同頻星球",
+    "productName": "同頻星球 Companion Planet",
     "files": [
       "dist/**/*",
       "electron/**/*",
@@ -34,17 +34,26 @@
     ],
     "win": {
       "target": "nsis",
-      "signAndEditExecutable": false,
-      "icon": "public/icon.ico"
+      "icon": "public/icon.ico",
+      "executableName": "CompanionPlanet"
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "同頻星球 Companion Planet",
+      "uninstallDisplayName": "同頻星球 Companion Planet",
+      "differentialPackage": false
     },
     "directories": {
       "output": "release"
     },
-    "artifactName": "Companion-Planet-${version}-${arch}.${ext}"
+    "artifactName": "Companion-Planet-Setup-${version}-${arch}.${ext}",
+    "toolsets": {
+      "wine": "1.0.1"
+    },
+    "publish": null
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

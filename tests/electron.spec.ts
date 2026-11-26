@@ -36,7 +36,7 @@ test("desktop shares state, transparent topmost pet switches back and quits", as
     await expect(page.locator("canvas")).toHaveAttribute("data-frames", /\d+/, { timeout: 85000 });
     await page.getByRole("button", { name: "開始專注", exact: false }).click();
     await page.evaluate(() => window.desktop!.setMode("pet"));
-    await expect(page.locator("main")).toHaveClass("app pet");
+    await expect(page.locator("main")).toHaveClass("app pet native-pet");
     const config = await app.evaluate(({ BrowserWindow }) => {
       const win = BrowserWindow.getAllWindows()[0];
       return {
@@ -45,7 +45,9 @@ test("desktop shares state, transparent topmost pet switches back and quits", as
         background: win.getBackgroundColor(),
       };
     });
-    await page.getByRole("button", { name: "暫停", exact: true }).click();
+    await expect(page.getByRole("region", { name: "星球鐘", exact: true })).toHaveCount(0);
+    await page.getByRole("button", { name: "暫停星球鐘", exact: true }).click();
+    await page.getByRole("button", { name: "返回星球" }).click();
     const seconds = page.getByRole("textbox", { name: "秒鐘", exact: true });
     await expect(seconds).toBeVisible();
     await seconds.fill("35");
@@ -55,6 +57,8 @@ test("desktop shares state, transparent topmost pet switches back and quits", as
     await expect(page.getByRole("region", { name: "計時設定與紀錄" })).toBeVisible();
     await page.getByRole("button", { name: "星球鐘設定與紀錄" }).click();
     await page.getByRole("button", { name: "繼續專注" }).click();
+    await page.getByRole("button", { name: "召喚桌寵" }).click();
+    await expect(page.locator("main")).toHaveClass("app pet native-pet");
     expect(config.top).toBe(true);
     expect(config.bounds.width).toBe(320);
     const options = getWindowOptions("preload");
@@ -114,9 +118,11 @@ test("desktop shares state, transparent topmost pet switches back and quits", as
       omitBackground: true,
     });
     await page.getByRole("button", { name: "隱藏桌寵" }).click();
-    await app.evaluate(({ BrowserWindow }) =>
-      BrowserWindow.getAllWindows()[0].restore(),
-    );
+    await app.evaluate(({ BrowserWindow }) => {
+      const window = BrowserWindow.getAllWindows()[0];
+      window.restore();
+      window.show();
+    });
     await page.getByRole("button", { name: "返回星球" }).click();
     await expect(page.getByRole("heading")).toBeVisible();
     expect(
@@ -126,23 +132,13 @@ test("desktop shares state, transparent topmost pet switches back and quits", as
     ).toBe(false);
     expect(errors).toEqual([]);
     await page.evaluate(() => window.desktop!.setMode("pet"));
-    const closed = app.waitForEvent("close");
-    await Promise.all([
-      closed,
-      page
-        .getByRole("button", { name: "退出應用程式" })
-        .click({ noWaitAfter: true })
-        .catch((error) => {
-          if (
-            !page.isClosed() ||
-            !String(error).includes(
-              "Target page, context or browser has been closed",
-            )
-          )
-            throw error;
-        }),
-    ]);
-    await expect.poll(() => child.exitCode).toBe(0);
+    const exitButton = page.getByRole("button", { name: "退出應用程式" });
+    await expect(exitButton).toBeVisible();
+    // Activate the renderer control without waiting for a mouse-up on a closing window.
+    await exitButton.evaluate((button: HTMLButtonElement) => button.click()).catch(error => {
+      if (!page.isClosed()) throw error;
+    });
+    await expect.poll(() => child.exitCode, { timeout: 15000 }).toBe(0);
   } finally {
     if (child.exitCode === null && child.signalCode === null) await app.close();
   }

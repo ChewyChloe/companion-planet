@@ -48,3 +48,16 @@ export function nextClockStop(angle: number, random = Math.random) {
   }
   return candidate;
 }
+
+export function clockHandTurns(timer: {
+  running: boolean;
+  deadline: number | null;
+  remaining: number;
+  duration?: number;
+}, now: number) {
+  const remaining = timer.running && timer.deadline !== null
+    ? Math.max(0, timer.deadline - now)
+    : timer.remaining;
+  const elapsed = Math.max(0, (timer.duration ?? timer.remaining) - remaining);
+  return { minute: (elapsed % 60_000) / 60_000, hour: (elapsed % 720_000) / 720_000 };
+}
