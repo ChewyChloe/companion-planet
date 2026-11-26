@@ -1,0 +1,106 @@
+.clock-pet-document, .clock-pet-document body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+.clock-pet {
+  container-type: inline-size;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  color: #4b385d;
+  font: 14px/1.4 system-ui, sans-serif;
+  background:
+    radial-gradient(circle at 25% 15%, #fbf4f3 0, transparent 48%),
+    linear-gradient(145deg, #eee7f7, #d8d7ee 72%, #e9def1);
+}
+.clock-pet[data-night="true"] {
+  background: radial-gradient(ellipse at 45% 45%, #394060, #161b37 82%);
+}
+.clock-pet-face {
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  justify-items: center;
+  width: max-content;
+  pointer-events: none;
+  user-select: none;
+  color: #362452;
+  text-shadow: 0 0 5px #fff6f0, 0 0 12px #fff2e9;
+}
+.clock-pet-face span { font-size: clamp(10px, 3cqw, 13px); font-weight: 650; letter-spacing: .14em; }
+.clock-pet-face output {
+  font-size: clamp(22px, min(10cqw, 10vh), 42px);
+  font-variant-numeric: tabular-nums;
+  font-weight: 750;
+  line-height: 1;
+  letter-spacing: -.025em;
+}
+.clock-pet-controls {
+  position: absolute;
+  inset: auto 8px 8px;
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+}
+.clock-pet-controls button,
+.clock-pet-controls button:hover {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border: 1px solid #fff8f7a0;
+  border-radius: 999px;
+  color: #4b385d;
+  background: #f7eff9eb;
+  font: 600 12px/1.2 system-ui, sans-serif;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.clock-pet-controls button:hover { background: #fff7ff; }
+.clock-pet-controls button:focus-visible { outline: 2px solid #8159aa; outline-offset: 1px; }
+.clock-pet-controls .icon { width: 15px; height: 15px; }
+.clock-pet-load {
+  position: absolute;
+  top: 12%;
+  left: 50%;
+  width: max-content;
+  max-width: 94%;
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: #f7eff9eb;
+}
+.clock-pet-fallback {
+  position: fixed;
+  z-index: 20;
+  inline-size: min(340px, calc(100vw - 24px));
+  block-size: min(390px, calc(100dvh - 30px));
+  inset: auto max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) auto;
+  overflow: hidden;
+  border: 1px solid #fffbff;
+  border-radius: 24px;
+  box-shadow: 0 14px 34px #22183662;
+}
+.clock-pet-fallback > p {
+  position: absolute;
+  z-index: 1;
+  inset: 5px 9px auto;
+  margin: 0;
+  padding: 4px 7px;
+  border-radius: 10px;
+  color: #4b385d;
+  background: #f7eff9eb;
+  text-align: center;
+  font-size: 11px;
+  pointer-events: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .clock-pet-launch { display: none; }
+}

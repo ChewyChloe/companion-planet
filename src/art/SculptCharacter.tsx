@@ -369,7 +369,7 @@ function LegacyCharacter({
   );
 }
 
-export default function SculptCharacter(props: Parameters<typeof LegacyCharacter>[0]) {
+export default function SculptCharacter(props: Parameters<typeof LegacyCharacter>[0] & { floatingStage?: boolean }) {
   const selected = useWorld(s => s.companionId);
   const id = props.companionId || selected;
   if (id === "mushroom" && !props.modelUrl)
@@ -377,6 +377,6 @@ export default function SculptCharacter(props: Parameters<typeof LegacyCharacter
   if ((id === "fern" || id === "sprout") && !props.modelUrl && !getNebulaMaterialVariant())
     return <SuppliedPlant key={id} {...props} id={id} />;
   if (id === "nebula" && !getNebulaMaterialVariant() && !props.modelUrl)
-    return <SuppliedNebula action={props.action} held={props.held} still={props.still} pet={props.pet} seatBlend={props.seatBlend} gaitTime={props.gaitTime} />;
+    return <SuppliedNebula floatingStage={props.floatingStage} action={props.action} held={props.held} still={props.still} pet={props.pet} seatBlend={props.seatBlend} gaitTime={props.gaitTime} />;
   return <LegacyCharacter {...props} />;
 }

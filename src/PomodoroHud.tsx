@@ -1,4 +1,4 @@
-import { useId, useRef, useState, type CSSProperties } from "react";
+import { useId, useRef, useState, type CSSProperties, type RefObject } from "react";
 import { dailyFocus, formatTimerPart, localDay } from "./domain";
 import { Icon } from "./Icon";
 import { useWorld } from "./store";
@@ -27,9 +27,10 @@ function TimerSwitch({ label, icon, checked, onChange }: {
   );
 }
 
-export function PomodoroHud({ onCommand, previewSound }: {
+export function PomodoroHud({ onCommand, previewSound, clockPet }: {
   onCommand: (command: Command) => void;
   previewSound: () => void;
+  clockPet?: { open: () => Promise<void>; trigger: RefObject<HTMLButtonElement | null> };
 }) {
   const state = useWorld();
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -96,6 +97,9 @@ export function PomodoroHud({ onCommand, previewSound }: {
           aria-label="星球鐘設定與紀錄" aria-expanded={settingsOpen} aria-controls={settingsOpen ? settingsId : undefined}
           data-tooltip="星球鐘設定與紀錄"
           onClick={() => setSettingsOpen(open => !open)}><Icon name="sliders" /></button>
+        {clockPet && <button ref={clockPet.trigger} className="round-control control-tooltip clock-pet-launch"
+          type="button" aria-label="召喚桌寵" data-tooltip="召喚桌寵"
+          onClick={() => void clockPet.open()}><Icon name="monitor" /></button>}
       </div>
       {settingsOpen && (
         <section id={settingsId} className="pomodoro-settings" aria-label="計時設定與紀錄"

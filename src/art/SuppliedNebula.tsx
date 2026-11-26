@@ -11,8 +11,8 @@ import * as THREE from "three";
 import type { Action } from "../domain";
 
 export const SUPPLIED_NEBULA_URL = "models/user-residents/nebula.glb?v=modular-face-4";
-export function SuppliedNebula({ action, still, held, seatBlend, gaitTime, face, pet = false }: {
-  action: Action; face?: Face; still?: boolean; held?: React.RefObject<boolean>; seatBlend?: React.RefObject<number>; gaitTime?: React.RefObject<number>; pet?: boolean;
+export function SuppliedNebula({ action, still, held, seatBlend, gaitTime, face, pet = false, floatingStage = false }: {
+  action: Action; face?: Face; floatingStage?: boolean; still?: boolean; held?: React.RefObject<boolean>; seatBlend?: React.RefObject<number>; gaitTime?: React.RefObject<number>; pet?: boolean;
 }) {
   const modelPath = usesMobileSafariRendering() ? "models/user-residents/nebula-mobile.glb" : SUPPLIED_NEBULA_URL;
   const gltf = useLoader(GLTFLoader, import.meta.env.BASE_URL + modelPath);
@@ -134,26 +134,28 @@ export function SuppliedNebula({ action, still, held, seatBlend, gaitTime, face,
       gl.domElement.dataset.seatedPose = seat.current.toFixed(3);
       const seatedOffset = asset.offset[1] - .06 * seat.current;
       root.current.position.y=seatedOffset;
-      root.current.updateWorldMatrix(true,true);
-      // SkinnedMesh updates its attached bind inverse in updateMatrixWorld.
-      root.current.updateMatrixWorld(true);
-      let required=0;
-      const seated=seat.current>.95;
-      const planetId=useWorld.getState().planetId;
-      asset.meshes.forEach(mesh=>mesh.skeleton.update());
-      for(const {mesh,index,seat} of asset.contacts){
-        if(seated && !seat)continue;
-        mesh.getVertexPosition(index,vertex);mesh.localToWorld(vertex);
-        const hit=seated ? null : contactFloor(planetId,vertex);
-        const support=groundHeight(CHAIR.x,CHAIR.z)+CHAIR.seatHeight;
-        // Seated feet use the measured seat, rather than standing on a backrest
-        // or adjacent raised ledge sampled through the lower belly.
-        const floor=seated ? support : hit;
-        if(floor!==null)required=Math.max(required,floor-vertex.y+(seated ? .012 : .05));
+      if (!floatingStage) {
+        root.current.updateWorldMatrix(true,true);
+        // SkinnedMesh updates its attached bind inverse in updateMatrixWorld.
+        root.current.updateMatrixWorld(true);
+        let required=0;
+        const seated=seat.current>.95;
+        const planetId=useWorld.getState().planetId;
+        asset.meshes.forEach(mesh=>mesh.skeleton.update());
+        for(const {mesh,index,seat} of asset.contacts){
+          if(seated && !seat)continue;
+          mesh.getVertexPosition(index,vertex);mesh.localToWorld(vertex);
+          const hit=seated ? null : contactFloor(planetId,vertex);
+          const support=groundHeight(CHAIR.x,CHAIR.z)+CHAIR.seatHeight;
+          // Seated feet use the measured seat, rather than standing on a backrest
+          // or adjacent raised ledge sampled through the lower belly.
+          const floor=seated ? support : hit;
+          if(floor!==null)required=Math.max(required,floor-vertex.y+(seated ? .012 : .05));
+        }
+        lift.current=Math.max(required,THREE.MathUtils.damp(lift.current,required,12,Math.min(dt,.05)));
+        const parentScale=root.current.parent?.getWorldScale(vertex).y||1;
+        root.current.position.y=seatedOffset+Math.min(.50,lift.current)/parentScale;
       }
-      lift.current=Math.max(required,THREE.MathUtils.damp(lift.current,required,12,Math.min(dt,.05)));
-      const parentScale=root.current.parent?.getWorldScale(vertex).y||1;
-      root.current.position.y=seatedOffset+Math.min(.50,lift.current)/parentScale;
       gl.domElement.dataset.footCorrection=lift.current.toFixed(4);
     }
     const { tapMood, reactionUntil } = useWorld.getState();

@@ -14,7 +14,7 @@ const leafChains = [
   ["branch.R.1", "branch.R.2", "branch.R.3"],
 ];
 
-export function SuppliedPlant({ id, action, still, held, time, gaitTime, seatBlend, pet, poseTime }: {
+export function SuppliedPlant({ id, action, still, held, time, gaitTime, seatBlend, pet, poseTime, floatingStage }: {
   id: "fern" | "sprout";
   action: Action;
   still?: boolean;
@@ -24,6 +24,7 @@ export function SuppliedPlant({ id, action, still, held, time, gaitTime, seatBle
   seatBlend?: RefObject<number>;
   pet?: boolean;
   poseTime?: number;
+  floatingStage?: boolean;
 }) {
   const sprout = id === "sprout";
   const path = `models/user-residents/${id}.glb${sprout ? "?v=2" : ""}`;
@@ -91,7 +92,8 @@ export function SuppliedPlant({ id, action, still, held, time, gaitTime, seatBle
     const p = blendPose(pose.current, target, dt);
     seated.current = MathUtils.damp(seated.current, action === "read" && !pet && !grabbed ? seatBlend?.current ?? 0 : 0, 10, dt);
     const sit = seated.current;
-    const waving = sprout && !still && !grabbed && action === "happy";
+    const clockWave = floatingStage === true && !still && !grabbed && action === "stretch";
+    const waving = sprout && !still && !grabbed && (action === "happy" || clockWave);
     const wave = greeting.current;
     if (waving && !wave.active) wave.elapsed = 0;
     wave.active = waving;
@@ -128,10 +130,10 @@ export function SuppliedPlant({ id, action, still, held, time, gaitTime, seatBle
         // The uploaded bind pose already has arm_neg raised. Relax that
         // shoulder between greetings and restore its authored pose briefly.
         const relaxed = arm === "arm_neg" ? 1 - raised : 0;
-        turn(arm, 0, 0, swing * .30 + p.armForward * .28 + .055 * sit);
+        turn(arm, 0, 0, swing * .30 + p.armForward * .28 + .055 * sit + (clockWave && arm === "arm_neg" ? Math.sin(t * 17) * .16 * raised : 0));
         if (arm === "arm_neg") move(arm, 0, -.042 * relaxed);
       } else {
-        turn(arm, sign * (p.armRaise * .58 + .06 * sit), 0, swing * 1.10 + p.armForward * .55 + .13 * sit);
+        turn(arm, sign * (p.armRaise * .58 + .06 * sit), 0, swing * 1.10 + p.armForward * .55 + .13 * sit + (clockWave && index === 0 ? Math.sin(t * 17) * .2 : 0));
         move(arm, swing * .135, Math.abs(swing) * .035);
       }
       move(foot, leg * .17 * (1 - sit) + .066 * sit, lift * 1.35 * (1 - sit));

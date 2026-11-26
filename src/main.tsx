@@ -9,6 +9,10 @@ import { dialogueActions, dialogueMood, type TapMood, lateNightLine, tapDialogue
 import { Icon } from "./Icon";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { createPortal } from "react-dom";
+import { ClockPet } from "./pip/ClockPet";
+import { useClockPet } from "./pip/useClockPet";
+import "./pip/clock-pet.css";
 import Scene from "./Scene";
 import { useWorld } from "./store";
 import {
@@ -142,6 +146,9 @@ function App() {
     return () => clearTimeout(timer);
   }, [speech, speechVersion]);
   const [pet, setPet] = useState(false);
+  const clockPet = useClockPet();
+  const clockFace = useRef<HTMLDivElement>(null);
+  const [clockCelebration, setClockCelebration] = useState(0);
   const [chat, setChat] = useState(false);
   useEffect(() => {
     const close = (e: KeyboardEvent) => {
@@ -180,6 +187,7 @@ function App() {
   const notifyCompletion = useCallback((previous: Timer) => {
     const { silent, timerSettings, cueTimerGesture } = useWorld.getState();
     const focused = previous.phase === "focus";
+    setClockCelebration(count => count + 1);
     const title = focused ? "專注完成，可以休息一下" : "休息完成，準備好了再開始";
     setNotice(title);
     if (silent) return;
@@ -201,7 +209,8 @@ function App() {
       const completion = useWorld.getState().advanceTimer(Date.now());
       if (completion) notifyCompletion(completion);
     };
-    const id = setInterval(() => {
+    const timerHost = clockPet.host ?? window;
+    const id = timerHost.setInterval(() => {
       advance();
       const a = document.querySelector(".world canvas")?.getAttribute("data-action") as Action | null;
       if (a) setActivity(a);
@@ -213,12 +222,12 @@ function App() {
     window.addEventListener("pointerup", prime);
     window.addEventListener("keydown", prime);
     return () => {
-      clearInterval(id);
+      timerHost.clearInterval(id);
       document.removeEventListener("visibilitychange", advance);
       window.removeEventListener("pointerup", prime);
       window.removeEventListener("keydown", prime);
     };
-  }, [notifyCompletion, armChime]);
+  }, [notifyCompletion, armChime, clockPet.host]);
   const lastAmbient = useRef(-1);
   useEffect(() => {
     if (state.silent || state.timer.phase !== "idle" || state.companionId !== "nebula" || picker || chat || pet) return;
@@ -382,7 +391,18 @@ function App() {
           pickerOpen={picker}
         />
       </section>
-      <PomodoroHud onCommand={timerCommand} previewSound={previewTimerSound} />
+      <PomodoroHud onCommand={timerCommand} previewSound={previewTimerSound}
+        clockPet={!window.desktop && !pet ? clockPet : undefined} />
+      {clockPet.host && createPortal(
+        <ClockPet host={clockPet.host} face={clockFace} celebration={clockCelebration} onCommand={timerCommand} onReturn={clockPet.close} />,
+        clockPet.host.document.body,
+      )}
+      {clockPet.fallback && (
+        <aside className="clock-pet-fallback">
+          <p role="status">{clockPet.fallback}</p>
+          <ClockPet host={window} face={clockFace} celebration={clockCelebration} onCommand={timerCommand} onReturn={clockPet.close} />
+        </aside>
+      )}
       {!pet && (
         <>
           {window.desktop && <div className="window-drag" />}

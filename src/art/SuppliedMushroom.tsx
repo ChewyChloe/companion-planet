@@ -17,7 +17,7 @@ const caps = [
   { parts: [6, 7], point: [-.025, .525, .150], delay: 1.42 },
 ] as const;
 
-export function SuppliedMushroom({ action, still, held, time, gaitTime, seatBlend, pet, poseTime }: {
+export function SuppliedMushroom({ action, still, held, time, gaitTime, seatBlend, pet, poseTime, floatingStage }: {
   action: Action;
   still?: boolean;
   held?: RefObject<boolean>;
@@ -26,6 +26,7 @@ export function SuppliedMushroom({ action, still, held, time, gaitTime, seatBlen
   seatBlend?: RefObject<number>;
   pet?: boolean;
   poseTime?: number;
+  floatingStage?: boolean;
 }) {
   const { scene } = useLoader(GLTFLoader, import.meta.env.BASE_URL + path);
   const pose = useRef({ ...neutralPose });
@@ -104,6 +105,7 @@ export function SuppliedMushroom({ action, still, held, time, gaitTime, seatBlen
       const side = i === 0 ? 1 : -1;
       arm.rotation.x = side * (p.armRaise * .5 + .07 * sit);
       arm.rotation.z = (i === 0 ? p.leftArmSwing : p.rightArmSwing) * .68 - .18 * sit - p.armForward;
+      if (i === 0 && floatingStage && movement === "stretch") arm.rotation.z += Math.sin(t * 17) * .22;
       const stride = i === 0 ? p.leftLeg : p.rightLeg;
       const lift = i === 0 ? p.leftFootLift : p.rightFootLift;
       asset.foot[i].rotation.z = stride * .45 * (1 - sit) + .16 * sit;
