@@ -2,7 +2,7 @@ import type { TapMood } from "./tap-dialogue";
 import { planetFor, type PlanetId } from "./planets";
 import { create } from "zustand";
 import { initialTimer, normalizeFocusMinutes, restoreTimer, type Timer, type Action } from "./domain";
-import { type CompanionId } from "./companions";
+import { companionAvailable, type CompanionId } from "./companions";
 type WorldMemory = Partial<
   Record<PlanetId, { lampOn: boolean; flowersBloom: boolean }>
 >;
@@ -95,8 +95,8 @@ export const useWorld = create<State>((set) => ({
         [s.planetId]: { lampOn: s.lampOn, flowersBloom: !s.flowersBloom },
       },
     })),
-  companionId: "nebula",
-  setCompanion: (id) => { if (id === "nebula") set({ companionId: id }); },
+  companionId: companionAvailable(saved.companionId) ? saved.companionId : "nebula",
+  setCompanion: (id) => { if (companionAvailable(id)) set({ companionId: id }); },
   night: saved.night === true,
   toggleNight: () => set(s => ({ night: !s.night })),
   silent: saved.quietPreferenceVersion === 1 && saved.silent === true,

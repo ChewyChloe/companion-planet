@@ -9,18 +9,18 @@ export const companions = [
     head: "antenna",
   },
   {
-    id: "sprout",
-    name: companionName("sprout"),
-    color: "#e5d9ad",
-    accent: "#f7e4a3",
-    head: "star",
-  },
-  {
     id: "fern",
     name: companionName("fern"),
     color: "#99b970",
     accent: "#688c46",
     head: "fern",
+  },
+  {
+    id: "sprout",
+    name: companionName("sprout"),
+    color: "#e5d9ad",
+    accent: "#f7e4a3",
+    head: "star",
   },
   {
     id: "mushroom",
@@ -66,6 +66,9 @@ export const companions = [
   },
 ] as const;
 export type CompanionId = (typeof companions)[number]["id"];
+export function companionAvailable(id: unknown): id is "nebula" | "fern" {
+  return id === "nebula" || id === "fern";
+}
 export function companionFor(id: unknown) {
   return companions.find((c) => c.id === id) || companions[0];
 }

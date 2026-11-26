@@ -1,4 +1,4 @@
-import { companions, type CompanionId } from "./companions";
+import { companions, companionAvailable, type CompanionId } from "./companions";
 import { Icon } from "./Icon";
 function Portrait({id}:{id:CompanionId}) {
   return <img src={`${import.meta.env.BASE_URL}portraits/${id}.png`} alt="" style={{width:"100%",aspectRatio:"1",objectFit:"contain"}} />;
@@ -35,13 +35,13 @@ export function CompanionPicker({
         {companions.map((c) => (
           <button
             key={c.id}
-            disabled={c.id !== "nebula"}
+            disabled={!companionAvailable(c.id)}
             aria-pressed={selected === c.id}
             onClick={() => onSelect(c.id)}
           >
-            <div className={c.id === "nebula" ? undefined : "companion-preview"}><Portrait {...c} /></div>
+            <div className={companionAvailable(c.id) ? undefined : "companion-preview"}><Portrait {...c} /></div>
             <span>{c.name}</span>
-            {c.id !== "nebula" && <small className="companion-preview-label">開發中</small>}
+            {!companionAvailable(c.id) && <small className="companion-preview-label">開發中</small>}
             {selected === c.id && <Icon name="check" />}
           </button>
         ))}
