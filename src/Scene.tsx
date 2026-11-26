@@ -1,3 +1,6 @@
+import { SearchPlanet3D, searchPlanetSlot } from "./search/SearchPlanet3D";
+import { SearchOverlay } from "./search/SearchOverlay";
+import { useSearchPlanetState } from "./search/useSearchPlanetState";
 import { resolveBodyContact, collisionRevision } from "./art/world-collision";
 import { suppliedFlower,suppliedLamp,suppliedView } from "./art/supplied-world-config";
 import { userHome } from "./art/user-world-ground";
@@ -456,7 +459,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
 }
 import { useState as ReactUseState } from "react";
 class SceneBoundary extends Component<
-  { children: ReactNode },
+  { children: ReactNode; fallback?: ReactNode },
   { error: boolean }
 > {
   state = { error: false };
@@ -465,7 +468,7 @@ class SceneBoundary extends Component<
   }
   render() {
     return this.state.error ? (
-      <div className="scene-error" role="alert">
+      this.props.fallback !== undefined ? this.props.fallback : <div className="scene-error" role="alert">
         3D 畫面無法啟動。請開啟硬體加速並重新整理；計時與聊天仍可使用。
       </div>
     ) : (
@@ -534,6 +537,10 @@ export default function Scene({
   pickerOpen?: boolean;
 }) {
   const [lost, setLost] = ReactUseState(false);
+  const search = useSearchPlanetState();
+  const [searchReady, setSearchReady] = ReactUseState(false);
+  const searchTrigger = useRef<HTMLButtonElement>(null);
+  const searchActive = !pet && search.phase !== "closed";
   const planetId = useWorld((s) => s.planetId);
   const hoveredPlanet = useWorld((s) => s.hoveredPlanet);
   return (
@@ -574,10 +581,16 @@ export default function Scene({
           <>
             <Atmosphere reduced={reduced} />
             <Cosmos />
+            <SceneBoundary fallback={null}>
+              <Suspense fallback={null}>
+                <SearchPlanet3D state={search} reduced={reduced} onReady={() => setSearchReady(true)} />
+              </Suspense>
+            </SceneBoundary>
             <JourneyCamera />
             <World key={planetId} />
             <OrbitControls
               makeDefault
+              enabled={!searchActive}
               target={suppliedView(planetId).focus}
               minDistance={8}
               maxDistance={80}
@@ -615,8 +628,23 @@ export default function Scene({
                 <span>{p.short}</span>
               </button>
             ))}
+          {searchReady && !lost && (
+            <button
+              ref={searchTrigger}
+              type="button"
+              className="search-planet-trigger"
+              data-phase={search.phase}
+              aria-haspopup="dialog"
+              aria-expanded={searchActive}
+              style={{ left: `${searchPlanetSlot[0]}%`, top: `${searchPlanetSlot[1]}%` }}
+              onClick={search.open}
+            >
+              <span>搜尋星球</span>
+            </button>
+          )}
         </nav>
       )}
+      {!pet && <SearchOverlay state={search} trigger={searchTrigger} />}
       {speech && (
         <div className="scene-speech">
           <div className="character-speech" role="note" aria-live="polite">
