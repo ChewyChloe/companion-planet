@@ -757,7 +757,7 @@ select {
   box-shadow: 0 20px 70px #15163359;
 }
 .companion-picker header {
-  padding: 13px 15px 0 24px;
+  padding: 20px 27px 0 36px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -794,8 +794,8 @@ select {
   background: #faf7ffc9;
   color: #514569;
 }
-.carousel-arrow.previous { left: 14px; }
-.carousel-arrow.next { right: 14px; }
+.carousel-arrow.previous { left: 26px; }
+.carousel-arrow.next { right: 26px; }
 .carousel-arrow.previous .icon { transform: rotate(180deg); }
 .carousel-greeting.character-speech {
   position: absolute;
@@ -809,7 +809,7 @@ select {
   white-space: nowrap;
 }
 .carousel-fallback { padding: 28px 60px; text-align: center; }
-.carousel-info { text-align: center; padding: 0 12px 18px; }
+.carousel-info { text-align: center; padding: 0 26px 28px; }
 .carousel-info h3 { font-size: 25px; margin: 3px 0 5px; font-weight: 400; }
 .carousel-info p { font-size: 14px; margin: 0 0 11px; }
 .carousel-count { font-size: 12px; font-variant-numeric: tabular-nums; color: #5b5272; }
@@ -818,14 +818,14 @@ select {
 .companion-picker button:focus-visible { outline: 2px solid #65537f; outline-offset: 2px; }
 .pet .carousel-stage { height: min(45dvh, 340px); }
 @media (max-width: 520px) {
-  .companion-picker header { padding: 8px 8px 0 15px; }
+  .companion-picker header { padding: 12px 13px 0 22px; }
   .carousel-stage { height: clamp(170px, 49dvh, 350px); }
-  .carousel-arrow.previous { left: 6px; }
-  .carousel-arrow.next { right: 6px; }
+  .carousel-arrow.previous { left: 10px; }
+  .carousel-arrow.next { right: 10px; }
 }
 @media (max-height: 520px) {
   .carousel-stage { height: 44dvh; }
-  .carousel-info { padding-bottom: 12px; }
+  .carousel-info { padding-bottom: 18px; }
   .carousel-info h3 { font-size: 21px; }
 }
 
@@ -1133,6 +1133,16 @@ select {
 .scene-tools .control-tooltip::after {
   right: calc(100% + 8px);
   left: auto;
+}
+.dock-tooltip::after {
+  top: auto;
+  bottom: calc(100% + 8px);
+  right: 0;
+  left: auto;
+  transform: none;
+}
+button.chat-launch.control-tooltip {
+  position: absolute;
 }
 .timer-reset::after {
   top: calc(100% + 6px);

@@ -372,7 +372,7 @@ function App() {
                 data-tooltip={state.silent ? "已開啟安靜陪伴" : "安靜陪我"}
                 onClick={() => state.setSilent(!state.silent)}
               >
-                <Icon name={state.silent ? "moon" : "mute"} />
+                <Icon name={state.silent ? "bell-off" : "bell"} />
               </button>
             </div>
           </section>
@@ -447,11 +447,11 @@ function App() {
           </div>
           <div className="companion-tools">
             <button
-              className="round-control"
+              className="round-control control-tooltip dock-tooltip"
               onClick={() => setPicker(!picker)}
               aria-label="更換角色"
               aria-expanded={picker}
-              title="更換角色"
+              data-tooltip="更換角色"
             >
               <Icon name="orbit" />
             </button>
@@ -513,9 +513,9 @@ function App() {
       )}
       {!pet && (
         <button
-          className="chat-launch round-control"
+          className="chat-launch round-control control-tooltip dock-tooltip"
           aria-label={`和${selected.name}說說話`}
-          title={`和${selected.name}說說話`}
+          data-tooltip={`和${selected.name}說說話`}
           aria-expanded={chat}
           onClick={() => setChat(!chat)}
         >
