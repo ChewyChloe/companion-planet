@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 import type { SearchPlanetState } from "./useSearchPlanetState";
+import { openNativeSearchSplit } from "./native-split";
 import "./search.css";
 
 export function SearchOverlay({ state, trigger, dialog }: {
@@ -10,6 +11,8 @@ export function SearchOverlay({ state, trigger, dialog }: {
   const { phase, close } = state;
   const [query, setQuery] = useState("");
   const [submitted, setSubmitted] = useState("");
+  const [openingSplit, setOpeningSplit] = useState(false);
+  const pendingSplit = useRef(false);
   const resultLink = useRef<HTMLAnchorElement>(null);
   const canUseSidebar = () => window.matchMedia("(pointer: fine)").matches || Boolean(window.desktop);
   const dismissSidebar = () => {
@@ -40,6 +43,24 @@ export function SearchOverlay({ state, trigger, dialog }: {
       trigger.current?.focus({ preventScroll: true });
     }
   }, [phase, trigger, dialog]);
+
+  async function submitDesktop(value: string) {
+    if (pendingSplit.current) return;
+    if (window.desktop) {
+      setSubmitted(value);
+      return;
+    }
+    pendingSplit.current = true;
+    setOpeningSplit(true);
+    try {
+      const opened = await openNativeSearchSplit(value).catch(() => false);
+      if (dialog.current?.dataset.phase !== "open") return;
+      setSubmitted(opened ? "" : value);
+    } finally {
+      pendingSplit.current = false;
+      setOpeningSplit(false);
+    }
+  }
 
   if (phase === "closed") return null;
   return (
@@ -85,7 +106,7 @@ export function SearchOverlay({ state, trigger, dialog }: {
               event.preventDefault();
             } else if (canUseSidebar()) {
               event.preventDefault();
-              setSubmitted(query.trim());
+              void submitDesktop(query.trim());
             }
           }}>
           <input ref={input} type="search" name="q" aria-label="Google 搜尋關鍵字" placeholder="用 Google 搜尋"
@@ -94,8 +115,9 @@ export function SearchOverlay({ state, trigger, dialog }: {
             onCompositionEnd={() => { composing.current = false; }}
             onKeyDown={(event) => { if (event.key === "Enter" && event.nativeEvent.isComposing) event.preventDefault(); }}
           />
-          <button type="submit" aria-label="搜尋 Google" disabled={!query.trim()} />
+          <button type="submit" aria-label="搜尋 Google" disabled={!query.trim() || openingSplit} />
         </form>
+        {openingSplit && <span className="search-planet-status" role="status">正在開啟右側分割搜尋…</span>}
         {submitted && (
           <aside className="search-planet-sidebar" aria-labelledby="search-planet-sidebar-heading">
             <header>
@@ -105,6 +127,7 @@ export function SearchOverlay({ state, trigger, dialog }: {
               </button>
             </header>
             <p className="search-planet-submitted">{submitted}</p>
+            {!window.desktop && <p>若要自動在右側開啟，可安裝支援的 Chrome 擴充套件。</p>}
             <a ref={resultLink} href={`https://www.google.com/search?${new URLSearchParams({ q: submitted })}`}
               target="_blank" rel="noopener noreferrer" onClick={(event) => {
                 if (window.desktop?.searchGoogle) {
