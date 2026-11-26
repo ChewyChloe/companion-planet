@@ -1,13 +1,14 @@
-import { useMemo, useRef, type RefObject } from "react";
+import { useEffect, useMemo, useRef, type RefObject } from "react";
 import { useFrame, useLoader } from "@react-three/fiber";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { Box3, Group, MathUtils, Mesh, Vector3 } from "three";
+import { Box3, Group, MathUtils, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, Vector3 } from "three";
 import type { Action } from "../domain";
 import { useWorld } from "../store";
 import { blendPose, neutralPose, poseFor } from "./character-animation";
 
-const path = "models/user-residents/mushroom.glb";
+const path = "models/user-residents/mushroom.glb?v=jelly-1";
 // The supplied mesh faces -X. These pivots use that mesh's source coordinates.
+const jellyParts = new Set([2, 4, 5, 9, 10].map(index => `tripo_part_${index}`));
 const arms = [[10, .26], [9, -.255]] as const;
 const feet = [[4, .15], [5, -.15]] as const;
 const caps = [
@@ -48,16 +49,40 @@ export function SuppliedMushroom({ action, still, held, time, gaitTime, seatBlen
     const foot = feet.map(([part, z], i) => pivot(`MushroomFoot${i}`, [-.073, .073, z], [part]));
     const cap = caps.map(({ point, parts }, i) => pivot(`MushroomCap${i}`, point, parts));
     const eyes = [[11, -.121], [13, .131]].map(([part, z], i) => pivot(`MushroomEye${i}`, [-.264, .327, z], [part]));
+    const jellyMaterials: MeshPhysicalMaterial[] = [];
     model.traverse(object => {
       if (object instanceof Mesh) {
         object.castShadow = true;
         object.receiveShadow = true;
+        const source = object.material;
+        if (jellyParts.has(object.name) && source instanceof MeshStandardMaterial) {
+          const jelly = new MeshPhysicalMaterial({
+            name: "MushroomJelly",
+            color: source.color,
+            map: source.map,
+            normalMap: source.normalMap,
+            normalScale: source.normalScale.clone().multiplyScalar(.13),
+            side: source.side,
+            metalness: 0,
+            roughness: .37,
+            clearcoat: .76,
+            clearcoatRoughness: .30,
+            specularIntensity: .64,
+            ior: 1.38,
+            sheen: .19,
+            sheenColor: "#ffd3a1",
+            sheenRoughness: .56,
+          });
+          object.material = jelly;
+          jellyMaterials.push(jelly);
+        }
       }
     });
     const scale = 1.43 / bounds.getSize(new Vector3()).y;
-    return { model, center, floor: bounds.min.y, scale, arm, foot, cap, eyes };
+    return { model, center, floor: bounds.min.y, scale, arm, foot, cap, eyes, jellyMaterials };
   }, [scene]);
   const body = useRef<Group>(null);
+  useEffect(() => () => asset.jellyMaterials.forEach(material => material.dispose()), [asset]);
 
   useFrame(({ gl }, delta) => {
     const dt = Math.min(delta, .05);
