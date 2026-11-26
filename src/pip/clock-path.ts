@@ -61,3 +61,11 @@ export function clockHandTurns(timer: {
   const elapsed = Math.max(0, (timer.duration ?? timer.remaining) - remaining);
   return { minute: (elapsed % 60_000) / 60_000, hour: (elapsed % 720_000) / 720_000 };
 }
+
+
+// A slow change in the ring's inclination makes the orbit visible even on a smooth band.
+export const clockRingCenter = [0, .417, 0] as const;
+export const clockRingAxis = [-.230, .878, .420] as const;
+export function clockRingYaw(seconds: number) {
+  return .22 * Math.sin(seconds * fullClockLap / 26);
+}

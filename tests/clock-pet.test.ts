@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { BufferAttribute, BufferGeometry, DoubleSide, Group, Mesh, MeshBasicMaterial, Raycaster, Vector3 } from "three";
 import { expect, it } from "vitest";
-import { clockHandTurns, clockPath, clockRingLift, clockCenterY, fullClockLap, nextClockStop } from "../src/pip/clock-path";
+import { clockHandTurns, clockPath, clockRingLift, clockRingYaw, clockRingAxis, clockRingCenter, clockCenterY, fullClockLap, nextClockStop } from "../src/pip/clock-path";
 
 it("keeps the floating resident's ring route supported by the supplied GLB", () => {
   const bytes = readFileSync("public/models/pip/clock-planet.glb");
@@ -31,6 +31,10 @@ it("keeps the floating resident's ring route supported by the supplied GLB", () 
   );
   expect(faces.children.length).toBeGreaterThan(2);
   expect(ring.children).toHaveLength(1);
+  const ringCenter = new Vector3(...clockRingCenter);
+  const ringAxis = new Vector3(...clockRingAxis).normalize();
+  ring.position.copy(ringCenter);
+  ring.children[0].position.sub(ringCenter);
   for (let i = 0; i < 96; i++) {
     const angle = i / 96 * fullClockLap;
     const point = clockPath(angle);
@@ -41,10 +45,15 @@ it("keeps the floating resident's ring route supported by the supplied GLB", () 
     const hits = ray.intersectObject(faces);
     const distances = hits.map(hit => hit.point.distanceTo(support));
     expect(Math.min(...distances), `clearance at point ${i}`).toBeLessThan(.008);
-    const nearestRing = ray.intersectObject(ring)[0];
-    const ringHeight = nearestRing ? nearestRing.point.distanceTo(support) : 0;
-    if (nearestRing && nearestRing.distance < hits[0].distance && ringHeight > .016) {
-      expect(clockRingLift(angle), `ring clearance at point ${i}`).toBeGreaterThan(ringHeight + .01);
+    for (const seconds of [0, 6.5, 13, 19.5, 26, 32.5, 39, 45.5]) {
+      ring.rotation.set(0, clockRingYaw(seconds), 0);
+      ring.rotateOnAxis(ringAxis, seconds * .29);
+      ring.updateMatrixWorld(true);
+      const nearestRing = ray.intersectObject(ring)[0];
+      const ringHeight = nearestRing ? nearestRing.point.distanceTo(support) : 0;
+      if (nearestRing && nearestRing.distance < hits[0].distance && ringHeight > .016) {
+        expect(clockRingLift(angle), `ring clearance at point ${i} after ${seconds}s`).toBeGreaterThan(ringHeight + .01);
+      }
     }
   }
   expect(clockPath(fullClockLap / 4).x).toBeLessThan(-.33);
