@@ -1,14 +1,13 @@
 import { useEffect, useMemo, useRef, type RefObject } from "react";
 import { useFrame, useLoader } from "@react-three/fiber";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { Bone, Box3, BufferAttribute, Color, Group, MathUtils, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, Skeleton, SkinnedMesh, SRGBColorSpace, TextureLoader, Vector3 } from "three";
+import { Bone, Box3, BufferAttribute, Group, MathUtils, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, Skeleton, SkinnedMesh, Vector3 } from "three";
 import type { Action } from "../domain";
 import { useWorld } from "../store";
 import { blendPose, neutralPose, poseFor } from "./character-animation";
 
 const directory = `${import.meta.env.BASE_URL}models/user-residents/`;
-const path = "water.glb?v=smooth-jelly-1";
-const expressionPaths = [`${directory}water-blink.jpg`, `${directory}water-smile.jpg`];
+const path = "water.glb?v=sealed-jelly-2";
 const armJoints = [[3, -.307, .417, .048], [5, .298, .431, .093]] as const;
 const footJoints = [[2, -.150, .098, 0], [4, .154, .097, 0]] as const;
 
@@ -24,7 +23,6 @@ export function SuppliedWater({ action, time, gaitTime, still, held, seatBlend, 
   floatingStage?: boolean;
 }) {
   const { scene } = useLoader(GLTFLoader, directory + path);
-  const [blinkMap, smileMap] = useLoader(TextureLoader, expressionPaths);
   const body = useRef<Group>(null);
   const pose = useRef({ ...neutralPose });
   const step = useRef(0);
@@ -40,10 +38,10 @@ export function SuppliedWater({ action, time, gaitTime, still, held, seatBlend, 
       if (item) joint.attach(item);
       return joint;
     };
-    const arms = armJoints.map(([part, x, y, z], i) => {
+    const skinPart = (name: string, part: number, x: number, y: number, z: number, isStem = false) => {
       const source = model.getObjectByName(`tripo_part_${part}`);
       const joint = new Bone();
-      joint.name = `WaterArm${i}`;
+      joint.name = name;
       joint.position.set(x, y, z);
       if (!(source instanceof Mesh) || !source.parent) return { joint };
       const geometry = source.geometry.clone();
@@ -51,11 +49,18 @@ export function SuppliedWater({ action, time, gaitTime, still, held, seatBlend, 
       const indices = new Uint16Array(positions.count * 4);
       const weights = new Float32Array(positions.count * 4);
       for (let vertex = 0; vertex < positions.count; vertex++) {
-        // Keep the cut at the shoulder seated and let the outer fin bend.
-        const movable = MathUtils.smoothstep(positions.getX(vertex) * Math.sign(x), .321, .376);
-        // Ease the fin into the body at rest so its shoulder cut stays covered.
-        positions.setXYZ(vertex, x + (positions.getX(vertex) - x) * .92 - Math.sign(x) * .008,
-          y + (positions.getY(vertex) - y) * .92 - .008, positions.getZ(vertex));
+        const px = positions.getX(vertex), py = positions.getY(vertex);
+        // The joined edge follows the body; only the outer portion bends.
+        const movable = isStem
+          ? MathUtils.smoothstep(py, .748, .86)
+          : MathUtils.smoothstep(px * Math.sign(x), .321, .376);
+        if (isStem) {
+          positions.setY(vertex, py - .025 * (1 - MathUtils.smoothstep(py, .718, .80)));
+        } else {
+          const inset = .009 + .020 * (1 - movable);
+          positions.setXYZ(vertex, x + (px - x) * .92 - Math.sign(x) * inset,
+            y + (py - y) * .92 - .008, positions.getZ(vertex));
+        }
         const slot = vertex * 4;
         indices[slot + 1] = 1;
         weights[slot] = 1 - movable;
@@ -65,88 +70,75 @@ export function SuppliedWater({ action, time, gaitTime, still, held, seatBlend, 
       geometry.computeBoundingSphere();
       geometry.setAttribute("skinIndex", new BufferAttribute(indices, 4));
       geometry.setAttribute("skinWeight", new BufferAttribute(weights, 4));
-      const arm = new SkinnedMesh(geometry, source.material);
-      arm.name = source.name;
-      const shoulder = new Bone();
-      shoulder.add(joint);
-      arm.add(shoulder);
-      const skeleton = new Skeleton([shoulder, joint]);
-      arm.bind(skeleton);
-      source.parent.add(arm);
+      const skin = new SkinnedMesh(geometry, source.material);
+      skin.name = source.name;
+      const base = new Bone();
+      base.add(joint);
+      skin.add(base);
+      const skeleton = new Skeleton([base, joint]);
+      skin.bind(skeleton);
+      source.parent.add(skin);
       source.removeFromParent();
       return { joint, geometry, skeleton };
-    });
+    };
+    const arms = armJoints.map(([part, x, y, z], i) => skinPart(`WaterArm${i}`, part, x, y, z));
     const feet = footJoints.map(([part, x, y, z], i) => pivot(`WaterFoot${i}`, part, x, y, z));
-    const drop = pivot("WaterDrop", 1, .031, .71, .012);
+    const drop = skinPart("WaterDrop", 1, .031, .748, .012, true);
     const blink = { value: 0 }, smile = { value: 0 };
-    for (const texture of [blinkMap, smileMap]) {
-      texture.colorSpace = SRGBColorSpace;
-      texture.flipY = false;
-      texture.needsUpdate = true;
-    }
     const materials: MeshPhysicalMaterial[] = [];
     model.traverse(object => {
       if (!(object instanceof Mesh) || !(object.material instanceof MeshStandardMaterial)) return;
       object.castShadow = true;
       object.receiveShadow = true;
-      const isBody = object.name === "tripo_part_0";
-      const isDrop = object.name === "tripo_part_1";
       const jelly = new MeshPhysicalMaterial({
-        color: isBody ? "#ffffff" : "#a5d9ed",
-        map: isBody ? object.material.map : null,
-        metalness: 0, roughness: .32, ior: 1.36,
+        color: "#ffffff", metalness: 0, roughness: .32, ior: 1.36,
         clearcoat: .75, clearcoatRoughness: .23, specularIntensity: .72,
         sheen: .12, sheenColor: "#b4f3ff", sheenRoughness: .58,
       });
-      if (isBody || isDrop) {
-        jelly.onBeforeCompile = shader => {
-          shader.vertexShader = "varying vec3 waterSurface;\n" + shader.vertexShader.replace(
-            "#include <begin_vertex>", "#include <begin_vertex>\nwaterSurface = position;");
-          shader.fragmentShader = "varying vec3 waterSurface;\n" + shader.fragmentShader;
-          if (isDrop) {
-            shader.uniforms.dropTip = { value: new Color("#c5eaa2") };
-            shader.fragmentShader = "uniform vec3 dropTip;\n" + shader.fragmentShader.replace(
-              "#include <color_fragment>",
-              "#include <color_fragment>\ndiffuseColor.rgb = mix(diffuseColor.rgb, dropTip, smoothstep(.76, .93, waterSurface.y));");
-            return;
+      jelly.onBeforeCompile = shader => {
+        Object.assign(shader.uniforms, { waterBlink: blink, waterSmile: smile });
+        shader.vertexShader = "varying vec3 waterSurface;\n" + shader.vertexShader.replace(
+          "#include <begin_vertex>", "#include <begin_vertex>\nwaterSurface = position;");
+        shader.fragmentShader = `
+          varying vec3 waterSurface;
+          uniform float waterBlink;
+          uniform float waterSmile;
+          float waterOval(vec2 p, vec2 radius) {
+            return 1.0 - smoothstep(.90, 1.0, length(p / radius));
           }
-          Object.assign(shader.uniforms, {
-            waterBlinkMap: { value: blinkMap }, waterSmileMap: { value: smileMap },
-            waterBlink: blink, waterSmile: smile,
-            waterBlue: { value: new Color("#94d1ed") }, waterLight: { value: new Color("#c2e9f5") },
-          });
-          shader.fragmentShader = shader.fragmentShader.replace("#include <map_pars_fragment>", `
-            #include <map_pars_fragment>
-            uniform sampler2D waterBlinkMap;
-            uniform sampler2D waterSmileMap;
-            uniform float waterBlink;
-            uniform float waterSmile;
-            uniform vec3 waterBlue;
-            uniform vec3 waterLight;
-            float faceMask(vec2 center, vec2 radius) {
-              return 1.0 - smoothstep(.72, 1.0, length((waterSurface.xy - center) / radius));
-            }
-          `).replace("#include <map_fragment>", `
-            vec3 face = mix(texture2D(map, vMapUv).rgb, texture2D(waterSmileMap, vMapUv).rgb, waterSmile);
-            face = mix(face, texture2D(waterBlinkMap, vMapUv).rgb, waterBlink);
-            float eyes = max(faceMask(vec2(-.126,.502),vec2(.039,.044)), faceMask(vec2(.116,.501),vec2(.040,.044)));
-            float mouth = faceMask(vec2(-.008,.448),vec2(.062,.044));
-            float front = smoothstep(.13,.19,waterSurface.z);
-            vec3 gel = mix(waterBlue, waterLight, smoothstep(.08,.68,waterSurface.y));
-            float feature = front * max(eyes * (1.0-smoothstep(.15,.48,face.g)), mouth * (1.0-smoothstep(.45,.64,face.g)));
-            diffuseColor.rgb *= mix(gel, face, feature);
-          `);
-        };
-        jelly.customProgramCacheKey = () => isBody ? "water-clean-face" : "water-drop-gradient";
-      }
+          float waterEye(vec2 p, float close) {
+            p.y -= close * .008 * (1.0 - pow(clamp(abs(p.x / .028), 0.0, 1.0), 2.0));
+            return waterOval(p, vec2(mix(.026,.024,close), mix(.031,.0035,close)));
+          }
+        ` + shader.fragmentShader.replace("#include <color_fragment>", `
+          #include <color_fragment>
+          vec3 gel = mix(vec3(.30,.63,.84), vec3(.54,.78,.89), smoothstep(.08,.68,waterSurface.y));
+          gel = mix(gel, vec3(.53,.77,.36), smoothstep(.79,.97,waterSurface.y));
+          vec2 face = waterSurface.xy;
+          float close = max(waterBlink, waterSmile * .38);
+          vec2 leftEye = face - vec2(-.126,.502);
+          vec2 rightEye = face - vec2(.116,.501);
+          float front = smoothstep(.13,.19,waterSurface.z);
+          float eyes = front * max(waterEye(leftEye,close), waterEye(rightEye,close));
+          float shine = (1.0 - close) * max(waterOval(leftEye - vec2(-.007,.010),vec2(.006,.009)),
+            waterOval(rightEye - vec2(-.007,.010),vec2(.006,.009)));
+          vec3 ink = mix(vec3(.006,.015,.027),vec3(.24,.42,.57),shine);
+          vec2 lip = face - vec2(-.008,.448);
+          lip.y += .010 * pow(clamp(abs(lip.x / .048), 0.0, 1.0), 2.0);
+          float mouth = front * waterOval(lip,vec2(.047,mix(.020,.031,waterSmile)));
+          vec3 insideMouth = mix(vec3(.48,.044,.069),vec3(.19,.012,.027),smoothstep(-.014,.020,lip.y));
+          diffuseColor.rgb *= mix(mix(gel,ink,eyes),insideMouth,mouth);
+        `);
+      };
+      jelly.customProgramCacheKey = () => "water-gel-features";
       object.material = jelly;
       materials.push(jelly);
     });
     return { model, arms, feet, drop, blink, smile, materials, center: bounds.getCenter(new Vector3()), floor: bounds.min.y };
-  }, [scene, blinkMap, smileMap]);
+  }, [scene]);
   useEffect(() => () => {
     asset.materials.forEach(material => material.dispose());
-    asset.arms.forEach(arm => {
+    [...asset.arms, asset.drop].forEach(arm => {
       arm.geometry?.dispose();
       arm.skeleton?.dispose();
     });
@@ -184,8 +176,8 @@ export function SuppliedWater({ action, time, gaitTime, still, held, seatBlend, 
       asset.feet[i].position.z = -stride * .065 + seated * .028;
     }
     const lag = Math.sin(cycle * 2 - 1.3) * step.current * energy;
-    asset.drop.rotation.set(lag * .10, 0, lag * .14 + p.antenna * .53 + Math.sin(t * 2.4 - .8) * .036 * energy);
-    asset.drop.scale.set(1 - lag * .030, 1 + lag * .074, 1 - lag * .030);
+    asset.drop.joint.rotation.set(lag * .10, 0, lag * .14 + p.antenna * .53 + Math.sin(t * 2.4 - .8) * .036 * energy);
+    asset.drop.joint.scale.set(1 - lag * .030, 1 + lag * .074, 1 - lag * .030);
     asset.blink.value = 1 - MathUtils.smoothstep(p.eyeOpen, .18, .72);
     asset.smile.value = Math.max(p.happyEyes, p.mouthOpen);
     gl.domElement.dataset.modelReady = "user-water";
