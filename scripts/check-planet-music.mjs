@@ -23,9 +23,8 @@ try {
       const a = window.musicPlayers.at(-1);
       return { src: a.currentSrc || a.src, paused: a.paused, time: a.currentTime, ready: a.readyState, loop: a.loop, volume: a.volume, error: a.error?.code || null, count: window.musicPlayers.length };
     });
-    await expect(page.getByRole('button', { name: '開啟環境音', exact: true })).toBeVisible();
-    expect((await status()).paused).toBe(true);
-    await page.getByRole('button', { name: '開啟環境音', exact: true }).click();
+    await expect(page.getByRole('button', { name: '關閉環境音', exact: true })).toBeVisible();
+    await page.getByRole('heading', { name: '同頻星球', exact: true }).click();
     for (const [id, name, file] of [['b612', '同頻星球', 'home'], ['rose', '玫瑰花園', 'rose'], ['forest', '微風森林', 'forest'], ['moon', '月光書原', 'moon']]) {
       if (id !== 'b612') {
         await page.getByRole('button', { name: `前往${name}`, exact: true }).press('Enter');

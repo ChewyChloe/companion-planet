@@ -6,22 +6,33 @@ import rose from "../assets/music/rose.mp3";
 import forest from "../assets/music/forest.mp3";
 
 export const planetMusic: Record<PlanetId, string> = { b612: home, moon, rose, forest };
+const preference = "companion-planet-music";
+
+function defaultEnabled() {
+  try { return localStorage.getItem(preference) !== "off"; }
+  catch { return true; }
+}
 
 export function usePlanetMusic(planet: PlanetId) {
   const player = useRef<HTMLAudioElement | null>(null);
-  const enabled = useRef(false);
-  const generation = useRef(0);
-  const [on, setOn] = useState(false);
+  const [on, setOn] = useState(defaultEnabled);
+  const enabled = useRef(on);
 
   useEffect(() => {
     const audio = new Audio();
     audio.loop = true;
     audio.preload = "none";
-    audio.volume = 0.35;
+    audio.volume = .35;
     player.current = audio;
+    const unlock = (event: Event) => {
+      if (event.target instanceof Element && event.target.closest("[data-planet-audio]")) return;
+      if (enabled.current && audio.paused) void audio.play().catch(() => {});
+    };
+    document.addEventListener("pointerup", unlock, true);
+    document.addEventListener("keydown", unlock, true);
     return () => {
-      generation.current++;
-      enabled.current = false;
+      document.removeEventListener("pointerup", unlock, true);
+      document.removeEventListener("keydown", unlock, true);
       audio.pause();
       audio.removeAttribute("src");
       audio.load();
@@ -30,38 +41,23 @@ export function usePlanetMusic(planet: PlanetId) {
   }, []);
 
   useEffect(() => {
-    const audio = player.current!;
-    const token = ++generation.current;
+    const audio = player.current;
+    if (!audio) return;
     audio.pause();
     audio.src = planetMusic[planet];
     audio.load();
-    if (enabled.current) {
-      void audio.play().catch(() => {
-        if (token !== generation.current) return;
-        enabled.current = false;
-        setOn(false);
-      });
-    }
+    // Autoplay can be blocked until the first interaction; preserve the preference.
+    if (enabled.current) void audio.play().catch(() => {});
   }, [planet]);
 
   const toggle = async () => {
     const audio = player.current;
     if (!audio) return;
-    const token = ++generation.current;
     enabled.current = !enabled.current;
     setOn(enabled.current);
-    if (!enabled.current) {
-      audio.pause();
-      return;
-    }
-    // Start directly inside the user's gesture, including on mobile Safari.
-    try {
-      await audio.play();
-    } catch {
-      if (token !== generation.current) return;
-      enabled.current = false;
-      setOn(false);
-    }
+    try { localStorage.setItem(preference, enabled.current ? "on" : "off"); } catch { /* Session only. */ }
+    if (enabled.current) await audio.play().catch(() => {});
+    else audio.pause();
   };
   return { on, toggle };
 }

@@ -1166,3 +1166,106 @@ button.chat-launch.control-tooltip {
     bottom: 1px;
   }
 }
+
+.time-input,
+.time-display {
+  width: 4.7ch;
+  text-align: center;
+}
+.time-input {
+  justify-content: center;
+}
+.timer-part {
+  display: inline-flex;
+  align-items: baseline;
+}
+.time-input input::selection {
+  color: #fff;
+  background: #53719e;
+}
+.timer-stage {
+  position: absolute;
+  left: 15px;
+  bottom: 10px;
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.2;
+  text-shadow: 0 1px 3px #292037;
+}
+.pomodoro-settings {
+  position: absolute;
+  top: calc(100% + 9px);
+  left: 0;
+  width: min(325px, calc(100vw - 44px));
+  max-height: max(120px, calc(100dvh - 245px));
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 15px;
+  border: 1px solid #fff;
+  border-radius: 16px;
+  background: #f8f4f9;
+  color: #443c54;
+  box-shadow: 0 12px 30px #2e20443d;
+  font-size: 13px;
+}
+.pomodoro-heading,
+.pomodoro-sound,
+.pomodoro-records li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.pomodoro-heading h2 { margin: 0; font-size: 16px; font-weight: 400; }
+.pomodoro-settings button { min-height: 34px; padding: 4px 9px; }
+.pomodoro-durations {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 9px 0;
+}
+.pomodoro-durations label { display: grid; gap: 2px; }
+.pomodoro-durations input {
+  width: 100%;
+  min-width: 0;
+  padding: 5px 8px;
+  border: 1px solid #d6c9dd;
+  border-radius: 7px;
+  background: #fffafd;
+  color: inherit;
+}
+.pomodoro-check,
+.pomodoro-volume {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+}
+.pomodoro-settings input { accent-color: #765e8a; }
+.pomodoro-volume input { flex: 1; min-width: 0; }
+.pomodoro-records {
+  margin-top: 7px;
+  border-top: 1px solid #ded3e4;
+}
+.pomodoro-records p { margin-block: 7px; }
+.pomodoro-records summary { cursor: pointer; }
+.pomodoro-records ul { margin: 7px 0 0; padding: 0; }
+.pomodoro-records li { padding: 3px 0; }
+.pet .focus-hud {
+  left: 12px;
+  top: 43px;
+  gap: 6px;
+  -webkit-app-region: no-drag;
+}
+.pet .time-card { min-width: 112px; width: 112px; height: 62px; padding: 5px; background: #f4f1e8; color: #443c54; }
+.pet .time { font-size: 31px; }
+.pet .timer-stage { left: 8px; bottom: 7px; font-size: 10px; color: #443c54; text-shadow: none; }
+.pet .timer-buttons { flex-direction: row; gap: 5px; }
+.pet .timer-buttons .round-control { width: 38px; min-width: 38px; height: 38px; min-height: 38px; background: #f4f1e8; color: #443c54; }
+.pet .pomodoro-settings { max-height: calc(100dvh - 162px); width: calc(100vw - 24px); }
+.pet .timer-reset { min-height: 23px; width: 25px; }
+.pet .notice { top: 115px; max-width: calc(100% - 16px); }
+@media (max-width: 700px) {
+  .time-input, .time-display { width: 4.7ch; }
+  .timer-stage { left: 10px; font-size: 11px; }
+}

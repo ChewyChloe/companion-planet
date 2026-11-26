@@ -31,7 +31,6 @@ const lines = [
   "你看書，我看你……啊，不對，我看星星 (⁄ ⁄>⁄ω⁄<⁄ ⁄)",
   "下次來的時候，也要記得找我喔 (｡•̀ᴗ-)✧",
 ];
-export const focusCompleteLine = "叮！是休息時間！我先去伸個懶腰。";
 export const lateNightLine = "這個時間，連星星都快睡著了。";
 export function tapDialogue(previous: number, count: number, focusing: boolean, hour: number, random = Math.random, allowNight = true) {
   if (count === 3) return { index: previous, text: "等、等一下！我的腦袋轉不過來啦！" };

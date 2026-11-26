@@ -29,16 +29,11 @@ export function advanceBehavior(
   elapsed: number,
   random: () => number = Math.random,
 ): Behavior {
+  if (phase === "focus") {
+    if (current.phase === phase && current.action === "read" && current.target === desk) return current;
+    return { ...current, phase, action: "read", target: desk, until: Infinity, reactionId: reactionUntil };
+  }
   if (current.phase !== phase) {
-    if (phase === "focus")
-      return {
-        ...current,
-        phase,
-        action: "read",
-        target: desk,
-        until: elapsed + 6,
-        reactionId: reactionUntil,
-      };
     return {
       ...current,
       phase,
@@ -55,10 +50,8 @@ export function advanceBehavior(
       reactionId: reactionUntil,
       home: current.target,
       target:
-        phase === "focus"
-          ? desk
-          : action === "approach"
-            ? [...APPROACH]
+        action === "approach"
+          ? [...APPROACH]
             : action === "return"
               ? current.home
               : action === "rest"
@@ -93,7 +86,6 @@ export function advanceBehavior(
   }
   const action = chooseAction(phase, random());
   let target = current.target;
-  if (phase === "focus") target = desk;
-  else if (action === "rest") target = safeDrop(-1.1, .65);
+  if (action === "rest") target = safeDrop(-1.1, .65);
   return { ...current, action, target, until: elapsed + 5 + random() * 7 };
 }

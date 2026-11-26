@@ -1,4 +1,4 @@
-import { setFocusDuration } from "./ui";
+import { readTimer, setFocusDuration } from "./ui";
 import { test, expect } from "@playwright/test";
 // Software WebGL plus three full-scene screenshots can exceed two minutes.
 test.describe.configure({ timeout: 180000 });
@@ -53,11 +53,11 @@ test("planet renders, camera rotates, character responds, timer and conversation
     timeout: 45000,
   });
   await page.getByRole("button", { name: "暫停" }).click();
-  const paused = await page.getByRole("timer").innerText();
+  const paused = await readTimer(page);
   await page.waitForTimeout(700);
-  await expect(page.getByRole("timer")).toHaveText(paused);
+  await expect.poll(() => readTimer(page)).toBe(paused);
   await page.reload();
-  await expect(page.getByRole("timer")).toHaveText(paused);
+  await expect.poll(() => readTimer(page)).toBe(paused);
   await page.getByRole("button", { name: "繼續專注" }).click();
   await page.getByRole("button", { name: "和星雲仔說說話" }).click();
   await page.getByLabel("想對星雲仔說的話").fill("今天好累");
@@ -76,7 +76,7 @@ test("planet renders, camera rotates, character responds, timer and conversation
   });
   expect(errors).toEqual([]);
 });
-test("silent mode suppresses completion notices and AI proposals require confirmation", async ({
+test("silent mode preserves the visual completion notice and AI proposals require confirmation", async ({
   page,
 }) => {
   await page.goto("/");
@@ -86,7 +86,7 @@ test("silent mode suppresses completion notices and AI proposals require confirm
   await expect(page.locator("main")).toHaveAttribute("data-phase", "break", {
     timeout: 18000,
   });
-  await expect(page.getByRole("status")).toHaveCount(0);
+  await expect(page.getByRole("status")).toContainText("專注完成");
   await page.getByRole("button", { name: "和星雲仔說說話" }).click();
   await page.getByLabel("想對星雲仔說的話").fill("我要開始讀書");
   await page.getByRole("button", { name: "送出訊息" }).click();

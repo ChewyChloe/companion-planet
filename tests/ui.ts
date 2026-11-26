@@ -5,3 +5,10 @@ export async function setFocusDuration(page: Page, minutes: string, seconds = "0
   await secondsField.fill(seconds);
   await secondsField.press("Enter");
 }
+
+export async function readTimer(page: Page) {
+  const minutes = page.getByRole("textbox", { name: "分鐘", exact: true });
+  if (await minutes.isVisible())
+    return `${await minutes.inputValue()}:${await page.getByRole("textbox", { name: "秒鐘", exact: true }).inputValue()}`;
+  return page.getByRole("timer").innerText();
+}

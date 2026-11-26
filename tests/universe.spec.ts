@@ -1,3 +1,4 @@
+import { readTimer } from "./ui";
 import { test, expect, type Page } from "@playwright/test";
 async function renderState(page: Page, point?: [number, number]) {
   return page.evaluate(async (point) => {
@@ -49,7 +50,7 @@ test("real distant-planet raycasting travels between worlds and the lamp toggles
   await expect(canvas).toHaveAttribute("data-frames", /\d+/);
   expect((await renderState(page)).fog).toBe(true);
   expect((await renderState(page)).env).toBe(true);
-  const timer = await page.getByRole("timer").innerText();
+  const timer = await readTimer(page);
   const box = (await canvas.boundingBox())!;
   await expect(canvas).toHaveAttribute("data-planet0", /^rose,/);
   const destination = (await canvas.getAttribute("data-planet0"))!.split(",").slice(1).map(Number);
@@ -59,7 +60,7 @@ test("real distant-planet raycasting travels between worlds and the lamp toggles
   await expect(page.locator("main")).toHaveAttribute("data-planet", "rose");
   await expect(canvas).toHaveAttribute("data-journey", "idle");
   await expect(canvas).toHaveAttribute("data-planet-model", "user-world-rose",{timeout:60000});
-  await expect(page.getByRole("timer")).toHaveText(timer);
+  await expect.poll(() => readTimer(page)).toBe(timer);
   await page.screenshot({
     path: `artifacts/universe/${info.project.name}-rose.png`,
   });

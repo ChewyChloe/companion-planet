@@ -1,4 +1,4 @@
-import { setFocusDuration } from "./ui";
+import { readTimer, setFocusDuration } from "./ui";
 import { test, expect } from "@playwright/test";
 test.describe.configure({ timeout: 120000 });
 test("touch rotation, character tap, timer and mobile keyboard chat work", async ({
@@ -152,7 +152,7 @@ test("touch distant planets and the physical lamp while keeping the timer", asyn
   await page.goto("/");
   const canvas = page.locator("canvas");
   await expect(canvas).toHaveAttribute("data-frames", /\d+/);
-  const timer = await page.getByRole("timer").innerText(),
+  const timer = await readTimer(page),
     box = (await canvas.boundingBox())!;
   await page.touchscreen.tap(box.width * 0.18, box.height * 0.41);
   await expect(page.locator("main")).toHaveAttribute("data-planet", "rose");
@@ -169,7 +169,7 @@ test("touch distant planets and the physical lamp while keeping the timer", asyn
   const flowerBox = (await canvas.boundingBox())!;
   await page.touchscreen.tap(flowerBox.x + flowerBox.width * flower[0], flowerBox.y + flowerBox.height * flower[1]);
   await expect(canvas).toHaveAttribute("data-flowers-bloom", "true");
-  await expect(page.getByRole("timer")).toHaveText(timer);
+  await expect.poll(() => readTimer(page)).toBe(timer);
   await page.screenshot({
     path: `artifacts/universe/${info.project.name}-touch-world.png`,
   });

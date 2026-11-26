@@ -8,7 +8,6 @@ import {
   tick,
   chooseAction,
   allowedAction,
-  shouldNotify,
   restoreTimer,
 } from "../src/domain";
 import { validateReply, fallback, getReply } from "../server/dialogue.js";
@@ -28,12 +27,10 @@ describe("deadline timer", () => {
     expect(done.phase).toBe("break");
     expect(done.completed).toBe(1);
     expect(tick(done, 130000).completed).toBe(1);
-    expect(shouldNotify(s, done, false, true)).toBe(true);
-    expect(shouldNotify(s, done, true, true)).toBe(false);
-    expect(shouldNotify(s, done, false, false)).toBe(false);
   });
   it("restarts focus and finishes a break", () => {
-    const b = tick(startTimer(initialTimer, 1, 0, "break"), 60000);
+    const running = startTimer(initialTimer, 1, 0, "break");
+    const b = tick(running, 60000);
     expect(b.phase).toBe("idle");
     expect(startTimer(b, 5, 70000).deadline).toBe(370000);
   });

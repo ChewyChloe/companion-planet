@@ -46,14 +46,10 @@ test("immersive lakeside keeps corner controls, open center and local Huninn", a
   await page.screenshot({
     path: `artifacts/layout/${info.project.name}-scene.png`,
   });
-  await page.getByRole("button", { name: "開啟環境音" }).click();
-  await expect(
-    page.getByRole("button", { name: "關閉環境音" }),
-  ).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("button", { name: "關閉環境音" })).toHaveAttribute("aria-pressed", "true");
   await page.getByRole("button", { name: "關閉環境音" }).click();
-  await expect(
-    page.getByRole("button", { name: "開啟環境音" }),
-  ).toHaveAttribute("aria-pressed", "false");
+  await expect(page.getByRole("button", { name: "開啟環境音" })).toHaveAttribute("aria-pressed", "false");
+  await page.getByRole("button", { name: "開啟環境音" }).click();
   await setFocusDuration(page, "5");
   await expect(page.getByRole("textbox", { name: "分鐘", exact: true })).toHaveValue("05");
   await page.getByRole("button", { name: "和星雲仔說說話" }).click();
@@ -73,11 +69,11 @@ test("timer and controls stay readable when every font download fails", async ({
   );
   await page.route("**/fonts/Huninn-Regular.woff2", (r) => r.abort());
   await page.goto("/");
-  await expect(page.getByRole("timer")).toBeVisible();
+  await expect(page.getByRole("group", { name: "計時時間" })).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "同頻星球", exact: true }),
   ).toBeVisible();
-  const box = await page.getByRole("timer").boundingBox();
+  const box = await page.getByRole("group", { name: "計時時間" }).boundingBox();
   expect(box!.height).toBeGreaterThan(35);
   expect(box!.width).toBeGreaterThan(75);
   await page.getByRole("button", { name: "開始專注", exact: true }).click();

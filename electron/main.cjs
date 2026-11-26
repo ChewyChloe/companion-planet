@@ -56,7 +56,11 @@ else {
         console.error("Renderer stopped:", details.reason),
       );
       window.webContents.session.setPermissionRequestHandler(
-        (_contents, _permission, callback) => callback(false),
+        (contents, permission, callback, details) => {
+          const trustedPage = /^http:\/\/127\.0\.0\.1:3002(?:\/|$)/;
+          callback(permission === "notifications" && contents === window?.webContents
+            && details.isMainFrame === true && trustedPage.test(details.requestingUrl));
+        },
       );
       ipcMain.handle("world:mode", (event, next) => {
         if (event.sender === window.webContents) switchMode(next);

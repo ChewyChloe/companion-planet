@@ -1,7 +1,11 @@
 import type { TapMood } from "./tap-dialogue";
 import { planetFor, type PlanetId } from "./planets";
 import { create } from "zustand";
-import { initialTimer, normalizeFocusMinutes, restoreTimer, type Timer, type Action } from "./domain";
+import {
+  addFocusRecord, defaultTimerSettings, editStage, initialTimer, nextStage,
+  normalizeTimerSettings, resetStage, restoreTimer, resume, tick,
+  type Timer, type Action, type FocusRecord, type TimerSettings,
+} from "./domain";
 import { companionAvailable, type CompanionId } from "./companions";
 type WorldMemory = Partial<
   Record<PlanetId, { lampOn: boolean; flowersBloom: boolean }>
@@ -26,15 +30,19 @@ interface State {
   toggleNight: () => void;
   silent: boolean;
   reduced: boolean;
-  notifications: boolean;
-  focusMinutes: number;
-  setFocusMinutes: (minutes: number) => void;
+  timerSettings: TimerSettings;
+  focusRecords: FocusRecord[];
+  updateTimerSettings: (changes: Partial<TimerSettings>) => void;
+  editTimer: (milliseconds: number) => void;
+  advanceTimer: (now: number) => Timer | null;
+  timerCommand: (command: "start" | "pause" | "reset" | "skip", now: number, stage?: "focus" | "break") => void;
   reaction: Action | null;
   reactionUntil: number;
   setTimer: (t: Timer) => void;
   setSilent: (b: boolean) => void;
   setReduced: (b: boolean) => void;
-  setNotifications: (b: boolean) => void;
+  timerGesture: { action: Action; until: number } | null;
+  cueTimerGesture: (action: Action, ms: number) => void;
   tapMood: TapMood | null;
   react: (a: Action, mood?: TapMood) => void;
   clear: () => void;
@@ -51,8 +59,18 @@ function read() {
   }
 }
 const saved = read();
-export const useWorld = create<State>((set) => ({
-  timer: restoreTimer(saved.timer, Date.now()),
+const settings = normalizeTimerSettings(saved.timerSettings ?? { focusMinutes: saved.focusMinutes, sound: saved.notifications !== false });
+const restoredAt = Date.now();
+const snapshot = restoreTimer(saved.timer, restoredAt, settings, false);
+const restored = saved.timer ? tick(snapshot, restoredAt, settings) : resetStage(initialTimer, settings);
+const savedRecords: FocusRecord[] = Array.isArray(saved.focusRecords) ? saved.focusRecords.filter(
+  (record: FocusRecord) => record && typeof record.id === "string" && /^\d{4}-\d{2}-\d{2}$/.test(record.day)
+    && Number.isFinite(record.milliseconds) && record.milliseconds > 0,
+) : [];
+const recoveredRecords = restored.completed > snapshot.completed ? addFocusRecord(savedRecords, snapshot, settings) : savedRecords;
+
+export const useWorld = create<State>((set, get) => ({
+  timer: restored,
   planetId: planetFor(saved.planetId).id,
   worldStates: {
     [planetFor(saved.planetId).id]: {
@@ -104,24 +122,48 @@ export const useWorld = create<State>((set) => ({
     saved.reduced === true ||
     (saved.reduced === undefined &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches),
-  notifications: saved.notifications !== false,
-  focusMinutes: normalizeFocusMinutes(saved.focusMinutes),
-  setFocusMinutes: (minutes) =>
-    set((s) => {
-      const focusMinutes = normalizeFocusMinutes(minutes);
-      return {
-        focusMinutes,
-        timer: s.timer.phase === "idle"
-          ? { ...s.timer, remaining: Math.round(focusMinutes * 60_000) }
-          : s.timer,
-      };
-    }),
+  timerSettings: settings,
+  focusRecords: recoveredRecords,
+  updateTimerSettings: (changes) => set(s => {
+    const timerSettings = normalizeTimerSettings({ ...s.timerSettings, ...changes });
+    const timer = s.timer.running || s.timer.started || s.timer.custom ? s.timer : resetStage(s.timer, timerSettings);
+    return { timerSettings, timer };
+  }),
+  editTimer: (milliseconds) => set(s => ({ timer: editStage(s.timer, milliseconds) })),
+  advanceTimer: (now) => {
+    const { timer, timerSettings, focusRecords } = get();
+    const next = tick(timer, now, timerSettings);
+    if (timer === next) return null;
+    if (timer.deadline !== null && now >= timer.deadline) {
+      set({
+        timer: next,
+        focusRecords: next.completed > timer.completed ? addFocusRecord(focusRecords, timer, timerSettings) : focusRecords,
+      });
+      return timer;
+    }
+    if (Math.ceil(next.remaining / 1000) !== Math.ceil(timer.remaining / 1000)) set({ timer: next });
+    return null;
+  },
+  timerCommand: (command, now, stage) => set(s => {
+    const { timer, timerSettings } = s;
+    if (command === "reset") return { timer: resetStage(timer, timerSettings) };
+    if (command === "skip") return { timer: nextStage(timer, timerSettings, false) };
+    if (command === "pause") return timer.running
+      ? { timer: { ...timer, remaining: Math.max(1, timer.deadline! - now), running: false, deadline: null } }
+      : {};
+    if (timer.running) return {};
+    const prepared = stage && (timer.phase === "break") !== (stage === "break")
+      ? resetStage({ ...timer, phase: stage === "break" ? "break" : "idle", breakKind: "short" }, timerSettings)
+      : timer;
+    return { timer: resume(prepared, now) };
+  }),
   reaction: null,
   reactionUntil: 0,
   setTimer: (timer) => set({ timer }),
   setSilent: (silent) => set({ silent }),
   setReduced: (reduced) => set({ reduced }),
-  setNotifications: (notifications) => set({ notifications }),
+  timerGesture: null,
+  cueTimerGesture: (action, ms) => set({ timerGesture: { action, until: Date.now() + ms } }),
   tapMood: null,
   react: (reaction, mood) => set({ reaction, reactionUntil: Date.now() + 3200, tapMood: mood ?? null }),
   clear: () => {
@@ -137,8 +179,9 @@ export const useWorld = create<State>((set) => ({
       flowersBloom: false,
       silent: false,
       reduced: false,
-      notifications: true,
-      focusMinutes: 25,
+      timerSettings: { ...defaultTimerSettings },
+      focusRecords: [],
+      timerGesture: null,
       reaction: null,
       reactionUntil: 0,
     });
@@ -154,11 +197,11 @@ useWorld.subscribe((s, previous) => {
     s.night !== previous.night ||
     s.silent !== previous.silent ||
     s.reduced !== previous.reduced ||
-    s.notifications !== previous.notifications ||
-    s.focusMinutes !== previous.focusMinutes;
+    s.timerSettings !== previous.timerSettings;
   const timerChanged =
     s.timer.running !== previous.timer.running ||
     s.timer.deadline !== previous.timer.deadline;
+  if (!preferenceChanged && s.timer === previous.timer && s.focusRecords === previous.focusRecords) return;
   if (
     s.timer.running &&
     !preferenceChanged &&
@@ -166,6 +209,9 @@ useWorld.subscribe((s, previous) => {
     Date.now() - lastPersist < 900
   )
     return;
+  persist(s);
+});
+function persist(s: State) {
   lastPersist = Date.now();
   try {
     localStorage.setItem(
@@ -179,11 +225,13 @@ useWorld.subscribe((s, previous) => {
         silent: s.silent,
         quietPreferenceVersion: 1,
         reduced: s.reduced,
-        notifications: s.notifications,
-        focusMinutes: s.focusMinutes,
+        timerSettings: s.timerSettings,
+        focusRecords: s.focusRecords,
       }),
     );
   } catch {
     /* Memory-only when storage is unavailable. */
   }
-});
+}
+// Hydration can settle exactly one elapsed stage without replaying a notification.
+if (restored.completed !== snapshot.completed || restored.phase !== snapshot.phase) persist(useWorld.getState());

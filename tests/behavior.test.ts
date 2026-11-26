@@ -6,7 +6,7 @@ it("prioritizes focus and rejects distracting reactions", () => {
   expect(focus.target).toEqual([0.72, 0.23]);
   expect(focus.action).toBe("read");
   const react = advanceBehavior(focus, "focus", "happy", 5000, 1000, 2);
-  expect(react.action).toBe("listen");
+  expect(react.action).toBe("read");
   expect(react.target).toEqual(focus.target);
 });
 it("approaches then returns smoothly through a destination, with cooldown", () => {

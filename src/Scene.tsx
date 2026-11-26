@@ -54,6 +54,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
   const held = useRef(false);
   const manualUntil = useRef(0);
   const walking = useRef(false);
+  const focusFreedom = useRef(false);
   const arrivalAction = useRef<Action>("idle");
   const command = useRef(0);
   const worldRevision = useRef(-1);
@@ -124,6 +125,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
       if (gl.domElement.hasPointerCapture(d.id))
         gl.domElement.releasePointerCapture(d.id);
       if (moved) {
+        focusFreedom.current = useWorld.getState().timer.phase === "focus";
         arrivalAction.current = "idle";
         manualUntil.current = Date.now() + 20000;
         behavior.current = {
@@ -178,20 +180,20 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
     clock.current += state.reduced ? dt * 0.18 : dt;
     if (phase.current !== state.timer.phase) {
       phase.current = state.timer.phase;
+      focusFreedom.current = false;
       manualUntil.current = 0;
       walking.current = false;
     }
     if (state.reactionUntil !== reactionCommand.current) {
       reactionCommand.current = state.reactionUntil;
-      if (!held.current && (reaction === "read" || reaction === "rest")) {
+      const commandAction = state.reaction === "rest" ? "rest" : reaction;
+      if (!held.current && (commandAction === "read" || commandAction === "rest")) {
+        focusFreedom.current = state.timer.phase === "focus" && commandAction === "rest";
         manualUntil.current = Date.now() + 60000;
         walking.current = true;
-        arrivalAction.current = reaction;
-        target.current.set(
-          reaction === "read" ? CHAIR.x : safeDrop(-1.1,.65)[0],
-          0,
-          reaction === "read" ? CHAIR.z : safeDrop(-1.1,.65)[1],
-        );
+        arrivalAction.current = commandAction;
+        const [x, z] = commandAction === "read" ? [CHAIR.x, CHAIR.z] : safeDrop(-1.1, .65);
+        target.current.set(x, 0, z);
       }
     }
     if (
@@ -201,6 +203,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
     ) {
       arrivalAction.current = "idle";
       command.current = state.destination.serial;
+      focusFreedom.current = state.timer.phase === "focus";
       const [x, z] = safeDrop(state.destination.x, state.destination.z);
       target.current.set(x, 0, z);
       walking.current = true;
@@ -216,7 +219,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
         action: arrivalAction.current,
       };
     }
-    const manual = poseLocked || held.current || Date.now() < manualUntil.current;
+    const manual = poseLocked || held.current || focusFreedom.current || Date.now() < manualUntil.current;
     if (!manual)
       behavior.current = advanceBehavior(
         behavior.current,
@@ -227,7 +230,8 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
         _state.clock.elapsedTime,
       );
     action.current = manual
-      ? reaction && state.reactionUntil > Date.now()
+      ? state.timer.phase === "focus" ? arrivalAction.current
+      : reaction && state.reactionUntil > Date.now()
         ? reaction === "read"
           ? arrivalAction.current === "read"
             ? "read"
@@ -248,7 +252,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
         : position.current.distanceTo(target.current);
     const beforeX = position.current.x, beforeZ = position.current.z;
     if (!pet && !held.current && distance > (strolling ? .07 : .001)) {
-      waypoint(position.current, target.current, next, action.current === "read");
+      waypoint(position.current, target.current, next, action.current === "read" || seatBlend.current > .02);
       const speed = strolling ? .42 : .82;
       position.current.lerp(next, Math.min(1, speed * motionDt / Math.max(.001, position.current.distanceTo(next))));
     } else if (strolling) {
@@ -272,9 +276,13 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
         : action.current === "walk" || action.current === "return"
           ? "idle"
           : action.current;
-    if (actual !== rendered.current) {
-      rendered.current = actual;
-      setVisual(actual);
+    // Timer gestures are presentation-only. They leave the current route and seat target intact.
+    const gesture = state.timerGesture;
+    const animation = gesture && Date.now() < gesture.until && !poseLocked && !held.current && !focusFreedom.current
+      ? gesture.action : actual;
+    if (animation !== rendered.current) {
+      rendered.current = animation;
+      setVisual(animation);
     }
     if (root.current) {
       if (pet) {

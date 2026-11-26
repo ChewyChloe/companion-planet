@@ -1,25 +1,20 @@
-import { TimerInput } from "./TimerInput";
+import { useTimerChime } from "./useTimerChime";
+import { PomodoroHud } from "./PomodoroHud";
 import { usePlanetMusic } from "./usePlanetMusic";
 import { getNebulaMaterialVariant, nebulaMaterialVariants } from "./art/nebula-material-test";
 import { planetFor } from "./planets";
 import { CompanionPicker } from "./CompanionPicker";
 import { companionFor } from "./companions";
-import { dialogueActions, dialogueMood, type TapMood, focusCompleteLine, lateNightLine, tapDialogue } from "./tap-dialogue";
+import { dialogueActions, dialogueMood, type TapMood, lateNightLine, tapDialogue } from "./tap-dialogue";
 import { Icon } from "./Icon";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import Scene from "./Scene";
 import { useWorld } from "./store";
 import {
-  initialTimer,
-  formatTimerPart,
-  pause,
-  resume,
-  startTimer,
-  tick,
-  shouldNotify,
   allowedAction,
   type Action,
+  type Timer,
 } from "./domain";
 import { fallback, urgent, validateReply } from "../shared/dialogue.js";
 import "./style.css";
@@ -51,6 +46,25 @@ const actionNames: Record<Action, string> = {
   approach: "靠近陪你",
   return: "回到小角落",
 };
+const ambientLines = [
+  "剛才有一顆星星眨眼，你有看到嗎？",
+  "我找到一個風剛剛好的角落",
+  "今天的雲，看起來很適合靠一下",
+  "我散步回來啦，順便帶了一點星光",
+  "想發呆的話，可以算我一個",
+  "聽，窗外的風又換了一首歌",
+];
+const focusCheers = [
+  "叮！這一段完成啦，伸個懶腰吧",
+  "把一顆番茄收進口袋！這段很值得記住",
+  "做完啦！剛才跑掉的注意力也可以回來休息了",
+  "這一頁先夾起來，我替你拍兩下手！",
+];
+const breakReminders = [
+  "休息時間到了，準備好就一起回書桌",
+  "椅子還暖著，你可以慢慢坐回來",
+  "這一小段歇夠了嗎？下一頁在等我們",
+];
 function NebulaMaterialPanel() {
   const variant = getNebulaMaterialVariant();
   const companion = useWorld(s => s.companionId);
@@ -109,10 +123,12 @@ function App() {
   const nightLineUntil = useRef(0);
   const taps = useRef({ count: 0, at: 0 });
   const [speechVersion, setSpeechVersion] = useState(0);
-  const showSpeech = (text: string) => {
+  const speechUntil = useRef(0);
+  const showSpeech = useCallback((text: string) => {
+    speechUntil.current = Date.now() + 5500;
     setSpeech(text);
     setSpeechVersion(version => version + 1);
-  };
+  }, []);
   useEffect(() => {
     if (state.silent) setSpeech("");
   }, [state.silent]);
@@ -137,8 +153,6 @@ function App() {
     window.addEventListener("keydown", close);
     return () => window.removeEventListener("keydown", close);
   }, []);
-  const minutes = state.focusMinutes;
-  const setMinutes = state.setFocusMinutes;
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -147,6 +161,7 @@ function App() {
   const [intent, setIntent] = useState("");
   const [activity, setActivity] = useState<Action>("idle");
   const audio = usePlanetMusic(state.planetId);
+  const { arm: armChime, ring: ringChime } = useTimerChime();
   const request = useRef<AbortController | null>(null);
   const generation = useRef(0);
   const end = useRef<HTMLDivElement>(null);
@@ -160,36 +175,73 @@ function App() {
       .catch(() => setProvider("離線陪伴模式"));
     return () => controller.abort();
   }, []);
+  const lastCompletionLine = useRef("");
+  const notifyCompletion = useCallback((previous: Timer) => {
+    const { silent, timerSettings, cueTimerGesture } = useWorld.getState();
+    const focused = previous.phase === "focus";
+    const title = focused ? "專注完成，可以休息一下" : "休息完成，準備好了再開始";
+    setNotice(title);
+    if (silent) return;
+    if (timerSettings.sound) ringChime(focused ? "focus" : "break", timerSettings.volume);
+    const lines = (focused ? focusCheers : breakReminders).filter(line => line !== lastCompletionLine.current);
+    const line = lines[Math.floor(Math.random() * lines.length)];
+    lastCompletionLine.current = line;
+    showSpeech(line);
+    cueTimerGesture(focused ? "happy" : "listen", 1450);
+    try {
+      if (timerSettings.desktopNotifications && typeof Notification !== "undefined" && Notification.permission === "granted")
+        new Notification(title, { body: line, tag: "companion-planet-timer" });
+    } catch {
+      // Some browsers only support notifications through a service worker.
+    }
+  }, [ringChime, showSpeech]);
   useEffect(() => {
+    const advance = () => {
+      const completion = useWorld.getState().advanceTimer(Date.now());
+      if (completion) notifyCompletion(completion);
+    };
     const id = setInterval(() => {
-      const current = useWorld.getState();
-      const next = tick(current.timer, Date.now());
-      if (next !== current.timer) {
-        if (
-          shouldNotify(
-            current.timer,
-            next,
-            current.silent,
-            current.notifications,
-          )
-        )
-          showSpeech(focusCompleteLine);
-        if (
-          next.phase !== current.timer.phase ||
-          next.running !== current.timer.running ||
-          Math.ceil(next.remaining / 1000) !==
-            Math.ceil(current.timer.remaining / 1000)
-        )
-          current.setTimer(next);
-      }
-      const a = document.querySelector("canvas")?.dataset.action as Action;
+      advance();
+      const a = document.querySelector(".world canvas")?.getAttribute("data-action") as Action | null;
       if (a) setActivity(a);
     }, 200);
-    return () => clearInterval(id);
-  }, []);
+    const prime = () => {
+      if (useWorld.getState().timer.running) void armChime();
+    };
+    document.addEventListener("visibilitychange", advance);
+    window.addEventListener("pointerup", prime);
+    window.addEventListener("keydown", prime);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener("visibilitychange", advance);
+      window.removeEventListener("pointerup", prime);
+      window.removeEventListener("keydown", prime);
+    };
+  }, [notifyCompletion, armChime]);
+  const lastAmbient = useRef(-1);
   useEffect(() => {
-    if (state.silent || !state.notifications) setNotice("");
-  }, [state.silent, state.notifications]);
+    if (state.silent || state.timer.phase !== "idle" || state.companionId !== "nebula" || picker || chat || pet) return;
+    let timeout: ReturnType<typeof setTimeout>;
+    const schedule = () => {
+      timeout = setTimeout(() => {
+        const latest = useWorld.getState();
+        if (!document.hidden && !latest.silent && latest.timer.phase === "idle" && !latest.journey
+          && Date.now() >= Math.max(speechUntil.current, latest.reactionUntil)) {
+          const canvas = document.querySelector(".world canvas") as HTMLCanvasElement | null;
+          const action = canvas?.dataset.action;
+          if (!latest.reduced && action === "idle" && Math.random() < .42) {
+            latest.react("happy", "joy");
+          } else if (action === "walk" || action === "idle") {
+            lastAmbient.current = (lastAmbient.current + 1 + Math.floor(Math.random() * (ambientLines.length - 1))) % ambientLines.length;
+            showSpeech(ambientLines[lastAmbient.current]);
+          }
+        }
+        schedule();
+      }, 38_000 + Math.random() * 42_000);
+    };
+    schedule();
+    return () => clearTimeout(timeout);
+  }, [state.silent, state.timer.phase, state.companionId, picker, chat, pet, showSpeech]);
   useEffect(() => {
     end.current?.scrollIntoView({
       behavior: state.reduced ? "instant" : "smooth",
@@ -203,18 +255,34 @@ function App() {
     if (window.desktop) await window.desktop.setMode(next ? "pet" : "planet");
     setPet(next);
   };
-  const begin = (phase: "focus" | "break" = "focus") => {
-    state.setTimer(
-      startTimer(
-        state.timer,
-        phase === "break" ? 5 : useWorld.getState().focusMinutes,
-        Date.now(),
-        phase,
-      ),
-    );
-    setNotice("");
+  const timerCommand = (command: "start" | "pause" | "reset" | "skip", stage?: "focus" | "break") => {
+    const now = Date.now();
+    const completed = useWorld.getState().advanceTimer(now);
+    if (completed) {
+      notifyCompletion(completed);
+      if (command === "pause") return;
+    }
+    const latest = useWorld.getState();
+    latest.timerCommand(command, now, stage);
+    const timer = useWorld.getState().timer;
+    if (command !== "pause") setNotice("");
+    if (command !== "start" || latest.timer.running || !timer.running) return;
+    const resting = timer.phase === "break";
+    if (!latest.timer.started || (stage && stage !== latest.timer.phase)) {
+      if (!latest.silent) {
+        latest.cueTimerGesture(resting ? "stretch" : "happy", resting ? 1700 : 1150);
+        if (resting) showSpeech("先把肩膀放下來，我也伸個懶腰");
+      }
+      if (!resting && latest.timerSettings.sound && !latest.silent)
+        void armChime().then(() => ringChime("start", useWorld.getState().timerSettings.volume));
+      else void armChime();
+    } else void armChime();
     setIntent("");
-    if (phase === "focus") setChat(false);
+    if (!resting) setChat(false);
+  };
+  const begin = (phase: "focus" | "break" = "focus") => timerCommand("start", phase);
+  const previewTimerSound = () => {
+    void armChime().then(() => ringChime("focus", useWorld.getState().timerSettings.volume));
   };
   const interact = () => {
     const now = Date.now();
@@ -295,13 +363,6 @@ function App() {
       setBusy(false);
     }
   };
-  const time = Math.ceil(state.timer.remaining / 1000);
-  const display = `${formatTimerPart(Math.floor(time / 60))}:${formatTimerPart(time % 60)}`;
-  const breakReady = state.timer.phase === "break" && !state.timer.running && state.timer.remaining === 300_000;
-  const timerActive = state.timer.phase !== "idle" && !breakReady;
-  const timerLabel = state.timer.running ? "暫停"
-    : state.timer.phase === "focus" ? "繼續專注"
-    : timerActive ? "繼續休息" : "開始專注";
   const audioLabel = audio.on ? "關閉環境音" : "開啟環境音";
   return (
     <main
@@ -320,63 +381,10 @@ function App() {
           pickerOpen={picker}
         />
       </section>
+      <PomodoroHud onCommand={timerCommand} previewSound={previewTimerSound} />
       {!pet && (
         <>
           {window.desktop && <div className="window-drag" />}
-          <section className="focus-hud" aria-label="番茄鐘">
-            <div className="time-card">
-              {state.timer.phase === "idle" ? (
-                <TimerInput minutes={minutes} onChange={setMinutes} />
-              ) : (
-                <span className="time" role="timer" aria-label="剩餘時間">{display}</span>
-              )}
-              {breakReady && (
-                <button className="timer-break" onClick={() => begin("break")}>
-                  開始休息
-                </button>
-              )}
-              {timerActive && (
-                <button
-                  className="timer-reset control-tooltip"
-                  aria-label="重新開始"
-                  data-tooltip="重新開始"
-                  onClick={() => {
-                    state.setTimer({
-                      ...initialTimer,
-                      remaining: Math.round(minutes * 60_000),
-                      completed: state.timer.completed,
-                    });
-                    setNotice("");
-                  }}
-                >
-                  <Icon name="reset" />
-                </button>
-              )}
-            </div>
-            <div className="timer-buttons">
-              <button
-                className="round-control control-tooltip"
-                aria-label={timerLabel}
-                data-tooltip={timerLabel}
-                onClick={() => {
-                  if (state.timer.running) state.setTimer(pause(state.timer, Date.now()));
-                  else if (timerActive) state.setTimer(resume(state.timer, Date.now()));
-                  else begin();
-                }}
-              >
-                <Icon name={state.timer.running ? "pause" : "play"} />
-              </button>
-              <button
-                className="round-control control-tooltip"
-                aria-label="安靜陪我"
-                aria-pressed={state.silent}
-                data-tooltip={state.silent ? "已開啟安靜陪伴" : "安靜陪我"}
-                onClick={() => state.setSilent(!state.silent)}
-              >
-                <Icon name={state.silent ? "bell-off" : "bell"} />
-              </button>
-            </div>
-          </section>
           <nav className="scene-tools" aria-label="陪伴設定">
             <button
               className="round-control control-tooltip"
@@ -390,6 +398,7 @@ function App() {
             <button
               className="round-control control-tooltip"
               aria-label={audioLabel}
+              data-planet-audio
               data-tooltip={audioLabel}
               aria-pressed={audio.on}
               onClick={() => void audio.toggle()}
@@ -473,7 +482,7 @@ function App() {
       {pet && (
         <>
           <div className="pet-handle" title="拖曳這裡移動桌寵">
-            <Icon name="move" /> {selected.name} <span>{display}</span>
+            <Icon name="move" /> {selected.name}
           </div>
           <div className="pet-controls">
             <button onClick={() => setPicker(!picker)} aria-label="更換角色">
@@ -504,7 +513,7 @@ function App() {
           </div>
         </>
       )}
-      {notice && !state.silent && (
+      {notice && (
         <div className="notice" role="status">
           <Icon name="leaf" /> {notice}
           <button aria-label="關閉提示" onClick={() => setNotice("")}>
