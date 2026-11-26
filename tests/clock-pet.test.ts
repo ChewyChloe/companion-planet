@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { BufferAttribute, BufferGeometry, DoubleSide, Mesh, MeshBasicMaterial, Raycaster, Vector3 } from "three";
 import { expect, it } from "vitest";
-import { clockPath, clockRingLift, clockCenterY, fullClockLap } from "../src/pip/clock-path";
+import { clockPath, clockRingLift, clockCenterY, fullClockLap, nextClockStop } from "../src/pip/clock-path";
 
 it("keeps the floating resident's ring route supported by the supplied GLB", () => {
   const bytes = readFileSync("public/models/pip/clock-planet.glb");
@@ -36,4 +36,16 @@ it("keeps the floating resident's ring route supported by the supplied GLB", () 
   expect(clockPath(fullClockLap / 4).x).toBeLessThan(-.33);
   expect(clockPath(fullClockLap / 2).y).toBeLessThan(.08);
   expect(clockPath(fullClockLap * .75).x).toBeGreaterThan(.33);
+});
+
+it("varies the resident's walking distance while keeping stops away from the outer ring", () => {
+  expect(nextClockStop(0, () => 0)).not.toBe(nextClockStop(0, () => .99));
+  for (let angle = -1; angle < 20; angle += .19) {
+    for (const roll of [0, .16, .42, .77, .99]) {
+      const stop = nextClockStop(angle, () => roll);
+      expect(stop - angle).toBeGreaterThanOrEqual(1.65 - 1e-8);
+      expect(stop - angle).toBeLessThan(4.6);
+      expect(clockRingLift(stop)).toBe(0);
+    }
+  }
 });

@@ -4,10 +4,9 @@ import { Group, Matrix4, MathUtils, Quaternion, Vector3 } from "three";
 import SculptCharacter from "../art/SculptCharacter";
 import type { Action } from "../domain";
 import { useWorld } from "../store";
-import { clockPath, clockRingLift, fullClockLap } from "./clock-path";
+import { clockPath, clockRingLift, fullClockLap, nextClockStop } from "./clock-path";
 
 const startAngle = -.16;
-const stops = [.67, 1.37, 2.49, 3.4, 4.15, 5.35, 6.12];
 const messages = [
   "走累了就一起歇一下吧",
   "我在這裡陪你～",
@@ -23,7 +22,7 @@ export function ClockResident({ celebration, bubble, onSay }: {
   const resident = useRef<Group>(null);
   const time = useRef(0);
   const gait = useRef(0);
-  const orbit = useRef({ angle: startAngle, nextStop: stops[0], pause: 0, stop: 0 });
+  const orbit = useRef({ angle: startAngle, nextStop: startAngle, pause: 0, pauseLength: 1, talk: false, stop: 0 });
   const seat = useRef(0);
   const cheer = useRef({ event: celebration, remaining: 0 });
   const [pose, setPose] = useState<Action>("idle");
@@ -45,21 +44,27 @@ export function ClockResident({ celebration, bubble, onSay }: {
     const loop = orbit.current;
     if (cheer.current.event !== celebration) cheer.current = { event: celebration, remaining: 1.6 };
 
+    if (loop.nextStop === startAngle) loop.nextStop = nextClockStop(loop.angle);
     const before = clockPath(loop.angle);
-    const talkStop = !silent && !focus && loop.stop % 3 === 0 && before.upY > -.4;
     const stride = focus || reduced ? .32 : .47;
     let target: Action = "walk";
     if (cheer.current.remaining > 0) {
       cheer.current.remaining -= dt;
       target = reduced ? "idle" : "happy";
     } else if (loop.angle >= loop.nextStop) {
+      if (loop.pause === 0) {
+        loop.pauseLength = .8 + Math.random() * .9;
+        loop.talk = !silent && !focus && before.upY > -.4 && Math.random() < .4;
+      }
       loop.pause += dt;
-      const pauseLength = focus ? 4.4 : talkStop ? 3.8 : 1.7 + loop.stop % 3 * .55;
-      target = loop.pause < (talkStop ? 3.1 : 1.3) ? "idle" : resting ? "rest" : "read";
+      const speaks = loop.talk && !silent && !focus;
+      const pauseLength = speaks ? 2.35 : loop.pauseLength;
+      target = !speaks && loop.pause > .85 ? resting ? "rest" : "read" : "idle";
       if (loop.pause >= pauseLength) {
         loop.stop++;
-        loop.nextStop = Math.floor(loop.stop / stops.length) * fullClockLap + stops[loop.stop % stops.length];
+        loop.nextStop = nextClockStop(loop.angle);
         loop.pause = 0;
+        loop.talk = false;
         target = "walk";
       }
     }
@@ -92,8 +97,8 @@ export function ClockResident({ celebration, bubble, onSay }: {
     facing.setFromRotationMatrix(basis.makeBasis(right, up, forward));
     actor.quaternion.slerp(facing, 1 - Math.exp(-dt * 13));
 
-    const line = talkStop && target === "idle" && loop.pause > .45
-      ? messages[Math.floor(loop.stop / 3) % messages.length] : "";
+    const line = loop.talk && !silent && !focus && target === "idle" && loop.pause > .35
+      ? messages[loop.stop % messages.length] : "";
     if (line !== activeLine.current) {
       activeLine.current = line;
       onSay(line);

@@ -7,6 +7,8 @@ const radii = [
   .3593,.3594,.3594,.3590,.3581,.3579,.3572,.3577,.3591,.3617,.3651,.3684,.3727,.3776,.3833,.3864,
 ];
 export const fullClockLap = Math.PI * 2;
+const crossings = [[2.012, .176], [4.777, .158]] as const;
+const crossingHalfWidth = .43;
 
 export function clockPath(angle: number) {
   const sample = ((angle % fullClockLap + fullClockLap) % fullClockLap) / fullClockLap * radii.length;
@@ -32,5 +34,17 @@ export function clockRingLift(angle: number) {
     const t = Math.max(0, Math.min(1, (Math.abs(phase - center) - .14) / .29));
     return height * (1 - t * t * (3 - 2 * t));
   };
-  return Math.max(crossing(2.012, .176), crossing(4.777, .158));
+  return Math.max(...crossings.map(([center, height]) => crossing(center, height)));
+}
+
+export function nextClockStop(angle: number, random = Math.random) {
+  const distance = random();
+  const candidate = angle + 1.65 + distance * 1.7;
+  const phase = ((candidate % fullClockLap) + fullClockLap) % fullClockLap;
+  for (const [center] of crossings) {
+    if (Math.abs(phase - center) <= crossingHalfWidth + .06) {
+      return candidate + center - phase + crossingHalfWidth + .10 + distance * .18;
+    }
+  }
+  return candidate;
 }
