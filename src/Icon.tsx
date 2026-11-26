@@ -8,6 +8,13 @@ type Name =
   | "bell-off"
   | "settings"
   | "sliders"
+  | "skip"
+  | "star"
+  | "sunrise"
+  | "bolt"
+  | "monitor"
+  | "minus"
+  | "plus"
   | "arrow"
   | "pause"
   | "play"
@@ -35,6 +42,13 @@ const paths: Record<Name, string[]> = {
   bell: ["M18 8a6 6 0 0 0-12 0c0 5-2 6-2 8h16c0-2-2-3-2-8", "M10 20a2 2 0 0 0 4 0"],
   "bell-off": ["M9 4a6 6 0 0 1 9 5v.5c0 2 .4 3.4 1 4.5M6.5 6.5A6 6 0 0 0 6 9c0 4-2 5-2 7h12", "M10 20a2 2 0 0 0 4 0M3 3l18 18"],
   sliders: ["M4 7h5m4 0h7M4 17h9m4 0h3","M9 4v6m8 4v6"],
+  skip: ["m5 7 7 5-7 5Zm7 0 7 5-7 5Z"],
+  star: ["m12 3 2.7 5.7 6.3.8-4.6 4.5 1.1 6.3-5.5-3-5.5 3 1.1-6.3L3 9.5l6.3-.8L12 3Z"],
+  sunrise: ["M3 17h18M6 14a6 6 0 0 1 12 0m-6-9V3M5 8 3 6m16 2 2-2"],
+  bolt: ["m13 2-8 12h6l-1 8 9-12h-6l1-8Z"],
+  monitor: ["M3 4h18v13H3zM12 17v3m-4 1h8"],
+  minus: ["M5 12h14"],
+  plus: ["M5 12h14m-7-7v14"],
   settings: [
     "M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8",
     "M12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2",

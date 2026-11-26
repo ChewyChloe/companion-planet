@@ -51,9 +51,9 @@ test("desktop shares state, transparent topmost pet switches back and quits", as
     await seconds.fill("35");
     await seconds.press("Enter");
     await expect(seconds).toHaveValue("35");
-    await page.getByRole("button", { name: "番茄鐘設定與紀錄" }).click();
+    await page.getByRole("button", { name: "星球鐘設定與紀錄" }).click();
     await expect(page.getByRole("region", { name: "計時設定與紀錄" })).toBeVisible();
-    await page.getByRole("button", { name: "番茄鐘設定與紀錄" }).click();
+    await page.getByRole("button", { name: "星球鐘設定與紀錄" }).click();
     await page.getByRole("button", { name: "繼續專注" }).click();
     expect(config.top).toBe(true);
     expect(config.bounds.width).toBe(320);
