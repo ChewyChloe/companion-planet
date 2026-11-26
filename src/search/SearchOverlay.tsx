@@ -9,6 +9,16 @@ export function SearchOverlay({ state, trigger, dialog }: {
 }) {
   const { phase, close } = state;
   const [query, setQuery] = useState("");
+  const [submitted, setSubmitted] = useState("");
+  const resultLink = useRef<HTMLAnchorElement>(null);
+  const canUseSidebar = () => window.matchMedia("(pointer: fine)").matches || Boolean(window.desktop);
+  const dismissSidebar = () => {
+    setSubmitted("");
+    input.current?.focus({ preventScroll: true });
+  };
+  useEffect(() => {
+    if (submitted) resultLink.current?.focus({ preventScroll: true });
+  }, [submitted]);
   const input = useRef<HTMLInputElement>(null);
   const composing = useRef(false);
   const involved = useRef(false);
@@ -26,6 +36,7 @@ export function SearchOverlay({ state, trigger, dialog }: {
     if (phase === "closed" && involved.current) {
       involved.current = false;
       setQuery("");
+      setSubmitted("");
       trigger.current?.focus({ preventScroll: true });
     }
   }, [phase, trigger, dialog]);
@@ -35,6 +46,7 @@ export function SearchOverlay({ state, trigger, dialog }: {
     <div
       className="search-planet-overlay"
       data-phase={phase}
+      data-sidebar={controlsVisible && !!submitted}
       role="dialog"
       aria-modal="true"
       aria-label="搜尋星球"
@@ -44,7 +56,8 @@ export function SearchOverlay({ state, trigger, dialog }: {
       onKeyDown={(event) => {
         if (event.key === "Escape" && !event.nativeEvent.isComposing) {
           event.stopPropagation();
-          close();
+          if (submitted && controlsVisible) dismissSidebar();
+          else close();
         }
         if (event.key !== "Tab") return;
         const items = [...event.currentTarget.querySelectorAll<HTMLElement>("button:not(:disabled), input:not(:disabled), a, [tabindex='0']")];
@@ -70,9 +83,9 @@ export function SearchOverlay({ state, trigger, dialog }: {
           target="_blank" rel="noopener noreferrer" onSubmit={(event) => {
             if (composing.current || !query.trim()) {
               event.preventDefault();
-            } else if (window.desktop?.searchGoogle) {
+            } else if (canUseSidebar()) {
               event.preventDefault();
-              window.desktop.searchGoogle(query);
+              setSubmitted(query.trim());
             }
           }}>
           <input ref={input} type="search" name="q" aria-label="Google 搜尋關鍵字" placeholder="用 Google 搜尋"
@@ -81,8 +94,26 @@ export function SearchOverlay({ state, trigger, dialog }: {
             onCompositionEnd={() => { composing.current = false; }}
             onKeyDown={(event) => { if (event.key === "Enter" && event.nativeEvent.isComposing) event.preventDefault(); }}
           />
-          <button type="submit" aria-label="在新分頁開啟 Google 搜尋" disabled={!query.trim()} />
+          <button type="submit" aria-label="搜尋 Google" disabled={!query.trim()} />
         </form>
+        {submitted && (
+          <aside className="search-planet-sidebar" aria-labelledby="search-planet-sidebar-heading">
+            <header>
+              <h2 id="search-planet-sidebar-heading">Google 搜尋</h2>
+              <button className="search-planet-sidebar-dismiss" type="button" aria-label="關閉搜尋側欄" onClick={dismissSidebar}>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+              </button>
+            </header>
+            <p className="search-planet-submitted">{submitted}</p>
+            <a ref={resultLink} href={`https://www.google.com/search?${new URLSearchParams({ q: submitted })}`}
+              target="_blank" rel="noopener noreferrer" onClick={(event) => {
+                if (window.desktop?.searchGoogle) {
+                  event.preventDefault();
+                  window.desktop.searchGoogle(submitted);
+                }
+              }}>在 Google 查看結果 <span aria-hidden="true">↗</span></a>
+          </aside>
+        )}
       </div>
     </div>
   );

@@ -36,6 +36,8 @@ export function SearchPlanet3D({ state, reduced, paused, onReady, overlay }: {
   const bar = useRef<Group>(null);
   const veilMaterial = useRef<MeshBasicMaterial>(null);
   const progress = useRef(0);
+  const stageX = useRef(0);
+  const motionPreference = useMemo(() => window.matchMedia("(prefers-reduced-motion: reduce)"), []);
   const ready = useRef(false);
   const barError = useRef<Group>(null);
 
@@ -59,7 +61,8 @@ export function SearchPlanet3D({ state, reduced, paused, onReady, overlay }: {
     const { phase } = state;
     if (phase === "opening" && barError.current) state.close();
     const target = phase === "closed" || phase === "closing" ? 0 : 1;
-    const duration = reduced ? .28 : 1.32;
+    const limitMotion = reduced || motionPreference.matches;
+    const duration = limitMotion ? .28 : target ? 2 : 1.3;
     progress.current = MathUtils.clamp(progress.current + (target ? 1 : -1) * Math.min(delta, .12) / duration, 0, searchBar ? 1 : .59);
     const { travel, shell, bar: deploy, veil } = searchMotion(progress.current);
     const viewport = window.visualViewport;
@@ -69,10 +72,15 @@ export function SearchPlanet3D({ state, reduced, paused, onReady, overlay }: {
     const planetY = viewCenterY - visibleHeight * .31;
     const panelY = viewCenterY - visibleHeight * .61;
 
-    planet.position.set(MathUtils.lerp(width * (searchPlanetSlot[0] / 100 - .5), 0, travel),
+    const controls = overlay.current;
+    const sidebarOpen = controls?.dataset.sidebar === "true";
+    const offset = sidebarOpen && width >= 780 ? -Math.min(152, width * .17) : 0;
+    stageX.current = limitMotion ? offset : MathUtils.damp(stageX.current, offset, 10, Math.min(delta, .12));
+
+    planet.position.set(MathUtils.lerp(width * (searchPlanetSlot[0] / 100 - .5), stageX.current, travel),
       MathUtils.lerp(height * (.5 - searchPlanetSlot[1] / 100), planetY, travel), 0);
     planet.scale.setScalar(MathUtils.lerp(74, planetSize, travel));
-    planet.rotation.y = reduced ? 0 : (1 - travel) * Math.sin(clock.elapsedTime * .65) * .15 + travel * -.11;
+    planet.rotation.y = limitMotion ? 0 : (1 - travel) * Math.sin(clock.elapsedTime * .65) * .15 + travel * -.11;
     if (upper) {
       upper.position.y = shell * .32;
       upper.rotation.z = shell * -.12;
@@ -82,10 +90,10 @@ export function SearchPlanet3D({ state, reduced, paused, onReady, overlay }: {
     const panelWidth = Math.min(470, width * .86, visibleHeight * 1.08);
     if (searchBar) {
       searchBar.visible = deploy > 0;
-      searchBar.position.set(0, MathUtils.lerp(planetY, panelY, deploy), 300);
+      searchBar.position.set(stageX.current, MathUtils.lerp(planetY, panelY, deploy), 300);
       searchBar.scale.setScalar(Math.max(.001, panelWidth * deploy));
-      searchBar.rotation.set(MathUtils.lerp(-.36, -.12, deploy), MathUtils.lerp(-.26, -.08, deploy), -.025);
-      const controls = overlay.current;
+      const yaw = limitMotion || !target ? -.08 : -.08 + 2 * Math.PI * (deploy - 1);
+      searchBar.rotation.set(MathUtils.lerp(-.36, -.12, deploy), yaw, -.025);
       if (controls && phase === "open") {
         searchBar.updateMatrixWorld(true);
         const form = controls.querySelector<HTMLFormElement>("form");
@@ -99,7 +107,7 @@ export function SearchPlanet3D({ state, reduced, paused, onReady, overlay }: {
         }
         const close = controls.querySelector<HTMLButtonElement>(".search-planet-close");
         if (close) {
-          close.style.left = `${width / 2 + panelWidth * .41}px`;
+          close.style.left = `${width / 2 + stageX.current + panelWidth * .41}px`;
           close.style.top = `${height / 2 - panelY - panelWidth * .21}px`;
         }
       }
