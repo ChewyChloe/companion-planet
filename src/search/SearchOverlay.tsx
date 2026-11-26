@@ -1,14 +1,7 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 import type { SearchPlanetState } from "./useSearchPlanetState";
-import { openNativeSearchSplit, type NativeSplitResult } from "./native-split";
+import { googleSearchUrl, openSearchWindow } from "./open-search-window";
 import "./search.css";
-
-const splitHelp = {
-  "extension-unavailable": "搜尋擴充套件未連線",
-  unsupported: "此瀏覽器版本未開放自動分割",
-  occupied: "目前的分割畫面已在使用中",
-  failed: "瀏覽器無法開啟分割畫面",
-} satisfies Record<Exclude<NativeSplitResult, "opened">, string>;
 
 export function SearchOverlay({ state, trigger, dialog }: {
   state: SearchPlanetState;
@@ -17,10 +10,7 @@ export function SearchOverlay({ state, trigger, dialog }: {
 }) {
   const { phase, close } = state;
   const [query, setQuery] = useState("");
-  const [fallback, setFallback] = useState<{ query: string; reason: Exclude<NativeSplitResult, "opened"> } | null>(null);
-  const [openingSplit, setOpeningSplit] = useState(false);
-  const pendingSplit = useRef(false);
-  const useDesktopSearch = () => window.matchMedia("(pointer: fine)").matches || Boolean(window.desktop);
+  const [blockedUrl, setBlockedUrl] = useState("");
   const input = useRef<HTMLInputElement>(null);
   const composing = useRef(false);
   const involved = useRef(false);
@@ -38,29 +28,10 @@ export function SearchOverlay({ state, trigger, dialog }: {
     if (phase === "closed" && involved.current) {
       involved.current = false;
       setQuery("");
-      setFallback(null);
+      setBlockedUrl("");
       trigger.current?.focus({ preventScroll: true });
     }
   }, [phase, trigger, dialog]);
-
-  async function submitDesktop(value: string) {
-    if (pendingSplit.current) return;
-    if (window.desktop) {
-      setFallback({ query: value, reason: "unsupported" });
-      return;
-    }
-    pendingSplit.current = true;
-    setOpeningSplit(true);
-    setFallback(null);
-    try {
-      const result = await openNativeSearchSplit(value).catch(() => "failed" as const);
-      if (dialog.current?.dataset.phase !== "open") return;
-      if (result !== "opened") setFallback({ query: value, reason: result });
-    } finally {
-      pendingSplit.current = false;
-      setOpeningSplit(false);
-    }
-  }
 
   if (phase === "closed") return null;
   return (
@@ -102,9 +73,13 @@ export function SearchOverlay({ state, trigger, dialog }: {
           target="_blank" rel="noopener noreferrer" onSubmit={(event) => {
             if (composing.current || !query.trim()) {
               event.preventDefault();
-            } else if (useDesktopSearch()) {
+            } else if (window.desktop) {
               event.preventDefault();
-              void submitDesktop(query.trim());
+              window.desktop.searchGoogle(query.trim());
+            } else if (window.matchMedia("(pointer: fine)").matches) {
+              event.preventDefault();
+              const url = googleSearchUrl(query.trim());
+              setBlockedUrl(openSearchWindow(url) ? "" : url);
             }
           }}>
           <input ref={input} type="search" name="q" aria-label="Google 搜尋關鍵字" placeholder="搜尋"
@@ -113,18 +88,12 @@ export function SearchOverlay({ state, trigger, dialog }: {
             onCompositionEnd={() => { composing.current = false; }}
             onKeyDown={(event) => { if (event.key === "Enter" && event.nativeEvent.isComposing) event.preventDefault(); }}
           />
-          <button type="submit" aria-label="搜尋 Google" disabled={!query.trim() || openingSplit} />
+          <button type="submit" aria-label="搜尋 Google" disabled={!query.trim()} />
         </form>
-        {openingSplit && <span className="search-planet-status" role="status">正在開啟右側分割搜尋…</span>}
-        {fallback && (
-          <div className="search-split-fallback">
-            <span role="status">{splitHelp[fallback.reason]}</span>
-            <a href={`https://www.google.com/search?${new URLSearchParams({ q: fallback.query })}`}
-              target="_blank" rel="noopener noreferrer" onClick={(event) => {
-                if (!window.desktop) return;
-                event.preventDefault();
-                window.desktop.searchGoogle(fallback.query);
-              }}>在 Google 查看「{fallback.query}」</a>
+        {blockedUrl && (
+          <div className="search-window-fallback">
+            <span role="status">瀏覽器阻擋了搜尋視窗</span>
+            <a href={blockedUrl} target="_blank" rel="noopener noreferrer">在 Google 查看結果</a>
           </div>
         )}
       </div>

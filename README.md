@@ -36,12 +36,6 @@ npm run dev
 
 聊天支援相容 OpenAI Chat Completions 的服務。在本機專案的 `.env` 或 Render 的 **Environment** 設定 `LLM_API_KEY`、`LLM_BASE_URL` 和 `LLM_MODEL`。金鑰只由後端讀取。未設定金鑰或模型服務失敗時，聊天會使用本機備援台詞。
 
-## Chrome 右側分割搜尋
+## Google 搜尋
 
-桌機 Chrome 156 以上若提供原生分割 API，可透過[同頻星球分割搜尋擴充套件](extensions/search-split)使用。
-
-1. 下載並解壓縮專案，保留 `extensions/search-split` 資料夾。
-2. 開啟 `chrome://extensions`，啟用「開發人員模式」，選擇「載入未封裝項目」，指定該資料夾。
-3. 重新整理[同頻星球正式網站](https://companion-planet.onrender.com)，開啟搜尋星球並按 Enter 或點放大鏡。
-
-星球會留在左側，Google 結果在右側開啟。再次搜尋會更新同一個右側分頁。擴充套件只接收正式網站主頁面的搜尋請求，直接把搜尋字詞送往 Google。若瀏覽器尚未支援分割 API，或目前視窗已有其他分割組合，仍可用站內的 Google 搜尋連結。
+在桌機上開啟搜尋星球，按 Enter 或點放大鏡即可開啟 Google 結果。網站會請求使用獨立視窗，並放在螢幕右側。實際位置和是否另開視窗由瀏覽器決定。若彈出視窗被阻擋，可使用搜尋框下方的 Google 連結。手機版直接開啟 Google 搜尋頁面。
