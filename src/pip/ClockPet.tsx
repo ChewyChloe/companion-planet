@@ -11,12 +11,21 @@ import { ClockResident } from "./ClockResident";
 function WindowFrames({ host, surface }: { host: Window; surface: RefObject<HTMLElement | null> }) {
   const advance = useThree(state => state.advance);
   const setSize = useThree(state => state.setSize);
+  const get = useThree(state => state.get);
   useLayoutEffect(() => {
     // The PiP document can resize independently from the opener's Canvas observer.
     const resize = () => {
       if (!surface.current) return;
       const { width, height, top, left } = surface.current.getBoundingClientRect();
-      if (width && height) setSize(width, height, top, left);
+      const { size, gl } = get();
+      if (!width || !height) return;
+      const dpr = gl.getPixelRatio();
+      if (width !== size.width || height !== size.height || top !== size.top || left !== size.left) {
+        setSize(width, height, top, left);
+      }
+      if (gl.domElement.width !== Math.floor(width * dpr) || gl.domElement.height !== Math.floor(height * dpr)) {
+        gl.setSize(width, height, false);
+      }
     };
     resize();
     host.addEventListener("resize", resize);
@@ -27,6 +36,8 @@ function WindowFrames({ host, surface }: { host: Window; surface: RefObject<HTML
       const interval = now - previous;
       if (interval >= 31) {
         previous = now;
+        // The opener's ResizeObserver can report a stale size after the child is moved or zoomed.
+        resize();
         elapsed += Math.min(interval, 70) / 1000;
         advance(elapsed, false);
       }
@@ -37,22 +48,27 @@ function WindowFrames({ host, surface }: { host: Window; surface: RefObject<HTML
       host.removeEventListener("resize", resize);
       host.cancelAnimationFrame(handle);
     };
-  }, [advance, host, setSize, surface]);
+  }, [advance, get, host, setSize, surface]);
   return null;
 }
 
-function ClockCamera({ face }: { face: RefObject<HTMLDivElement | null> }) {
-  const camera = useThree(state => state.camera);
-  const { width, height } = useThree(state => state.size);
+function ClockCamera({ face, surface }: { face: RefObject<HTMLDivElement | null>; surface: RefObject<HTMLElement | null> }) {
   const marker = useMemo(() => new Vector3(), []);
-  useLayoutEffect(() => {
-    if (!(camera instanceof OrthographicCamera) || !height || !width) return;
+  useFrame(({ camera, gl }) => {
+    if (!(camera instanceof OrthographicCamera) || !surface.current) return;
+    const { width, height } = surface.current.getBoundingClientRect();
+    if (!width || !height) return;
     const framing = Math.max(1.28, 1.10 * height / width);
-    camera.zoom = height / framing;
+    // Set the frustum directly from the visible PiP viewport, independently of R3F's auto-fit.
+    camera.left = -framing * width / height / 2;
+    camera.right = -camera.left;
+    camera.top = framing / 2;
+    camera.bottom = -camera.top;
+    camera.zoom = 1;
     camera.lookAt(0, .48, 0);
+    camera.updateMatrixWorld();
     camera.updateProjectionMatrix();
-  }, [camera, width, height]);
-  useFrame(() => {
+    gl.setViewport(0, 0, width, height);
     if (!face.current) return;
     marker.set(0, .424, .42).project(camera);
     face.current.style.left = `${(marker.x + 1) * 50}%`;
@@ -82,7 +98,7 @@ export function ClockPet({ host, face, celebration, onCommand, onReturn }: {
           dpr={[1, 1.5]} frameloop="never" gl={{ alpha: true, antialias: true }}
           fallback={<div className="clock-pet-load" role="status">這個裝置無法顯示 3D 星球</div>}>
           <WindowFrames host={host} surface={surface} />
-          <ClockCamera face={face} />
+          <ClockCamera face={face} surface={surface} />
           <hemisphereLight args={["#fff4ff", "#b0a3cf", 2]} />
           <directionalLight position={[-2, 4, 3]} intensity={1.55} color="#fff0d6" />
           <directionalLight position={[2, 1, -1]} intensity={.8} color="#d1dfff" />

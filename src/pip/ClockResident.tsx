@@ -9,7 +9,7 @@ import { clockPath } from "./clock-path";
 
 export function ClockResident({ celebration }: { celebration: number }) {
   const resident = useRef<Group>(null);
-  const time = useRef(2);
+  const time = useRef(0);
   const gait = useRef(0);
   const angle = useRef(1.15);
   const seat = useRef(0);
@@ -25,8 +25,8 @@ export function ClockResident({ celebration }: { celebration: number }) {
     const focus = timer.running && timer.phase === "focus";
     const resting = timer.phase === "break";
     const cycle = time.current % (focus ? 27 : 20);
-    let target: Action = cycle < (focus ? 6 : 8) && !resting ? "walk" : cycle < 11 ? "idle" : "read";
-    if (!focus && resting) target = cycle < 5 ? "rest" : "read";
+    let target: Action = cycle < (focus ? 6 : 9) ? "walk" : cycle < 11 ? "idle" : "read";
+    if (resting && cycle >= 14) target = "rest";
     if (!focus && !silent && !reduced && cycle > 10 && cycle < 11.5) target = "stretch";
     if (cheer.current.event !== celebration) {
       cheer.current = { event: celebration, remaining: 1.6 };
@@ -40,7 +40,7 @@ export function ClockResident({ celebration }: { celebration: number }) {
       setPose(target);
     }
     const before = clockPath(angle.current);
-    if (target === "walk") angle.current += dt * (focus || reduced ? .55 : .93);
+    if (target === "walk") angle.current += dt * (focus || reduced ? .55 : resting ? .82 : .93);
     const point = clockPath(angle.current);
     const travelled = Math.hypot(point.x - before.x, point.z - before.z);
     gait.current += travelled / .115 * (Math.PI * 2 / 7.1);

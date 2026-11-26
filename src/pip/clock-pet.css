@@ -104,3 +104,9 @@
 @media (hover: none) and (pointer: coarse) {
   .clock-pet-launch { display: none; }
 }
+
+.clock-pet canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
