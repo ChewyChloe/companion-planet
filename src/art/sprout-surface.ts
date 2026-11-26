@@ -1,4 +1,40 @@
-import { BufferAttribute, type MeshStandardMaterial, type SkinnedMesh } from "three";
+import { BufferAttribute, MathUtils, type MeshStandardMaterial, type SkinnedMesh } from "three";
+
+export function limitRaisedHandWeights(mesh: SkinnedMesh) {
+  if (mesh.geometry.userData.sproutHandLimited) return;
+  const hand = mesh.skeleton.bones.findIndex(bone => bone.name === "arm_neg");
+  const body = mesh.skeleton.bones.findIndex(bone => bone.name === "body");
+  if (hand < 0 || body < 0) return;
+  const { position, skinIndex, skinWeight } = mesh.geometry.attributes;
+  for (let i = 0; i < position.count; i++) {
+    const mask = MathUtils.smoothstep(-position.getX(i), .14, .235)
+      * MathUtils.smoothstep(position.getY(i), .20, .275);
+    for (let slot = 0; slot < 4; slot++) {
+      if (skinIndex.getComponent(i, slot) !== hand) continue;
+      const original = skinWeight.getComponent(i, slot);
+      if (!original) continue;
+      const other = 1 - original;
+      if (other < .0001) {
+        if (mask < 1) {
+          const spare = (slot + 1) % 4;
+          skinIndex.setComponent(i, spare, body);
+          skinWeight.setComponent(i, slot, mask);
+          skinWeight.setComponent(i, spare, 1 - mask);
+        }
+      } else {
+        const transfer = (1 - original * mask) / other;
+        for (let joint = 0; joint < 4; joint++) {
+          const weight = skinWeight.getComponent(i, joint);
+          skinWeight.setComponent(i, joint, weight * (joint === slot ? mask : transfer));
+        }
+      }
+      break;
+    }
+  }
+  skinIndex.needsUpdate = true;
+  skinWeight.needsUpdate = true;
+  mesh.geometry.userData.sproutHandLimited = true;
+}
 
 export function starWeights(mesh: SkinnedMesh) {
   if (mesh.geometry.hasAttribute("sproutStar")) return;

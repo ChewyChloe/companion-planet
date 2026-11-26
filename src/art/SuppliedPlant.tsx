@@ -7,7 +7,7 @@ import { useWorld } from "../store";
 import type { Action } from "../domain";
 import { blendPose, neutralPose, poseFor } from "./character-animation";
 
-import { sproutSurface, starWeights } from "./sprout-surface";
+import { limitRaisedHandWeights, sproutSurface, starWeights } from "./sprout-surface";
 const leafChains = [
   ["sprout.1", "sprout.2", "sprout.3"],
   ["branch.L.1", "branch.L.2", "branch.L.3"],
@@ -31,6 +31,7 @@ export function SuppliedPlant({ id, action, still, held, time, gaitTime, seatBle
   const { gl } = useThree();
   const pose = useRef({ ...neutralPose });
   const seated = useRef(0);
+  const greeting = useRef({ active: false, elapsed: 0 });
   const leafPhase = useRef(0);
   const surface = useMemo(() => ({ star: { value: .23 }, eyes: { value: 1 }, smile: { value: 0 } }), []);
   const face = useRef({ eyes: 1, mouth: 1, width: 1 });
@@ -52,7 +53,10 @@ export function SuppliedPlant({ id, action, still, held, time, gaitTime, seatBle
         object.castShadow = true;
         object.receiveShadow = true;
         object.frustumCulled = false;
-        if (sprout) starWeights(object);
+        if (sprout) {
+          limitRaisedHandWeights(object);
+          starWeights(object);
+        }
         const soften = (source: Material) => {
           if (!(source instanceof MeshStandardMaterial)) return source;
           const material = source.clone();
@@ -87,6 +91,14 @@ export function SuppliedPlant({ id, action, still, held, time, gaitTime, seatBle
     const p = blendPose(pose.current, target, dt);
     seated.current = MathUtils.damp(seated.current, action === "read" && !pet && !grabbed ? seatBlend?.current ?? 0 : 0, 10, dt);
     const sit = seated.current;
+    const waving = sprout && !still && !grabbed && action === "happy";
+    const wave = greeting.current;
+    if (waving && !wave.active) wave.elapsed = 0;
+    wave.active = waving;
+    wave.elapsed += dt;
+    const raised = waving
+      ? MathUtils.smoothstep(wave.elapsed, 0, .22) * (1 - MathUtils.smoothstep(wave.elapsed, .50, 1.12))
+      : 0;
 
     const turn = (name: string, x: number, y: number, z: number) => {
       const joint = asset.joints.get(PropertyBinding.sanitizeNodeName(name));
@@ -113,9 +125,11 @@ export function SuppliedPlant({ id, action, still, held, time, gaitTime, seatBle
       const arm = sprout ? index === 0 ? "arm_pos" : "arm_neg" : `arm.${side}`;
       const foot = sprout ? index === 0 ? "foot_pos" : "foot_neg" : `foot.${side}`;
       if (sprout) {
-        // These joints have weights on the torso. Keep the original arm
-        // silhouette and let the existing hands swing gently fore and aft.
-        turn(arm, 0, 0, swing * .30 + p.armForward * .28 + .055 * sit);
+        // The uploaded bind pose already has arm_neg raised. Relax that
+        // shoulder between greetings and restore its authored pose briefly.
+        const relaxed = arm === "arm_neg" ? 1 - raised : 0;
+        turn(arm, .56 * relaxed, 0, swing * .30 + p.armForward * .28 + .055 * sit);
+        if (arm === "arm_neg") move(arm, 0, -.042 * relaxed);
       } else {
         turn(arm, sign * (p.armRaise * .58 + .06 * sit), 0, swing * 1.10 + p.armForward * .55 + .13 * sit);
         move(arm, swing * .135, Math.abs(swing) * .035);
