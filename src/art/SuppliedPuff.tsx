@@ -6,11 +6,11 @@ import type { Action } from "../domain";
 import { useWorld } from "../store";
 import { blendPose, neutralPose, poseFor } from "./character-animation";
 
-const path = "models/user-residents/puff.glb";
+const path = "models/user-residents/puff.glb?v=soft-joins-2";
 const stem = new Vector3(.052, .746, 0);
 const crownParts = [0, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 const seedCount = 24;
-const nextBreeze = () => MathUtils.randFloat(38, 65);
+const nextBreeze = () => MathUtils.randFloat(25, 45);
 
 export function SuppliedPuff({ action, time, gaitTime, still, held, seatBlend, pet, poseTime, floatingStage }: {
   action: Action;
@@ -46,6 +46,8 @@ export function SuppliedPuff({ action, time, gaitTime, still, held, seatBlend, p
       return mount(joint, part);
     };
     const arms = [limb("PuffLeftArm", 3, -.315, .351, .027), limb("PuffRightArm", 2, .313, .351, .020)];
+    arms[0].position.x += .014;
+    arms[1].position.x -= .014;
     const feet = [limb("PuffLeftFoot", 4, -.132, .086, -.027), limb("PuffRightFoot", 5, .136, .092, .024)];
     const head = new Group();
     head.name = "PuffDandelion";
@@ -62,7 +64,7 @@ export function SuppliedPuff({ action, time, gaitTime, still, held, seatBlend, p
       return { joint, base: joint.position.clone(), dx: Math.cos(angle), dz: Math.sin(angle) };
     });
     const face = find(1);
-    const blink = { value: 0 }, smile = { value: 0 };
+    const blink = { value: 0 }, smile = { value: 0 }, happy = { value: 0 };
     const materials: MeshStandardMaterial[] = [];
     model.traverse(object => {
       if (!(object instanceof Mesh) || !(object.material instanceof MeshStandardMaterial)) return;
@@ -70,29 +72,40 @@ export function SuppliedPuff({ action, time, gaitTime, still, held, seatBlend, p
       const material = object.material.clone();
       material.metalness = 0;
       material.roughness = .54;
+      if (!crownParts.some(part => object.name === `tripo_part_${part}`)) {
+        material.normalMap = null;
+        material.map = null;
+        material.color.set(object === face ? "#ffffff" : "#deb78d");
+      }
       object.material = material;
       materials.push(material);
       if (object !== face) return;
       material.onBeforeCompile = shader => {
-        Object.assign(shader.uniforms, { puffBlink: blink, puffSmile: smile });
+        Object.assign(shader.uniforms, { puffBlink: blink, puffSmile: smile, puffHappy: happy });
         shader.vertexShader = "varying vec3 puffSurface;\n" + shader.vertexShader.replace(
           "#include <begin_vertex>", "#include <begin_vertex>\npuffSurface = position;");
         shader.fragmentShader = `
           varying vec3 puffSurface;
           uniform float puffBlink;
           uniform float puffSmile;
+          uniform float puffHappy;
           float puffOval(vec2 p, vec2 r) {
             return 1.0 - smoothstep(.88, 1.0, length(p / r));
           }
           float puffEye(vec2 p, float close) {
             p.y -= close * .007 * (1.0 - pow(clamp(abs(p.x / .027), 0.0, 1.0), 2.0));
-            return puffOval(p, vec2(mix(.027,.024,close), mix(.032,.0035,close)));
+            vec2 openRadius = mix(vec2(.027,.032), vec2(.041), puffHappy);
+            return puffOval(p, mix(openRadius, vec2(.024,.0035), close));
           }
         ` + shader.fragmentShader.replace("#include <map_fragment>", `
           #include <map_fragment>
           vec2 face = puffSurface.xy;
           float front = smoothstep(.14,.20,puffSurface.z);
-          float close = max(puffBlink, puffSmile * .44);
+          float close = puffBlink * (1.0 - puffHappy);
+          vec3 fur = mix(vec3(.73,.49,.28), vec3(.91,.70,.46), smoothstep(.09,.64,puffSurface.y));
+          float blush = max(puffOval(face - vec2(-.181,.429),vec2(.047,.037)),
+            puffOval(face - vec2(.184,.426),vec2(.047,.037)));
+          diffuseColor.rgb = mix(fur,vec3(.90,.34,.19),front * blush * .38);
           vec2 left = face - vec2(-.111,.481);
           vec2 right = face - vec2(.114,.481);
           float eyes = front * max(puffEye(left,close), puffEye(right,close));
@@ -105,9 +118,9 @@ export function SuppliedPuff({ action, time, gaitTime, still, held, seatBlend, p
             front * puffOval(mouth,vec2(.037,mix(.006,.018,puffSmile))));
         `);
       };
-      material.customProgramCacheKey = () => "puff-animated-face";
+      material.customProgramCacheKey = () => "puff-round-eyes";
     });
-    return { model, arms, feet, head, crown, blink, smile, materials, center: bounds.getCenter(new Vector3()), floor: bounds.min.y };
+    return { model, arms, feet, head, crown, blink, smile, happy, materials, center: bounds.getCenter(new Vector3()), floor: bounds.min.y };
   }, [scene]);
   useEffect(() => () => asset.materials.forEach(material => material.dispose()), [asset]);
 
@@ -121,7 +134,8 @@ export function SuppliedPuff({ action, time, gaitTime, still, held, seatBlend, p
     const seated = !pet && movement === "read" ? seatBlend?.current ?? 0 : 0;
     if (body.current) {
       body.current.scale.set(1 / Math.sqrt(p.scaleY), p.scaleY, 1 / Math.sqrt(p.scaleY));
-      body.current.position.y = p.lift * .7 - seated * .028;
+      const extraHop = Math.max(0, Math.sin(t * 5)) * .19 * p.happyEyes;
+      body.current.position.y = p.lift * .78 + extraHop * sway - seated * .028;
       body.current.rotation.set(p.pitch * .65, p.yaw * .55, p.roll * .72);
     }
     for (let i = 0; i < 2; i++) {
@@ -136,39 +150,42 @@ export function SuppliedPuff({ action, time, gaitTime, still, held, seatBlend, p
     }
     asset.blink.value = 1 - MathUtils.smoothstep(p.eyeOpen, .16, .80);
     asset.smile.value = Math.max(p.happyEyes, p.mouthOpen);
+    asset.happy.value = p.happyEyes;
 
     const event = breeze.current;
     if (!event.next) event.next = nextBreeze();
     if (!still && !reduced && !held?.current) event.age += dt;
     let phase = !still && !reduced ? event.age - event.next : -1;
-    if (phase >= 6.9) {
-      event.next = event.age + nextBreeze();
+    if (phase >= 7.65) {
+      event.next += nextBreeze();
       phase = -1;
     }
-    const spread = MathUtils.smoothstep(phase, 0, 1.45);
-    const rejoin = MathUtils.smoothstep(phase, 4.65, 6.9);
+    const spread = MathUtils.smoothstep(phase, 0, 2.28);
+    const rejoin = MathUtils.smoothstep(phase, 5.45, 7.65);
     const distance = spread * (1 - rejoin);
-    const size = 1 - distance;
+    const size = 1 - MathUtils.smoothstep(phase, .40, 2.28) * (1 - rejoin);
     const head = asset.head;
-    head.rotation.set(Math.sin(t * 1.57) * .073 * sway, 0, (Math.sin(t * 1.76 - .3) * .10 + p.antenna * .25) * sway);
+    const shake = Math.sin(t * 6.4 - .9) * .36 * p.happyEyes;
+    head.rotation.set((Math.sin(t * 1.57) * .073 + shake * .60) * sway, 0,
+      (Math.sin(t * 1.76 - .3) * .10 + p.antenna * .25 + shake) * sway);
     head.position.y = stem.y + Math.sin(t * 2.05) * .008 * sway;
     for (const [i, part] of asset.crown.entries()) {
       part.joint.visible = size > .015;
-      part.joint.position.set(part.base.x + part.dx * distance * .25,
-        part.base.y + distance * .12 + Math.sin(t * 2.1 - i * .36) * .007 * sway,
-        part.base.z + part.dz * distance * .25);
+      part.joint.position.set(part.base.x + part.dx * distance * .40,
+        part.base.y + distance * .17 + Math.sin(t * 2.1 - i * .36) * .007 * sway,
+        part.base.z + part.dz * distance * .40);
       part.joint.rotation.set(Math.sin(t * 1.68 - i) * .065 * sway + distance * .6, distance * part.dx, distance * part.dz);
       part.joint.scale.setScalar(size);
     }
 
     if (seeds.current) {
-      const fading = MathUtils.smoothstep(phase, 0, .42) * (1 - MathUtils.smoothstep(phase, 1.85, 3.15));
+      const fading = MathUtils.smoothstep(phase, 0, .42) * (1 - MathUtils.smoothstep(phase, 2.85, 4.35));
       seeds.current.visible = fading > .015;
       if (seeds.current.visible) {
-        const travel = MathUtils.smoothstep(phase, 0, 3.1);
+        const travel = MathUtils.smoothstep(phase, 0, 4.35);
         for (let i = 0; i < seedCount; i++) {
           const angle = i * 2.399963;
-          const reach = .12 + (i % 6) * .067;
+          const reach = .27 + (i % 6) * .115;
           seed.position.set(Math.cos(angle) * (.08 + reach * travel),
             .13 + (i % 5) * .02 + travel * (.12 + (i % 4) * .035),
             Math.sin(angle) * (.08 + reach * travel));
