@@ -146,7 +146,10 @@ export function SuppliedBlossomStardust({ id, action, time, gaitTime, still, hel
               float arc = .010*(1.0-pow(clamp(abs(p.x/.029),0.0,1.0),2.0));
               float closed = starOval(p+vec2(0.,arc-.006),vec2(.030,.0044));
               float happy = starOval(p-vec2(0.,arc),vec2(.034,.007));
-              float intent = starOval(vec2(p.x,p.y-(.012-.64*abs(p.x))*side),vec2(.028,.008));
+              // Mirror the chevrons horizontally so both tips point toward the nose.
+              vec2 squeeze = vec2(p.x * side, abs(p.y));
+              float stroke = abs(squeeze.x - (.022 - .92 * squeeze.y));
+              float intent = (1.0-smoothstep(.003,.007,stroke)) * (1.0-smoothstep(.015,.022,squeeze.y));
               float roundEye = starOval(p,vec2(.030,.038));
               return mix(mix(mix(roundEye,closed,starClose),intent,starFocus),happy,starSmile);
             }
