@@ -1,3 +1,4 @@
+import { SuppliedAurora } from "./SuppliedAurora";
 import { SuppliedBlossomStardust } from "./SuppliedBlossomStardust";
 import { SuppliedPuff } from "./SuppliedPuff";
 import { SuppliedWater } from "./SuppliedWater";
@@ -375,6 +376,7 @@ function LegacyCharacter({
 export default function SculptCharacter(props: Parameters<typeof LegacyCharacter>[0] & { floatingStage?: boolean }) {
   const selected = useWorld(s => s.companionId);
   const id = props.companionId || selected;
+  if (id === "aurora" && !props.modelUrl) return <SuppliedAurora {...props} />;
   if ((id === "blossom" || id === "stardust") && !props.modelUrl)
     return <SuppliedBlossomStardust key={id} {...props} id={id} />;
   if (id === "puff" && !props.modelUrl)

@@ -11,7 +11,7 @@ it("has nine distinct silhouettes and validates saved selections", () => {
   expect(companionAvailable("puff")).toBe(true);
   expect(companionAvailable("blossom")).toBe(true);
   expect(companionAvailable("stardust")).toBe(true);
-  expect(companionAvailable("aurora")).toBe(false);
+  expect(companionAvailable("aurora")).toBe(true);
   expect(companionFor("<script>")).toBe(companions[0]);
 });
 it("manual greetings vary without repeating and honor quiet/focus policy", () => {
