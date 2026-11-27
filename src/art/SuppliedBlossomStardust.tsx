@@ -25,17 +25,6 @@ export function SuppliedBlossomStardust({ id, action, time, gaitTime, still, hel
   const concentrate = useRef(0);
   const asset = useMemo(() => {
     const model = scene.clone(true);
-    if (blossom) {
-      for (const [part, side] of [["tripo_part_6", 1], ["tripo_part_3", -1]] as const) {
-        const hand = model.getObjectByName(part);
-        if (!hand) continue;
-        hand.position.x -= .035;
-        hand.position.y -= .045;
-        hand.position.z += side * .052;
-        hand.rotation.x = side * .26;
-        hand.scale.set(1.05,.88,.89);
-      }
-    }
     // The face on the supplied torso is turned slightly to its right.
     const starBody = model.getObjectByName("StarBody");
     if (starBody) starBody.rotation.y = -.27;
@@ -52,8 +41,8 @@ export function SuppliedBlossomStardust({ id, action, time, gaitTime, still, hel
       return joint;
     };
     const arm = blossom ? [
-      pivot("ResidentArmL", [.208,.329,.147], ["tripo_part_6"]),
-      pivot("ResidentArmR", [.208,.329,-.147], ["tripo_part_3"]),
+      pivot("ResidentArmL", [.237,.344,.076], ["tripo_part_6"]),
+      pivot("ResidentArmR", [.237,.338,-.075], ["tripo_part_3"]),
     ] : [
       pivot("ResidentArmL", [-.271,.32,.15], ["StarArmL"]),
       pivot("ResidentArmR", [.271,.32,.15], ["StarArmR"]),
@@ -202,7 +191,7 @@ export function SuppliedBlossomStardust({ id, action, time, gaitTime, still, hel
       const leg = i === 0 ? p.leftLeg : p.rightLeg;
       const lift = i === 0 ? p.leftFootLift : p.rightFootLift;
       if (blossom) {
-        asset.arm[i].rotation.set(side * MathUtils.clamp(p.armRaise,-.14,1.3) * .14,0,arm * .22 + p.armForward * .28);
+        asset.arm[i].rotation.set(side * p.armRaise * .34,0,arm * .52 + p.armForward);
         asset.foot[i].rotation.z = leg * .51;
         asset.foot[i].position.y = .085 + lift * (1-seated);
         asset.eyes[i]?.scale.set(1,Math.max(.12,p.eyeOpen*(1 - p.happyEyes*.59 - concentrate.current*.35)),1);
