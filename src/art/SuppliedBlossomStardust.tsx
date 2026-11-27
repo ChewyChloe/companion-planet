@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, type RefObject } from "react";
 import { useFrame, useLoader } from "@react-three/fiber";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { Box3, Color, Group, MathUtils, Matrix4, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, Vector3 } from "three";
+import { Box3, Color, Group, MathUtils, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, Vector3 } from "three";
 import type { Action } from "../domain";
 import { useWorld } from "../store";
 import { blendPose, neutralPose, poseFor } from "./character-animation";
@@ -28,37 +28,36 @@ export function SuppliedBlossomStardust({ id, action, time, gaitTime, still, hel
     // The face on the supplied torso is turned slightly to its right.
     const starBody = model.getObjectByName("StarBody");
     if (starBody) starBody.rotation.y = -.27;
-    const shapedHands = [];
-    const blossomBody = blossom ? model.getObjectByName("tripo_part_0") : undefined;
-    const bodyInverse = new Matrix4();
-    const handJoins = new Map<Mesh, { handToTorso: { value: Matrix4 }; torsoToHand: { value: Matrix4 } }>();
-    if (blossom) {
-      for (const part of ["tripo_part_6", "tripo_part_3"]) {
-        const hand = model.getObjectByName(part);
-        if (!(hand instanceof Mesh)) continue;
-        const geometry = hand.geometry.clone();
-        const positions = geometry.attributes.position;
-        const normals = geometry.attributes.normal;
-        const normal = new Vector3();
-        // +X faces outward. Sink the upper root into the body and keep the tip full.
-        for (let i = 0; i < positions.count; i++) {
-          const height = MathUtils.clamp((positions.getY(i) + .035) / .10, 0, 1);
-          const round = height * height * (3 - 2 * height);
-          positions.setX(i, positions.getX(i) - .008 - .024 * round);
-          if (normals) {
-            const slope = .024 * 6 * height * (1 - height) / .10;
-            normal.fromBufferAttribute(normals, i);
-            normal.y += normal.x * slope;
-            normal.normalize();
-            normals.setXYZ(i, normal.x, normal.y, normal.z);
-          }
+    const torso = blossom ? model.getObjectByName("tripo_part_0") : undefined;
+    const smoothTorso = torso instanceof Mesh ? torso.geometry.clone() : undefined;
+    if (torso instanceof Mesh && smoothTorso) {
+      const position = smoothTorso.attributes.position;
+      const normals = smoothTorso.attributes.normal;
+      const normal = new Vector3();
+      const profileNormal = new Vector3();
+      for (let i = 0; i < position.count; i++) {
+        const x = position.getX(i);
+        const y = position.getY(i);
+        const z = position.getZ(i);
+        // Feather a fitted belly profile into the original torso around both hand impressions.
+        const radius = Math.hypot((y + .052) / .145, z / .256);
+        const weight = MathUtils.smoothstep(x,.12,.19) * (1 - MathUtils.smoothstep(radius,.60,1));
+        if (weight === 0) continue;
+        const profileX = .2344 - .1113*y - .0031*z - 1.1503*y*y + .0195*y*z - 1.3367*z*z;
+        position.setX(i, MathUtils.lerp(x,profileX,weight));
+        if (normals) {
+          profileNormal.set(1,.1113 + 2.3006*y - .0195*z,.0031 + 2.6734*z - .0195*y).normalize();
+          normal.fromBufferAttribute(normals,i).lerp(profileNormal,weight).normalize();
+          normals.setXYZ(i,normal.x,normal.y,normal.z);
         }
-        geometry.computeBoundingBox();
-        geometry.computeBoundingSphere();
-        hand.geometry = geometry;
-        shapedHands.push(geometry);
-        handJoins.set(hand, { handToTorso: { value: new Matrix4() }, torsoToHand: { value: new Matrix4() } });
       }
+      smoothTorso.computeBoundingBox();
+      smoothTorso.computeBoundingSphere();
+      torso.geometry = smoothTorso;
+    }
+    if (blossom) {
+      model.getObjectByName("tripo_part_3")?.removeFromParent();
+      model.getObjectByName("tripo_part_6")?.removeFromParent();
     }
     const bounds = new Box3().setFromObject(model);
     const pivot = (name: string, point: [number, number, number], parts: string[]) => {
@@ -98,9 +97,7 @@ export function SuppliedBlossomStardust({ id, action, time, gaitTime, still, hel
       const source = object.material;
       const pinkParts: Record<string, string> = {
         tripo_part_0: "#f3a9be",
-        tripo_part_3: "#f3a9be",
         tripo_part_4: "#f3a9be",
-        tripo_part_6: "#f3a9be",
         tripo_part_7: "#f3a9be",
       };
       const pink = blossom ? pinkParts[object.name] : undefined;
@@ -111,36 +108,6 @@ export function SuppliedBlossomStardust({ id, action, time, gaitTime, still, hel
         side: source.side, metalness: 0, roughness: blossom ? .35 : .42,
         clearcoat: .60, clearcoatRoughness: .27, ior: 1.38,
       });
-      const join = handJoins.get(object);
-      if (join) {
-        gel.onBeforeCompile = shader => {
-          Object.assign(shader.uniforms, join);
-          shader.vertexShader = `
-            uniform mat4 handToTorso;
-            uniform mat4 torsoToHand;
-            varying vec3 torsoNormalAtHand;
-            varying float handClearance;
-          ` + shader.vertexShader.replace("#include <begin_vertex>", `
-            #include <begin_vertex>
-            // Local quadratic fit of the supplied torso across the hands' range.
-            vec3 torso = (handToTorso * vec4(position,1.0)).xyz;
-            float y = torso.y;
-            float z = torso.z;
-            float frontSurface = .2344 - .1113*y - .0031*z - 1.1503*y*y + .0195*y*z - 1.3367*z*z;
-            vec3 torsoNormal = normalize(vec3(1.0,.1113+2.3006*y-.0195*z,.0031+2.6734*z-.0195*y));
-            torsoNormalAtHand = normalMatrix * mat3(torsoToHand) * torsoNormal;
-            handClearance = torso.x - frontSurface;
-          `);
-          shader.fragmentShader = "varying vec3 torsoNormalAtHand;\nvarying float handClearance;\n" +
-            shader.fragmentShader.replace("#include <normal_fragment_begin>", `
-              #include <normal_fragment_begin>
-              float handRoundness = smoothstep(.007,.061,handClearance);
-              normal = normalize(mix(normalize(torsoNormalAtHand),normal,handRoundness));
-              nonPerturbedNormal = normal;
-            `);
-        };
-        gel.customProgramCacheKey = () => "blossom-hand-contact";
-      }
       if (blossom && object.name === "tripo_part_1") {
         gel.map = null;
         gel.normalMap = null;
@@ -237,24 +204,15 @@ export function SuppliedBlossomStardust({ id, action, time, gaitTime, still, hel
         gel.customProgramCacheKey = () => "stardust-gold-expressions";
       }
       object.material = gel;
-      object.castShadow = !join;
+      object.castShadow = true;
       materials.push(gel);
     });
-    if (blossomBody) {
-      blossomBody.updateWorldMatrix(true,false);
-      bodyInverse.copy(blossomBody.matrixWorld).invert();
-      for (const [hand,join] of handJoins) {
-        hand.updateWorldMatrix(true,false);
-        join.handToTorso.value.multiplyMatrices(bodyInverse,hand.matrixWorld);
-        join.torsoToHand.value.copy(join.handToTorso.value).invert();
-      }
-    }
-    return { model, arm, foot, head, wings, eyes, mouth, expression, materials, shapedHands,
+    return { model, arm, foot, head, wings, eyes, mouth, expression, materials, smoothTorso,
       center: bounds.getCenter(new Vector3()), floor: bounds.min.y, scale: 1.42 / bounds.getSize(new Vector3()).y };
   }, [scene, blossom]);
   useEffect(() => () => {
     asset.materials.forEach(material => material.dispose());
-    asset.shapedHands.forEach(geometry => geometry.dispose());
+    asset.smoothTorso?.dispose();
   }, [asset]);
 
   useFrame(({ gl }, delta) => {
