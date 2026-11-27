@@ -174,6 +174,7 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
   const next = useMemo(() => new THREE.Vector3(), []);
   useFrame((_state, delta) => {
     const state = useWorld.getState();
+    const floating = state.companionId === "aurora";
     if (!pet && worldRevision.current !== collisionRevision()) {
       worldRevision.current = collisionRevision();
       const [x,z]=safeDrop(position.current.x,position.current.z);
@@ -263,7 +264,8 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
     if (!pet && !held.current && distance > (strolling ? .07 : .001)) {
       waypoint(position.current, target.current, next, action.current === "read" || seatBlend.current > .02);
       const previousSpeed = groundSpeed.current;
-      groundSpeed.current = advanceWalkingSpeed(previousSpeed, strolling ? .42 : .82, distance, motionDt);
+      const cruiseSpeed = floating ? (strolling ? .57 : .97) : (strolling ? .42 : .82);
+      groundSpeed.current = advanceWalkingSpeed(previousSpeed, cruiseSpeed, distance, motionDt);
       const step = (previousSpeed + groundSpeed.current) * .5 * motionDt;
       position.current.lerp(next, Math.min(1, step / Math.max(.001, position.current.distanceTo(next))));
     } else {
@@ -313,8 +315,12 @@ function Character({ pet, onClick }: { pet: boolean; onClick: () => void }) {
         if (!seating || seatDistance>1.8) resolveBodyContact(state.planetId,root.current.position);
         position.current.x=root.current.position.x;
         position.current.z=root.current.position.z;
-        groundNormal(position.current.x, position.current.z, normal);
-        normal.lerp(up, seatBlend.current).normalize();
+        if (floating) {
+          normal.copy(up);
+        } else {
+          groundNormal(position.current.x, position.current.z, normal);
+          normal.lerp(up, seatBlend.current).normalize();
+        }
         supportRotation.setFromUnitVectors(up, normal);
         root.current.quaternion.slerp(supportRotation, 1-Math.exp(-8*motionDt));
         gl.domElement.dataset.supportTilt = THREE.MathUtils.radToDeg(root.current.quaternion.angleTo(levelRotation)).toFixed(3);

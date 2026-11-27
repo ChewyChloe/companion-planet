@@ -16,7 +16,7 @@ export function SuppliedAurora({ action, time, poseTime, still, held }: {
   still?: boolean;
   held?: RefObject<boolean>;
 }) {
-  const { scene } = useLoader(GLTFLoader, import.meta.env.BASE_URL + path);
+  const { scene } = useLoader(GLTFLoader, import.meta.env.BASE_URL + path + "?v=2");
   const actor = useRef<Group>(null);
   const posture = useRef({ ...neutralPose });
   const asset = useMemo(() => {
@@ -41,9 +41,11 @@ export function SuppliedAurora({ action, time, poseTime, still, held }: {
         sheenColor: "#b4d8ff",
         sheenRoughness: .57,
       });
+      const patchRearSpeck = object.name === "tripo_part_1" || object.name === "tripo_part_2";
       material.onBeforeCompile = shader => {
         Object.assign(shader.uniforms, motion);
         shader.vertexShader = `
+          varying vec3 auroraSurface;
           uniform float auroraTime;
           uniform float auroraFlow;
           uniform float auroraClose;
@@ -53,6 +55,7 @@ export function SuppliedAurora({ action, time, poseTime, still, held }: {
           }
         ` + shader.vertexShader.replace("#include <begin_vertex>", `
           #include <begin_vertex>
+          auroraSurface = position;
           // Use the same motion field for all exported parts so shared edges travel together.
           float ribbon = smoothstep(.20,.47,abs(position.x));
           float tail = 1.0-smoothstep(.025,.29,position.y);
@@ -74,12 +77,24 @@ export function SuppliedAurora({ action, time, poseTime, still, held }: {
           float smile = auroraSmile*front*auroraWeight(position.xy,smileCenter,vec2(.039,.034));
           transformed.xy += smile*(position.xy-smileCenter)*vec2(.38,.25);
         `);
+        if (patchRearSpeck) {
+          shader.fragmentShader = "varying vec3 auroraSurface;\n" + shader.fragmentShader.replace("#include <map_fragment>", `
+            #include <map_fragment>
+            // The source atlas has an extra dark-blue eye-shaped mark on the back.
+            vec2 speck = (auroraSurface.xy - vec2(-.136,.664))/vec2(.045,.048);
+            float rear = 1.0-smoothstep(-.09,-.055,auroraSurface.z);
+            float repair = rear * (1.0-smoothstep(.72,1.0,length(speck)));
+            float darkBlue = 1.0-smoothstep(.16,.39,diffuseColor.r);
+            vec3 violet = vec3(.415,.264,.908) + speck.y*vec3(.022,.017,.009);
+            diffuseColor.rgb = mix(diffuseColor.rgb,violet,repair*darkBlue);
+          `);
+        }
         shader.fragmentShader = shader.fragmentShader.replace("#include <emissivemap_fragment>", `
           #include <emissivemap_fragment>
           totalEmissiveRadiance += diffuseColor.rgb * .16;
         `);
       };
-      material.customProgramCacheKey = () => "aurora-flow-and-expressions";
+      material.customProgramCacheKey = () => patchRearSpeck ? "aurora-clean-rear" : "aurora-flow-and-expressions";
       object.material = material;
       materials.push(material);
     });
