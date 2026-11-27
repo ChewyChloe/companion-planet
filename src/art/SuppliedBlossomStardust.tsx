@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, type RefObject } from "react";
 import { useFrame, useLoader } from "@react-three/fiber";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { Box3, Color, Group, MathUtils, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, Vector3 } from "three";
+import { Box3, Color, Group, MathUtils, Matrix4, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, Vector3 } from "three";
 import type { Action } from "../domain";
 import { useWorld } from "../store";
 import { blendPose, neutralPose, poseFor } from "./character-animation";
@@ -28,6 +28,38 @@ export function SuppliedBlossomStardust({ id, action, time, gaitTime, still, hel
     // The face on the supplied torso is turned slightly to its right.
     const starBody = model.getObjectByName("StarBody");
     if (starBody) starBody.rotation.y = -.27;
+    const shapedHands = [];
+    const blossomBody = blossom ? model.getObjectByName("tripo_part_0") : undefined;
+    const bodyInverse = new Matrix4();
+    const handJoins = new Map<Mesh, { handToTorso: { value: Matrix4 }; torsoToHand: { value: Matrix4 } }>();
+    if (blossom) {
+      for (const part of ["tripo_part_6", "tripo_part_3"]) {
+        const hand = model.getObjectByName(part);
+        if (!(hand instanceof Mesh)) continue;
+        const geometry = hand.geometry.clone();
+        const positions = geometry.attributes.position;
+        const normals = geometry.attributes.normal;
+        const normal = new Vector3();
+        // +X faces outward. Sink the upper root into the body and keep the tip full.
+        for (let i = 0; i < positions.count; i++) {
+          const height = MathUtils.clamp((positions.getY(i) + .035) / .10, 0, 1);
+          const round = height * height * (3 - 2 * height);
+          positions.setX(i, positions.getX(i) - .008 - .024 * round);
+          if (normals) {
+            const slope = .024 * 6 * height * (1 - height) / .10;
+            normal.fromBufferAttribute(normals, i);
+            normal.y += normal.x * slope;
+            normal.normalize();
+            normals.setXYZ(i, normal.x, normal.y, normal.z);
+          }
+        }
+        geometry.computeBoundingBox();
+        geometry.computeBoundingSphere();
+        hand.geometry = geometry;
+        shapedHands.push(geometry);
+        handJoins.set(hand, { handToTorso: { value: new Matrix4() }, torsoToHand: { value: new Matrix4() } });
+      }
+    }
     const bounds = new Box3().setFromObject(model);
     const pivot = (name: string, point: [number, number, number], parts: string[]) => {
       const joint = new Group();
@@ -40,10 +72,7 @@ export function SuppliedBlossomStardust({ id, action, time, gaitTime, still, hel
       }
       return joint;
     };
-    const arm = blossom ? [
-      pivot("ResidentArmL", [.237,.344,.076], ["tripo_part_6"]),
-      pivot("ResidentArmR", [.237,.338,-.075], ["tripo_part_3"]),
-    ] : [
+    const arm = blossom ? [] : [
       pivot("ResidentArmL", [-.271,.32,.15], ["StarArmL"]),
       pivot("ResidentArmR", [.271,.32,.15], ["StarArmR"]),
     ];
@@ -82,6 +111,53 @@ export function SuppliedBlossomStardust({ id, action, time, gaitTime, still, hel
         side: source.side, metalness: 0, roughness: blossom ? .35 : .42,
         clearcoat: .60, clearcoatRoughness: .27, ior: 1.38,
       });
+      const join = handJoins.get(object);
+      if (join) {
+        gel.onBeforeCompile = shader => {
+          Object.assign(shader.uniforms, join);
+          shader.vertexShader = `
+            uniform mat4 handToTorso;
+            uniform mat4 torsoToHand;
+            varying vec3 torsoNormalAtHand;
+            varying float handClearance;
+          ` + shader.vertexShader.replace("#include <begin_vertex>", `
+            #include <begin_vertex>
+            // Local quadratic fit of the supplied torso across the hands' range.
+            vec3 torso = (handToTorso * vec4(position,1.0)).xyz;
+            float y = torso.y;
+            float z = torso.z;
+            float frontSurface = .2344 - .1113*y - .0031*z - 1.1503*y*y + .0195*y*z - 1.3367*z*z;
+            vec3 torsoNormal = normalize(vec3(1.0,.1113+2.3006*y-.0195*z,.0031+2.6734*z-.0195*y));
+            torsoNormalAtHand = normalMatrix * mat3(torsoToHand) * torsoNormal;
+            handClearance = torso.x - frontSurface;
+          `);
+          shader.fragmentShader = "varying vec3 torsoNormalAtHand;\nvarying float handClearance;\n" +
+            shader.fragmentShader.replace("#include <normal_fragment_begin>", `
+              #include <normal_fragment_begin>
+              float handRoundness = smoothstep(.007,.061,handClearance);
+              normal = normalize(mix(normalize(torsoNormalAtHand),normal,handRoundness));
+              nonPerturbedNormal = normal;
+            `);
+        };
+        gel.customProgramCacheKey = () => "blossom-hand-contact";
+      }
+      if (blossom && object.name === "tripo_part_1") {
+        gel.map = null;
+        gel.normalMap = null;
+        gel.roughness = .46;
+        gel.clearcoat = .30;
+        gel.onBeforeCompile = shader => {
+          shader.vertexShader = "varying float petalHeight;\n" + shader.vertexShader.replace(
+            "#include <begin_vertex>", "#include <begin_vertex>\npetalHeight = position.y;");
+          shader.fragmentShader = "varying float petalHeight;\n" + shader.fragmentShader.replace(
+            "#include <map_fragment>", `
+            #include <map_fragment>
+            float tip = smoothstep(-.135,.115,petalHeight);
+            diffuseColor.rgb *= mix(vec3(1.,.61,.56),vec3(.89,.31,.43),tip);
+          `);
+        };
+        gel.customProgramCacheKey = () => "blossom-petal-gradient";
+      }
       if (blossom && object.name === "tripo_part_0") {
         gel.onBeforeCompile = shader => {
           shader.vertexShader = "varying vec3 blossomSurface;\n" + shader.vertexShader.replace(
@@ -161,13 +237,25 @@ export function SuppliedBlossomStardust({ id, action, time, gaitTime, still, hel
         gel.customProgramCacheKey = () => "stardust-gold-expressions";
       }
       object.material = gel;
-      object.castShadow = true;
+      object.castShadow = !join;
       materials.push(gel);
     });
-    return { model, arm, foot, head, wings, eyes, mouth, expression, materials,
+    if (blossomBody) {
+      blossomBody.updateWorldMatrix(true,false);
+      bodyInverse.copy(blossomBody.matrixWorld).invert();
+      for (const [hand,join] of handJoins) {
+        hand.updateWorldMatrix(true,false);
+        join.handToTorso.value.multiplyMatrices(bodyInverse,hand.matrixWorld);
+        join.torsoToHand.value.copy(join.handToTorso.value).invert();
+      }
+    }
+    return { model, arm, foot, head, wings, eyes, mouth, expression, materials, shapedHands,
       center: bounds.getCenter(new Vector3()), floor: bounds.min.y, scale: 1.42 / bounds.getSize(new Vector3()).y };
   }, [scene, blossom]);
-  useEffect(() => () => asset.materials.forEach(material => material.dispose()), [asset]);
+  useEffect(() => () => {
+    asset.materials.forEach(material => material.dispose());
+    asset.shapedHands.forEach(geometry => geometry.dispose());
+  }, [asset]);
 
   useFrame(({ gl }, delta) => {
     const dt = Math.min(delta, .08);
@@ -191,7 +279,6 @@ export function SuppliedBlossomStardust({ id, action, time, gaitTime, still, hel
       const leg = i === 0 ? p.leftLeg : p.rightLeg;
       const lift = i === 0 ? p.leftFootLift : p.rightFootLift;
       if (blossom) {
-        asset.arm[i].rotation.set(side * p.armRaise * .34,0,arm * .52 + p.armForward);
         asset.foot[i].rotation.z = leg * .51;
         asset.foot[i].position.y = .085 + lift * (1-seated);
         asset.eyes[i]?.scale.set(1,Math.max(.12,p.eyeOpen*(1 - p.happyEyes*.59 - concentrate.current*.35)),1);
