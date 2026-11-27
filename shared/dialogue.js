@@ -7,7 +7,7 @@ export const companionNames = Object.freeze({
   mushroom: "菇菇獸",
   aurora: "極光仔",
   blossom: "花苞寶",
-  stardust: "星塵獸",
+  stardust: "星塵仔",
   water: "水球仔",
   puff: "蓬蓬仔",
 });
