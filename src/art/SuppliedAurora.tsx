@@ -7,6 +7,7 @@ import { useWorld } from "../store";
 import { blendPose, neutralPose, poseFor } from "./character-animation";
 
 const path = "models/user-residents/aurora.glb";
+const hoverHeight = .24;
 
 export function SuppliedAurora({ action, time, poseTime, still, held }: {
   action: Action;
@@ -94,6 +95,7 @@ export function SuppliedAurora({ action, time, poseTime, still, held }: {
     const { reduced, timer } = useWorld.getState();
     const focus = active === "read" || (active === "idle" && timer.running && timer.phase === "focus");
     const resting = active === "rest";
+    const gliding = active === "walk" || active === "approach" || active === "return";
     const energy = still || held?.current ? 0 : reduced ? .38 : 1;
     const flow = energy * (resting ? .36 : focus ? .55 : 1 + pose.happyEyes * .45);
     const { auroraTime, auroraFlow, auroraClose, auroraSmile } = asset.motion;
@@ -103,10 +105,15 @@ export function SuppliedAurora({ action, time, poseTime, still, held }: {
     auroraClose.value = MathUtils.damp(auroraClose.value, eyeClose, 21, delta);
     auroraSmile.value = pose.happyEyes;
     if (actor.current) {
-      const target = resting ? .022 : .065 + Math.sin(t * 2.2) * .028 * energy + pose.lift * .56;
-      actor.current.position.y = MathUtils.damp(actor.current.position.y, target, 9, delta);
+      const height = resting ? .17 : gliding ? .31 : hoverHeight;
+      const sway = Math.sin(t * 1.75) * (resting ? .015 : .036) * energy;
+      const celebration = active === "happy" ? pose.lift * .34 * energy : 0;
+      actor.current.position.y = MathUtils.damp(actor.current.position.y, height + sway + celebration, 6, delta);
       actor.current.scale.y = pose.scaleY;
-      actor.current.rotation.set(pose.pitch * .7, pose.yaw * .85, pose.roll + .027 * flow * Math.sin(t * 1.7));
+      const pitch = gliding ? .085 * energy : pose.pitch * .7;
+      actor.current.rotation.x = MathUtils.damp(actor.current.rotation.x,pitch,8,delta);
+      actor.current.rotation.y = pose.yaw * .85;
+      actor.current.rotation.z = (gliding ? 0 : pose.roll) + .027 * flow * Math.sin(t * 1.7);
     }
     gl.domElement.dataset.modelReady = "user-aurora";
     gl.domElement.dataset.modelPath = path;
@@ -114,7 +121,7 @@ export function SuppliedAurora({ action, time, poseTime, still, held }: {
   });
 
   return (
-    <group ref={actor} name="SuppliedAurora">
+    <group ref={actor} name="SuppliedAurora" position-y={hoverHeight}>
       <group scale={asset.scale}>
         <primitive object={asset.model} position={[-asset.center.x, -asset.floor, -asset.center.z]} />
       </group>
