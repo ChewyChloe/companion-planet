@@ -8,6 +8,7 @@ it("has nine distinct silhouettes and validates saved selections", () => {
   expect(companions.slice(0, 3).map(companion => companion.id)).toEqual(["nebula", "fern", "sprout"]);
   expect(companionAvailable("sprout")).toBe(true);
   expect(companionAvailable("mushroom")).toBe(true);
+  expect(companionAvailable("puff")).toBe(true);
   expect(companionAvailable("aurora")).toBe(false);
   expect(companionFor("<script>")).toBe(companions[0]);
 });
