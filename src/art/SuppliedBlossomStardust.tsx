@@ -19,12 +19,23 @@ export function SuppliedBlossomStardust({ id, action, time, gaitTime, still, hel
 }) {
   const blossom = id === "blossom";
   const path = `models/user-residents/${id}.glb`;
-  const { scene } = useLoader(GLTFLoader, import.meta.env.BASE_URL + path);
+  const { scene } = useLoader(GLTFLoader, import.meta.env.BASE_URL + path + (blossom ? "" : "?v=2"));
   const actor = useRef<Group>(null);
   const pose = useRef({ ...neutralPose });
   const concentrate = useRef(0);
   const asset = useMemo(() => {
     const model = scene.clone(true);
+    if (blossom) {
+      for (const [part, side] of [["tripo_part_6", 1], ["tripo_part_3", -1]] as const) {
+        const hand = model.getObjectByName(part);
+        if (!hand) continue;
+        hand.position.x -= .035;
+        hand.position.y -= .045;
+        hand.position.z += side * .052;
+        hand.rotation.x = side * .26;
+        hand.scale.set(1.05,.88,.89);
+      }
+    }
     const bounds = new Box3().setFromObject(model);
     const pivot = (name: string, point: [number, number, number], parts: string[]) => {
       const joint = new Group();
@@ -38,8 +49,8 @@ export function SuppliedBlossomStardust({ id, action, time, gaitTime, still, hel
       return joint;
     };
     const arm = blossom ? [
-      pivot("ResidentArmL", [.237,.344,.076], ["tripo_part_6"]),
-      pivot("ResidentArmR", [.237,.338,-.075], ["tripo_part_3"]),
+      pivot("ResidentArmL", [.208,.329,.147], ["tripo_part_6"]),
+      pivot("ResidentArmR", [.208,.329,-.147], ["tripo_part_3"]),
     ] : [
       pivot("ResidentArmL", [-.253,.36,.13], ["StarArmL"]),
       pivot("ResidentArmR", [.253,.36,.13], ["StarArmR"]),
@@ -93,6 +104,22 @@ export function SuppliedBlossomStardust({ id, action, time, gaitTime, still, hel
         };
         gel.customProgramCacheKey = () => "blossom-cheeks";
       }
+      if (object.name === "StarHood") {
+        gel.roughness = .31;
+        gel.onBeforeCompile = shader => {
+          shader.vertexShader = "varying float hoodHeight;\n" + shader.vertexShader.replace(
+            "#include <begin_vertex>", "#include <begin_vertex>\nhoodHeight = position.y;");
+          shader.fragmentShader = "varying float hoodHeight;\n" + shader.fragmentShader.replace(
+            "#include <map_fragment>", `
+            #include <map_fragment>
+            float cape = 1.0-smoothstep(.71,.83,hoodHeight);
+            vec3 lavender = vec3(.19,.31,.58);
+            float star = smoothstep(.32,.75,max(diffuseColor.r,diffuseColor.g));
+            diffuseColor.rgb = mix(diffuseColor.rgb, mix(diffuseColor.rgb*.43+lavender,vec3(.66,.80,.96),star),cape);
+          `);
+        };
+        gel.customProgramCacheKey = () => "stardust-periwinkle-cape";
+      }
       if (object.name === "StarBody") {
         gel.onBeforeCompile = shader => {
           Object.assign(shader.uniforms, expression);
@@ -116,10 +143,13 @@ export function SuppliedBlossomStardust({ id, action, time, gaitTime, still, hel
             }
           ` + shader.fragmentShader.replace("#include <map_fragment>", `
             #include <map_fragment>
+            float belt = 1.0-smoothstep(.154,.164,starSurface.y);
+            float piping = smoothstep(.136,.147,starSurface.y);
+            diffuseColor.rgb = mix(diffuseColor.rgb,vec3(.09,.12,.24)+piping*.050,belt*.94);
             vec2 at = starSurface.xy;
             float front = smoothstep(.06,.14,starSurface.z);
-            float starEyes = front * max(starEye(at-vec2(-.068,.413),1.0),starEye(at-vec2(.197,.420),-1.0));
-            float starMouth = front * starOval(at-vec2(.072,.377), vec2(.030,mix(.006,.014,starSmile)));
+            float starEyes = front * max(starEye(at-vec2(-.110,.408),1.0),starEye(at-vec2(.123,.408),-1.0));
+            float starMouth = front * starOval(at-vec2(.007,.365), vec2(.030,mix(.006,.014,starSmile)));
             float starFace = max(starEyes,starMouth);
             diffuseColor.rgb = mix(diffuseColor.rgb,vec3(1.,.71,.35),starFace);
           `).replace("#include <emissivemap_fragment>", `
@@ -160,17 +190,17 @@ export function SuppliedBlossomStardust({ id, action, time, gaitTime, still, hel
       const leg = i === 0 ? p.leftLeg : p.rightLeg;
       const lift = i === 0 ? p.leftFootLift : p.rightFootLift;
       if (blossom) {
-        asset.arm[i].rotation.set(side * p.armRaise * .34,0,arm * .52 + p.armForward);
+        asset.arm[i].rotation.set(side * MathUtils.clamp(p.armRaise,-.14,1.3) * .14,0,arm * .22 + p.armForward * .28);
         asset.foot[i].rotation.z = leg * .51;
         asset.foot[i].position.y = .085 + lift * (1-seated);
         asset.eyes[i]?.scale.set(1,Math.max(.12,p.eyeOpen*(1 - p.happyEyes*.59 - concentrate.current*.35)),1);
         const eye = asset.eyes[i];
         if (eye) eye.rotation.x = (concentrate.current - p.happyEyes) * side * .38;
       } else {
-        asset.arm[i].rotation.set(arm * .65 - p.armForward,0,side * p.armRaise * .56);
+        asset.arm[i].rotation.set(arm * .31 - p.armForward * .55,0,side * p.armRaise * .25);
         asset.foot[i].rotation.x = leg * .55 - seated * .16;
         asset.foot[i].position.y = .104 + lift * (1-seated);
-        asset.wings[i].rotation.set((Math.sin(t*2.8 - i*.25) * .052 + p.happyEyes*Math.sin(t*9)*.25) * energy,
+        asset.wings[i].rotation.set((Math.sin(t*2.8 - i*.25) * .052 + p.happyEyes*Math.sin(t*7)*.13) * energy,
           side * (p.happyEyes *.14 + Math.sin(t*2.4)*.043*energy),side * p.happyEyes*.14);
       }
     }
